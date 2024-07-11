@@ -1,6 +1,18 @@
-import "@/styles/globals.css";
-import type { AppProps } from "next/app";
+// pages/_app.tsx
+import React from 'react';
+import { ThemeProvider } from './ThemeContext'; 
+import { CssBaseline } from '@mui/material'; 
+import '../styles/globals.css'
 
-export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+import type { AppProps } from 'next/app';
+
+function MyApp({ Component, pageProps }: AppProps) {
+    return (
+        <ThemeProvider>
+            <CssBaseline /> {/* Apply baseline CSS reset */}
+            <Component {...pageProps} />
+        </ThemeProvider>
+    );
 }
+
+export default MyApp;

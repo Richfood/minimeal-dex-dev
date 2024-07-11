@@ -1,107 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&display=swap');
+
+@font-face {
+  font-family: 'Futura Bk BT';
+  src: url('/fonts/FuturaBT-Book.eot');
+  src: url('/fonts/FuturaBT-Book.eot?#iefix') format('embedded-opentype'),
+      url('/fonts/FuturaBT-Book.woff2') format('woff2'),
+      url('/fonts/FuturaBT-Book.woff') format('woff'),
+      url('/fonts/FuturaBT-Book.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Futura Md BT';
+  src: url('/fonts/FuturaBT-Medium.eot');
+  src: url('/fonts/FuturaBT-Medium.eot?#iefix') format('embedded-opentype'),
+      url('/fonts/FuturaBT-Medium.woff2') format('woff2'),
+      url('/fonts/FuturaBT-Medium.woff') format('woff'),
+      url('/fonts/FuturaBT-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Futura Hv BT';
+  src: url('/fonts/FuturaBT-Heavy.eot');
+  src: url('/fonts/FuturaBT-Heavy.eot?#iefix') format('embedded-opentype'),
+      url('/fonts/FuturaBT-Heavy.woff2') format('woff2'),
+      url('/fonts/FuturaBT-Heavy.woff') format('woff'),
+      url('/fonts/FuturaBT-Heavy.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: "Epilogue", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
 :root {
-  --max-width: 1100px;
-  --border-radius: 12px;
-  --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
-    "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
-    "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
-
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-
-  --primary-glow: conic-gradient(
-    from 180deg at 50% 50%,
-    #16abff33 0deg,
-    #0885ff33 55deg,
-    #54d6ff33 120deg,
-    #0071ff33 160deg,
-    transparent 360deg
-  );
-  --secondary-glow: radial-gradient(
-    rgba(255, 255, 255, 1),
-    rgba(255, 255, 255, 0)
-  );
-
-  --tile-start-rgb: 239, 245, 249;
-  --tile-end-rgb: 228, 232, 233;
-  --tile-border: conic-gradient(
-    #00000080,
-    #00000040,
-    #00000030,
-    #00000020,
-    #00000010,
-    #00000010,
-    #00000080
-  );
-
-  --callout-rgb: 238, 240, 241;
-  --callout-border-rgb: 172, 175, 176;
-  --card-rgb: 180, 185, 188;
-  --card-border-rgb: 131, 134, 135;
+  --primary: #173D3D;
+  --white: #ffffff;
+  --black: #000000;
+  --secondary: #F6B41B;
+  --light_clr: #F7F0DF;
+  --creame_clr: #D1AC70;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-
-    --primary-glow: radial-gradient(rgba(1, 65, 255, 0.4), rgba(1, 65, 255, 0));
-    --secondary-glow: linear-gradient(
-      to bottom right,
-      rgba(1, 65, 255, 0),
-      rgba(1, 65, 255, 0),
-      rgba(1, 65, 255, 0.3)
-    );
-
-    --tile-start-rgb: 2, 13, 46;
-    --tile-end-rgb: 2, 5, 19;
-    --tile-border: conic-gradient(
-      #ffffff80,
-      #ffffff40,
-      #ffffff30,
-      #ffffff20,
-      #ffffff10,
-      #ffffff10,
-      #ffffff80
-    );
-
-    --callout-rgb: 20, 20, 20;
-    --callout-border-rgb: 108, 108, 108;
-    --card-rgb: 100, 100, 100;
-    --card-border-rgb: 200, 200, 200;
-  }
+h1 {
+  font-size: 32px;
+  font-weight: 900;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+body.dark-mode .swap_graph_box {
+  background: var(--primary);
+  color: var(--white);
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+
+
+.swap_graph_sec {
+  padding-top: 50px;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+.swap_graph_box {
+  padding: 30px;
+  background: var(--white);
+  border-radius: 20px;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.toolbar-button {
+  background: var(--light_clr);
+  display: inline-block;
+  border-radius: 30px;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.toolbar-button button {
+  background: unset;
+  border: unset;
+  padding: 5px;
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 14px;
+  padding: 10px 15px;
+}
+
+.toolbar-button button.active {
+  background: var(--primary);
+  border-radius: 30px;
+  color: var(--white);
+}
+
+.chart_title svg,.chart_resize svg {
+  fill: var(--creame_clr);
+  width: 21px;
+  height: 21px;
+  cursor: pointer;
 }

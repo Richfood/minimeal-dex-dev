@@ -1,0 +1,156 @@
+@font-face {
+    font-family: 'Futura XBlk BT';
+    src: url('FuturaBT-ExtraBlack.eot');
+    src: url('FuturaBT-ExtraBlack.eot?#iefix') format('embedded-opentype'),
+        url('FuturaBT-ExtraBlack.woff2') format('woff2'),
+        url('FuturaBT-ExtraBlack.woff') format('woff'),
+        url('FuturaBT-ExtraBlack.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Futura Lt BT';
+    src: url('FuturaBT-Light.eot');
+    src: url('FuturaBT-Light.eot?#iefix') format('embedded-opentype'),
+        url('FuturaBT-Light.woff2') format('woff2'),
+        url('FuturaBT-Light.woff') format('woff'),
+        url('FuturaBT-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Futura Md BT';
+    src: url('FuturaBT-Medium.eot');
+    src: url('FuturaBT-Medium.eot?#iefix') format('embedded-opentype'),
+        url('FuturaBT-Medium.woff2') format('woff2'),
+        url('FuturaBT-Medium.woff') format('woff'),
+        url('FuturaBT-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Futura LtCn BT';
+    src: url('FuturaBT-LightCondensed.eot');
+    src: url('FuturaBT-LightCondensed.eot?#iefix') format('embedded-opentype'),
+        url('FuturaBT-LightCondensed.woff2') format('woff2'),
+        url('FuturaBT-LightCondensed.woff') format('woff'),
+        url('FuturaBT-LightCondensed.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Futura Hv BT';
+    src: url('FuturaBT-Heavy.eot');
+    src: url('FuturaBT-Heavy.eot?#iefix') format('embedded-opentype'),
+        url('FuturaBT-Heavy.woff2') format('woff2'),
+        url('FuturaBT-Heavy.woff') format('woff'),
+        url('FuturaBT-Heavy.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Futura MdCn BT';
+    src: url('FuturaBT-MediumCondensed.eot');
+    src: url('FuturaBT-MediumCondensed.eot?#iefix') format('embedded-opentype'),
+        url('FuturaBT-MediumCondensed.woff2') format('woff2'),
+        url('FuturaBT-MediumCondensed.woff') format('woff'),
+        url('FuturaBT-MediumCondensed.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Futura';
+    src: url('Futura-CondensedLight.eot');
+    src: url('Futura-CondensedLight.eot?#iefix') format('embedded-opentype'),
+        url('Futura-CondensedLight.woff2') format('woff2'),
+        url('Futura-CondensedLight.woff') format('woff'),
+        url('Futura-CondensedLight.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Futura XBlk BT';
+    src: url('FuturaBT-ExtraBlack_1.eot');
+    src: url('FuturaBT-ExtraBlack_1.eot?#iefix') format('embedded-opentype'),
+        url('FuturaBT-ExtraBlack_1.woff2') format('woff2'),
+        url('FuturaBT-ExtraBlack_1.woff') format('woff'),
+        url('FuturaBT-ExtraBlack_1.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Futura Bk BT';
+    src: url('FuturaBT-Book.eot');
+    src: url('FuturaBT-Book.eot?#iefix') format('embedded-opentype'),
+        url('FuturaBT-Book.woff2') format('woff2'),
+        url('FuturaBT-Book.woff') format('woff'),
+        url('FuturaBT-Book.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Futura';
+    src: url('Futura-Bold.eot');
+    src: url('Futura-Bold.eot?#iefix') format('embedded-opentype'),
+        url('Futura-Bold.woff2') format('woff2'),
+        url('Futura-Bold.woff') format('woff'),
+        url('Futura-Bold.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Futura';
+    src: url('Futura-Black-Bold.eot');
+    src: url('Futura-Black-Bold.eot?#iefix') format('embedded-opentype'),
+        url('Futura-Black-Bold.woff2') format('woff2'),
+        url('Futura-Black-Bold.woff') format('woff'),
+        url('Futura-Black-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Futura';
+    src: url('Futura-Bold_1.eot');
+    src: url('Futura-Bold_1.eot?#iefix') format('embedded-opentype'),
+        url('Futura-Bold_1.woff2') format('woff2'),
+        url('Futura-Bold_1.woff') format('woff'),
+        url('Futura-Bold_1.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Futura BdCn BT';
+    src: url('FuturaBT-BoldCondensed.eot');
+    src: url('FuturaBT-BoldCondensed.eot?#iefix') format('embedded-opentype'),
+        url('FuturaBT-BoldCondensed.woff2') format('woff2'),
+        url('FuturaBT-BoldCondensed.woff') format('woff'),
+        url('FuturaBT-BoldCondensed.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
