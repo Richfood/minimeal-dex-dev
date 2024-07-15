@@ -1,5 +1,3 @@
-// src/theme.ts
-
 import { ThemeOptions } from '@mui/material/styles';
 
 export interface CustomThemeOptions extends ThemeOptions {

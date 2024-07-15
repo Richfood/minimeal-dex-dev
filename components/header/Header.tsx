@@ -26,7 +26,7 @@ const Header = () => {
                 <ListItemText primary="Pools" />
               </ListItemButton>
             </ListItem>
-            <ListItem disablePadding>
+            {/* <ListItem disablePadding>
               <ListItemButton component="a">
                 <ListItemText primary="Stats & Graphs" />
               </ListItemButton>
@@ -35,16 +35,16 @@ const Header = () => {
               <ListItemButton component="a">
                 <ListItemText primary="Staking" />
               </ListItemButton>
-            </ListItem>
+            </ListItem> */}
           </List>
         </Box>
         <Box className={styles.header_right}>
           <List>
-            <ListItem disablePadding>
+            {/* <ListItem disablePadding>
               <ListItemButton component="a">
                 <GrLanguage />
               </ListItemButton>
-            </ListItem>
+            </ListItem> */}
             <ListItem disablePadding>
               <ListItemButton component="a">
                 <IoSettingsOutline />

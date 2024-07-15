@@ -47,48 +47,57 @@ body {
   --primary: #173D3D;
   --white: #ffffff;
   --black: #000000;
+  --light: #FFE6A8;
   --secondary: #F6B41B;
   --light_clr: #F7F0DF;
   --creame_clr: #D1AC70;
 }
 
-h1 {
+.chart_bottom h1 {
   font-size: 32px;
-  font-weight: 900;
+  font-weight: 700;
+}
+
+.chart_bottom h4 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.chart_data {
+  font-family: "Epilogue", sans-serif;
 }
 
 
+.chart_actions button.active {
+  background: #173D3D;
+}
+
+.chart_actions .MuiButton-contained {
+  background: var(--primary);
+  color: var(--white);
+  border: unset;
+}
+
+.chart_actions button {
+  border: unset;
+}
+
+.chart_actions {
+  background: var(--light_clr);
+  border-radius: 30px;
+}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-body.dark-mode .swap_graph_box {
+body.dark-mode .white_box {
   background: var(--primary);
   color: var(--white);
 }
-
-
 
 .swap_graph_sec {
   padding-top: 50px;
 }
 
-.swap_graph_box {
+.white_box {
   padding: 30px;
   background: var(--white);
   border-radius: 20px;
@@ -99,6 +108,20 @@ body.dark-mode .swap_graph_box {
   display: inline-block;
   border-radius: 30px;
 }
+
+body.dark-mode .toolbar-button {
+  background:  #092626;
+}
+
+body.dark-mode .toolbar-button button {
+  color: var(--creame_clr);
+}
+
+body.dark-mode .toolbar-button button.active {
+  background:  var(--creame_clr);
+  color: var(--primary);
+}
+
 
 .toolbar-button button {
   background: unset;
@@ -116,9 +139,161 @@ body.dark-mode .swap_graph_box {
   color: var(--white);
 }
 
-.chart_title svg,.chart_resize svg {
+.chart_title svg, .chart_resize svg {
   fill: var(--creame_clr);
   width: 21px;
   height: 21px;
   cursor: pointer;
+  stroke: var(--creame_clr);
 }
+
+
+.SwapWidgetInner .inputBox .inputField {
+
+  background: var(--light_clr);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.SwapWidgetInner {
+  display: flex;
+  justify-content: space-between;
+  max-width: 970px;
+}
+
+.SwapWidgetInner .inputBox input{
+  width: 100%;
+  font-size: 14px;
+  border: unset;
+  background-color: transparent;
+}
+
+.SwapWidgetInner .inputBox input:focus-visible {
+  border: unset;
+  outline: unset;
+}
+
+.swapData svg {
+  width: 18px;
+  height: 18px;
+}
+
+.swapData {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--creame_clr);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+}
+
+.arrowBox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.SwapWidgetBox {
+  padding: 20px;
+  position: absolute;
+  background: var(--primary);
+  top: 0;
+  border-radius: 20px;
+  color: var(--white);
+  bottom: unset;
+  margin-right: -40px;
+  margin-top: -24px;
+  right: 0;
+  flex-wrap: wrap;
+  display: inline-flex;
+  max-width: 190px;
+}
+
+body.dark-mode .SwapWidgetBox {
+  background: var(--light);
+  color: var(--primary);
+}
+
+.SwapWidgetBox div {
+  width: 100%;
+}
+
+.widgetList ul {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 0;
+}
+
+.SwapWidgetBoxTitle h4 {
+  font-size: 20px;
+  font-weight: 700;;
+}
+.widgetList ul svg {
+  width: 24px;
+  height: 24px;
+  color: var(--light);
+}
+
+body.dark-mode .widgetList ul svg {
+  color: var(--primary);
+}
+
+.widgetList ul li {
+  width: auto;
+  cursor: pointer;
+}
+
+.slippageSec {
+  width: 437px;
+  margin-top: 15px;
+}
+
+
+
+
+
+/************************  Footer Css  ***********************/
+
+.footer_wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  position: relative;
+}
+
+.social_links ul {
+  gap: 4px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+.social_links ul li {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px 10px 0 0;
+  background-color: var(--primary);
+}
+
+.social_links li a {
+  color: var(--creame_clr);
+  text-decoration: none;
+}
+
+.social_links ul {
+  display: flex;
+  padding: 0;
+}
+
+.social_links ul svg{
+  width: 20px;
+  height: 20px;
+}
+
+/************************  Footer Css  ***********************/

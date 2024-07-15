@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import dynamic from 'next/dynamic';
 import style from './SwapGraph.module.css'
-import { Box, Typography } from '@mui/material';
+import { Box, Typography,Button } from '@mui/material';
 import { VscArrowSwap } from "react-icons/vsc";
-import { IoIosResize } from "react-icons/io";
+import { TbArrowsDiagonal } from "react-icons/tb";
+import { TbArrowsDiagonalMinimize2 } from "react-icons/tb";
+import { lightTheme } from '@/pages/theme';
+
 
 // Dynamically import ReactApexChart with SSR disabled
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -312,7 +315,32 @@ class SwapGraph extends Component<{}, SwapGraphState> {
                     }
                 },
                 annotations: {
-                    // Your annotations if any
+                    yaxis: [
+                        {
+                            y: 30,
+                            borderColor: '#999',
+                            label: {
+                                text: 'Support',
+                                style: {
+                                    color: "#fff",
+                                    background: '#00E396'
+                                }
+                            }
+                        }
+                    ],
+                    xaxis: [
+                        {
+                            x: new Date('14 Nov 2012').getTime(),
+                            borderColor: '#999',
+                            label: {
+                                text: 'Rally',
+                                style: {
+                                    color: "#fff",
+                                    background: '#775DD0'
+                                }
+                            }
+                        }
+                    ]
                 },
                 dataLabels: {
                     enabled: false
@@ -328,6 +356,25 @@ class SwapGraph extends Component<{}, SwapGraphState> {
                 xaxis: {
                     type: 'datetime',
                     tickAmount: 6,
+                    labels: {
+                        style: {
+                            colors: lightTheme.body.color,
+                            fontSize: '12px',
+                            fontWeight: 400,
+                            cssClass: 'apexcharts-xaxis-label',
+                        },
+                    },
+                },
+                yaxis: {
+                    labels: {
+                        style: {
+                            colors: lightTheme.body.color, 
+                            fontSize: '12px',
+                
+                            fontWeight: 400,
+                            cssClass: 'apexcharts-yaxis-label',
+                        },
+                    },
                 },
                 tooltip: {
                     x: {
@@ -336,13 +383,47 @@ class SwapGraph extends Component<{}, SwapGraphState> {
                 },
                 fill: {
                     type: 'gradient',
+                    pattern: {
+                        style: 'verticalLines',
+                        width: 1,
+                        height: 1,
+                        strokeWidth: 1
+                    },
                     gradient: {
-                        shadeIntensity: 1,
-                        opacityFrom: 0.7,
-                        opacityTo: 0.9,
-                        stops: [0, 100]
+                        shade: 'dark',
+                        type: 'horizontal',
+                        shadeIntensity: 0.5,
+                        gradientToColors: ['#F7F0DF', '#D1AC70'], // Custom colors for gradient
+                        inverseColors: true,
+                        opacityFrom: 1,
+                        opacityTo: 1,
+
+                        stops: [0, 50, 100],
+                        colorStops: [
+                            {
+                                offset: 0,
+                                color: '#F7F0DF', // Start color
+                                opacity: 0.3
+                            },
+                            {
+                                offset: 50,
+                                color: '#FFE6A8', // Mid color
+                                opacity: 0.5
+                            },
+                            {
+                                offset: 100,
+                                color: '#FFE6A8', // End color
+                                opacity: 1
+                            }
+                        ]
                     }
                 },
+                stroke: {
+                    curve: 'straight',
+                    width: 2, 
+                    colors: ['#D1AC70'] 
+                }
+
             },
             activeInterval: '24Hours',
         };
@@ -430,9 +511,9 @@ class SwapGraph extends Component<{}, SwapGraphState> {
         return (
             <Box>
                 <Box className="chart_info">
-                    <Box className="chart_top" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',mb: '15px' }}>
+                    <Box className="chart_top" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '15px' }}>
                         <Box className="chart_swap" sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                            <Box  sx={{ display: 'flex', alignItems: 'center',gap: '5px'}}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                                 <Box>
                                     <img src='/images/circle1.svg' alt="" />
                                 </Box>
@@ -446,39 +527,44 @@ class SwapGraph extends Component<{}, SwapGraphState> {
                             </Box>
                         </Box>
                         <Box className="chart_resize">
-                            <IoIosResize />
+                            <TbArrowsDiagonal   />
                         </Box>
                     </Box>
 
-                    <Box className="chart_bottom" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',mb: '50px' }}>
-                        <Box>
-                        <Typography variant="h1">&lt;0.001</Typography>
+                    <Box className="chart_bottom" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '50px' }}>
+                        <Box className="chart_data">
+                            <Box sx={{ display: 'flex', gap: '5px', alignItems: 'flex-end' }}>
+                                <Typography variant="h1">&lt;0.001</Typography>
+                                <Typography variant="h4">PLS/9MM</Typography>
+                                <Typography sx={{ color: '#00A413' }} variant="h4">+0.001(9.53%)</Typography>
+                            </Box>
+                            <Typography sx={{fontSize: '12px',color: 'var(--creame_clr)',fontWeight: '600'}}>Jul 8, 2024, 1:30 PM (UTC)</Typography>
                         </Box>
                         <Box className="toolbar-button">
-                            <button
+                            <Button
                                 className={activeInterval === '24Hours' ? 'active' : ''}
                                 onClick={() => this.fetchNewData('24Hours')}
                             >
                                 24H
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 className={activeInterval === '1Week' ? 'active' : ''}
                                 onClick={() => this.fetchNewData('1Week')}
                             >
                                 1W
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 className={activeInterval === '1Month' ? 'active' : ''}
                                 onClick={() => this.fetchNewData('1Month')}
                             >
                                 1M
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 className={activeInterval === '1Year' ? 'active' : ''}
                                 onClick={() => this.fetchNewData('1Year')}
                             >
                                 1Y
-                            </button>
+                            </Button>
                         </Box>
                     </Box>
 

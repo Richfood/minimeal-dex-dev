@@ -72,8 +72,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       MuiContainer: {
         styleOverrides: {
           root: {
-            maxWidth: '1230px',
-            padding: '0 15px'
+            maxWidth: '1270px !important',
+            padding: '0 15px !important'
           }
         }
       }
