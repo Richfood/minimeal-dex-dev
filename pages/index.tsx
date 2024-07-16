@@ -6,7 +6,7 @@ import Header from '@/components/header/Header';
 import { Box, Button, Container } from '@mui/material';
 import SwapGraph from '@/components/SwapGraph/SwapGraph';
 import SwapWidget from '@/components/SwapWidget/SwapWidget';
-import { useTheme } from './ThemeContext';
+import { useTheme } from '../components/ThemeContext';
 
 
 const IndexPage = () => {

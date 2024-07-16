@@ -1,6 +1,6 @@
 // pages/_app.tsx
 import React from 'react';
-import { ThemeProvider } from './ThemeContext'; 
+import { ThemeProvider } from '../components/ThemeContext'; 
 import { CssBaseline } from '@mui/material'; 
 import '../styles/globals.css'
 

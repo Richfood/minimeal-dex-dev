@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Container, Switch, List, ListItem, Link } from '@mui/material';
-import { useTheme } from '../../pages/ThemeContext';
+import { useTheme } from '../ThemeContext';
 import { styled } from '@mui/material/styles';
 import styles from './Footer.module.css';
 import { FaXTwitter } from "react-icons/fa6";

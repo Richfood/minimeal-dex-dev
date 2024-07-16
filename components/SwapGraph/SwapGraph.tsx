@@ -5,7 +5,8 @@ import { Box, Typography,Button } from '@mui/material';
 import { VscArrowSwap } from "react-icons/vsc";
 import { TbArrowsDiagonal } from "react-icons/tb";
 import { TbArrowsDiagonalMinimize2 } from "react-icons/tb";
-import { lightTheme } from '@/pages/theme';
+import { lightTheme } from '../theme';
+
 
 
 // Dynamically import ReactApexChart with SSR disabled
