@@ -558,7 +558,7 @@ class SwapGraph extends Component<{}, SwapGraphState> {
                                 className={activeInterval === '1Month' ? 'active' : ''}
                                 onClick={() => this.fetchNewData('1Month')}
                             >
-                                1M
+                                1M  
                             </Button>
                             <Button
                                 className={activeInterval === '1Year' ? 'active' : ''}
