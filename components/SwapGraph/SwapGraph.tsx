@@ -1,152 +1,149 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Box, Typography, Button } from '@mui/material';
-import { VscArrowSwap } from "react-icons/vsc";
-import { TbArrowsDiagonal } from "react-icons/tb";
-import { lightTheme } from '../theme';
+import { VscArrowSwap } from 'react-icons/vsc';
+import { TbArrowsDiagonal } from 'react-icons/tb';
 import { ApexOptions } from 'apexcharts';
+import { useTheme } from '../ThemeContext'; // Adjust the path as per your project structure
 
-interface SwapGraphProps {
-    onToggle: () => void; // Define the onToggle prop as a function that toggles visibility
-}
-
-// Dynamically import ReactApexChart with SSR disabled
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const SwapGraph: React.FC<SwapGraphProps> = ({ onToggle }) => {
+const SwapGraph = () => {
+    const { theme } = useTheme(); // Access theme context
+
     const [series, setSeries] = useState([
         {
             data: [
-                [1327359600000, 30.95],
-                [1327446000000, 31.34],
+                [1327532400000, 31.18],
+                [1327618800000, 31.05],
             ],
-        }
+        },
     ]);
-
-    const [options, setOptions] = useState<ApexOptions>({
-        chart: {
-            id: 'area-datetime',
-            type: 'area', // Ensure this is one of the allowed types: 'area', 'line', 'bar', etc.
-            height: 350,
-            zoom: {
-                autoScaleYaxis: true
-            }
-        },
-        annotations: {
-            yaxis: [
-                {
-                    y: 30,
-                    borderColor: '#999',
-                    label: {
-                        text: 'Support',
-                        style: {
-                            color: "#fff",
-                            background: '#00E396'
-                        }
-                    }
-                }
-            ],
-            xaxis: [
-                {
-                    x: new Date('14 Nov 2012').getTime(),
-                    borderColor: '#999',
-                    label: {
-                        text: 'Rally',
-                        style: {
-                            color: "#fff",
-                            background: '#775DD0'
-                        }
-                    }
-                }
-            ]
-        },
-        dataLabels: {
-            enabled: false
-        },
-        markers: {
-            size: 0,
-            strokeWidth: 2,
-            hover: {
-                size: 6,
-                sizeOffset: 3
-            }
-        },
-        xaxis: {
-            type: 'datetime',
-            tickAmount: 6,
-            labels: {
-                style: {
-                    colors: lightTheme.body.color,
-                    fontSize: '12px',
-                    fontWeight: 400,
-                    cssClass: 'apexcharts-xaxis-label',
-                },
-            },
-        },
-        yaxis: {
-            labels: {
-                style: {
-                    colors: lightTheme.body.color,
-                    fontSize: '12px',
-                    fontWeight: 400,
-                    cssClass: 'apexcharts-yaxis-label',
-                },
-            },
-        },
-        tooltip: {
-            x: {
-                format: 'dd MMM yyyy'
-            }
-        },
-        fill: {
-            type: 'gradient',
-            pattern: {
-                style: 'verticalLines',
-                width: 1,
-                height: 1,
-                strokeWidth: 1
-            },
-            gradient: {
-                shade: 'dark',
-                type: 'horizontal',
-                shadeIntensity: 0.5,
-                gradientToColors: ['#F7F0DF', '#D1AC70'], // Custom colors for gradient
-                inverseColors: true,
-                opacityFrom: 1,
-                opacityTo: 1,
-
-                stops: [0, 50, 100],
-                colorStops: [
-                    {
-                        offset: 0,
-                        color: '#F7F0DF', // Start color
-                        opacity: 0.3
-                    },
-                    {
-                        offset: 50,
-                        color: '#FFE6A8', // Mid color
-                        opacity: 0.5
-                    },
-                    {
-                        offset: 100,
-                        color: '#FFE6A8', // End color
-                        opacity: 1
-                    }
-                ]
-            }
-        },
-        stroke: {
-            curve: 'straight',
-            width: 2,
-            colors: ['#D1AC70']
-        }
-    });
-
     const [activeInterval, setActiveInterval] = useState('24Hours');
 
-    useEffect(() => {
-        fetchNewData('24Hours');
-    }, []);
+    const generateThemeStyles = (currentTheme: string) => {
+        const themeStyles: ApexOptions = {
+            chart: {
+                id: 'area-datetime',
+                type: 'area', // Ensure this type matches one of the valid types defined by ApexCharts
+                height: 350,
+                zoom: {
+                    autoScaleYaxis: true,
+                },
+            },
+            annotations: {
+                yaxis: [
+                    {
+                        y: 30,
+                        borderColor: '#999',
+                        label: {
+                            text: 'Support',
+                            style: {
+                                color: currentTheme === 'light' ? '#000' : '#fff',
+                                background: currentTheme === 'light' ? '#00E396' : '#222',
+                            },
+                        },
+                    },
+                ],
+                xaxis: [
+                    {
+                        x: new Date('14 Nov 2012').getTime(),
+                        borderColor: '#999',
+                        label: {
+                            text: 'Rally',
+                            style: {
+                                color: currentTheme === 'light' ? '#000' : '#fff',
+                                background: currentTheme === 'light' ? '#775DD0' : '#333',
+                            },
+                        },
+                    },
+                ],
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            markers: {
+                size: 0,
+                strokeWidth: 2,
+                hover: {
+                    size: 6,
+                    sizeOffset: 3,
+                },
+            },
+            xaxis: {
+                type: 'datetime',
+                tickAmount: 6,
+                labels: {
+                    style: {
+                        colors: currentTheme === 'light' ? '#000' : '#fff',
+                        fontSize: '12px',
+                        fontWeight: 400,
+                        cssClass: 'apexcharts-xaxis-label',
+                    },
+                },
+            },
+            yaxis: {
+                labels: {
+                    style: {
+                        colors: currentTheme === 'light' ? '#000' : '#fff',
+                        fontSize: '12px',
+                        fontWeight: 400,
+                        cssClass: 'apexcharts-yaxis-label',
+                    },
+                },
+            },
+            tooltip: {
+                x: {
+                    format: 'dd MMM yyyy',
+                },
+            },
+            fill: {
+                type: 'gradient',
+                pattern: {
+                    style: 'verticalLines',
+                    width: 1,
+                    height: 1,
+                    strokeWidth: 1,
+                },
+                gradient: {
+                    shade: 'dark',
+                    type: 'horizontal',
+                    shadeIntensity: 0.5,
+                    gradientToColors: ['#F7F0DF', '#D1AC70'],
+                    inverseColors: true,
+                    opacityFrom: 1,
+                    opacityTo: 1,
+                    stops: [0, 50, 100],
+                    colorStops: [
+                        {
+                            offset: 0,
+                            color: '#F7F0DF',
+                            opacity: 0.3,
+                        },
+                        {
+                            offset: 50,
+                            color: '#FFE6A8',
+                            opacity: 0.5,
+                        },
+                        {
+                            offset: 100,
+                            color: '#FFE6A8',
+                            opacity: 1,
+                        },
+                    ],
+                },
+            },
+            stroke: {
+                curve: 'straight',
+                width: 2,
+                colors: ['#D1AC70'],
+            },
+        };
+
+        return themeStyles;
+    };
+
+    const options = generateThemeStyles(theme);
 
     const fetchNewData = (interval: string) => {
         const now = new Date().getTime();
@@ -220,22 +217,29 @@ const SwapGraph: React.FC<SwapGraphProps> = ({ onToggle }) => {
         }
     };
 
+    useEffect(() => {
+        fetchNewData('24Hours');
+    }, []);
+
     return (
         <Box>
             <Box className="chart_info">
-                <Box className="chart_top" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '15px' }}>
+                <Box
+                    className="chart_top"
+                    sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '15px' }}
+                >
                     <Box className="chart_swap" sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                             <Box>
-                                <img src='/images/circle1.svg' alt="" />
+                                <img src="/images/circle1.svg" alt="" />
                             </Box>
                             <Box>
-                                <img src='/images/circle2.svg' alt="" />
+                                <img src="/images/circle2.svg" alt="" />
                             </Box>
                         </Box>
                         <Box className="chart_title" sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                             <Typography sx={{ fontWeight: '700' }}>PLS/9MM</Typography>
-                            <VscArrowSwap onClick={onToggle} /> {/* Call onToggle prop on click */}
+                            <VscArrowSwap />
                         </Box>
                     </Box>
                     <Box className="chart_resize">
@@ -243,14 +247,21 @@ const SwapGraph: React.FC<SwapGraphProps> = ({ onToggle }) => {
                     </Box>
                 </Box>
 
-                <Box className="chart_bottom" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '50px' }}>
+                <Box
+                    className="chart_bottom"
+                    sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '50px' }}
+                >
                     <Box className="chart_data">
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'flex-end' }}>
                             <Typography variant="h1">&lt;0.001</Typography>
                             <Typography variant="h4">PLS/9MM</Typography>
-                            <Typography sx={{ color: '#00A413' }} variant="h4">+0.001(9.53%)</Typography>
+                            <Typography sx={{ color: '#00A413' }} variant="h4">
+                                +0.001(9.53%)
+                            </Typography>
                         </Box>
-                        <Typography sx={{ fontSize: '12px', color: 'var(--creame_clr)', fontWeight: '600' }}>Jul 8, 2024, 1:30 PM (UTC)</Typography>
+                        <Typography sx={{ fontSize: '12px', color: 'var(--creame_clr)', fontWeight: '600' }}>
+                            Jul 8, 2024, 1:30 PM (UTC)
+                        </Typography>
                     </Box>
                     <Box className="toolbar-button">
                         <Button
@@ -280,7 +291,6 @@ const SwapGraph: React.FC<SwapGraphProps> = ({ onToggle }) => {
                     </Box>
                 </Box>
             </Box>
-
             <Box id="chart-timeline">
                 <ReactApexChart options={options} series={series} type="area" height={350} />
             </Box>

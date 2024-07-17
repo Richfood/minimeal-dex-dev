@@ -2,12 +2,12 @@ import React from 'react';
 import { Box, Container, Switch, List, ListItem, Link } from '@mui/material';
 import { useTheme } from '../ThemeContext';
 import { styled } from '@mui/material/styles';
-import styles from './Footer.module.css';
-import SocialLinks from './SocialLinks';
-import ThemeModeSwitch from '../ThemeModeSwitch/ThemeModeSwitch';
+
+
+
 
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
-  width: 72,
+  width: 74,
   height: 36,
   padding: 0,
   borderRadius: '30px',
@@ -17,7 +17,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
     transform: 'translateX(0px)',
     '&.Mui-checked': {
       color: '#fff',
-      transform: 'translateX(36px)',
+      transform: 'translateX(38px)',
       '& .MuiSwitch-thumb:before': {
         backgroundImage: `url('data:image/svg+xml;utf8,<svg stroke="currentColor" fill="white" stroke-width="0" viewBox="0 0 256 256" height="20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M238,96a6,6,0,0,1-6,6H214v18a6,6,0,0,1-12,0V102H184a6,6,0,0,1,0-12h18V72a6,6,0,0,1,12,0V90h18A6,6,0,0,1,238,96ZM144,54h10V64a6,6,0,0,0,12,0V54h10a6,6,0,0,0,0-12H166V32a6,6,0,0,0-12,0V42H144a6,6,0,0,0,0,12Zm71.25,100.28a6,6,0,0,1,1.07,6A94,94,0,1,1,95.76,39.68a6,6,0,0,1,7.94,6.79A90.11,90.11,0,0,0,192,154a90.9,90.9,0,0,0,17.53-1.7A6,6,0,0,1,215.25,154.28Zm-14.37,11.34q-4.42.38-8.88.38A102.12,102.12,0,0,1,90,64q0-4.45.38-8.88a82,82,0,1,0,110.5,110.5Z"></path></svg>')`,
       },
@@ -71,7 +71,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   },
 }));
 
-const Footer: React.FC = () => {
+const ThemeModeSwitch: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
 
   const handleThemeToggle = () => {
@@ -79,18 +79,14 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className={`${styles.footer} ${theme === 'dark' ? styles.darkMode : styles.lightMode}`}>
-      <Box className="footer" sx={{ bgcolor: '#092626' }}>
-        <Container>
-          <Box className="footer_wrapper">
-            <SocialLinks />
-            <ThemeModeSwitch />
-          </Box>
-        </Container>
-        <Box className="footer_bottom" sx={{ bgcolor: 'var(--primary)', height: '14px' }} />
-      </Box>
-    </footer>
+    <Box className="themeToggle">
+    <MaterialUISwitch
+      checked={theme === 'dark'}
+      onChange={handleThemeToggle}
+      inputProps={{ 'aria-label': 'toggle dark/light theme' }}
+    />
+  </Box>
   );
 };
 
-export default Footer;
+export default ThemeModeSwitch;

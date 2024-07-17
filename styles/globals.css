@@ -1,3 +1,5 @@
+/***************** Common Css ****************/
+
 @import url('https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&display=swap');
 
 @font-face {
@@ -52,6 +54,40 @@ body {
   --light_clr: #F7F0DF;
   --creame_clr: #D1AC70;
 }
+
+.modal_head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed rgba(145, 158, 171, 0.7);
+  padding: 24px;
+  padding-bottom: 10px;
+}
+
+.modal_body {
+  padding: 15px 24px;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.closeIcon {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  line-height: normal;
+  cursor: pointer; 
+}
+
+
+
+/***************** Common Css ****************/
+
+
+
+/***************** Home Page Css ****************/
 
 .chart_bottom h1 {
   font-size: 32px;
@@ -216,8 +252,34 @@ body.dark-mode .SwapWidgetBox {
   color: var(--primary);
 }
 
-.SwapWidgetBox div {
+.widgetList ul .MuiButtonBase-root.MuiListItemButton-root {
+  padding: 0;
+  width: auto;
+  display: flex;
+}
+
+.SwapWidgetBox .widgetList {
   width: 100%;
+}
+
+.piechartIcon {
+  position: relative;
+}
+
+.piechartIcon.active::before {
+display: none;
+}
+
+.piechartIcon::before {
+  content: '';
+  position: absolute;
+  top: 13px;
+  left: 0;
+  background: var(--light);
+  height: 1px;
+  width: 30px;
+  transform: rotateZ(-45deg);
+  z-index: 9;
 }
 
 .widgetList ul {
@@ -250,12 +312,12 @@ body.dark-mode .widgetList ul svg {
   width: 437px;
   margin-top: 15px;
 }
+/***************** Home Page Css ****************/
 
 
 
 
-
-/************************  Footer Css  ***********************/
+/******************  Footer Css  *****************/
 
 .footer_wrapper {
   display: flex;
@@ -296,4 +358,4 @@ body.dark-mode .widgetList ul svg {
   height: 20px;
 }
 
-/************************  Footer Css  ***********************/
+/******************  Footer Css  *****************/

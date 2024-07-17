@@ -49,11 +49,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             lineHeight: '14px',
             fontSize: '14px',
             fontWeight: '700',
-            color: 'var(--primary)'
+            color: 'var(--primary)',
           },
           containedPrimary: {
             backgroundColor: '#F6B41B',
-
             '&:hover': {
               backgroundColor: '#F6B41B',
             },
@@ -61,22 +60,27 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           containedSecondary: {
             backgroundColor: '#F6B41B',
             padding: '17px 30px',
-
             '&:hover': {
               backgroundColor: '#F6B41B',
             },
           },
         },
       },
-
       MuiContainer: {
         styleOverrides: {
           root: {
             maxWidth: '1270px !important',
-            padding: '0 15px !important'
-          }
-        }
-      }
+            padding: '0 15px !important',
+          },
+        },
+      },
+      MuiBadge: {
+        styleOverrides: {
+          dot: {
+            backgroundColor: '#FF5630', // Different colors for light and dark mode
+          },
+        },
+      },
     },
   });
 
