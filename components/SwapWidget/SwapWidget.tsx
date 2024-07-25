@@ -1,27 +1,118 @@
-import React, { useState } from 'react';
-import { Box, Typography, Button, List, ListItem, ListItemButton, Badge } from '@mui/material';
-import { IoIosArrowDown } from "react-icons/io";
-import { FaArrowRight } from "react-icons/fa";
-import { PiChartBar } from "react-icons/pi";
-import { RxCountdownTimer } from "react-icons/rx";
-import { GrRefresh } from "react-icons/gr";
-import { IoSettingsOutline } from 'react-icons/io5';
-import { PiPencilSimpleBold } from "react-icons/pi";
+import React, { useState, useCallback } from 'react';
+import { Box, Typography, Button, List, ListItem, ListItemButton, Badge, Modal } from '@mui/material';
+import { IoIosArrowDown } from 'react-icons/io';
+import { FaArrowRight } from 'react-icons/fa';
+import { PiChartBar } from 'react-icons/pi';
+import { RxCountdownTimer } from 'react-icons/rx';
+import { GrRefresh } from 'react-icons/gr';
+import { IoCloseOutline, IoSettingsOutline } from 'react-icons/io5';
+import { PiPencilSimpleBold } from 'react-icons/pi';
+import { useTheme } from '../ThemeContext';
+import SettingsModal from '../SettingModal/SettingModal';
+import SelectedToken from '../SelectToken/SelectedToken';
 
 interface SwapWidgetProps {
-    onToggle: () => void; // Explicitly defining onToggle prop type
+    onToggle: () => void;
 }
 
 const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
+    const [activeIndex, setActiveIndex] = useState<number | null>(0);
+    const [isActive, setIsActive] = useState(false);
     const [activeItem, setActiveItem] = useState<string | null>(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const [openToken, setOpenToken] = useState(false);
+    const [isOpenRecent, setIsOpenRecent] = useState(false);
+    const [isOpenExpert, setIsOpenExpert] = useState(false);
+    const [selectedGraph, setSelectedGraph] = useState<'graph1' | 'graph2'>('graph1');
+    const [activeCurrency, setActiveCurrency] = useState<'PLS/9MM' | '9MM/PLS'>('PLS/9MM');
+    const [series, setSeries] = useState<{ name: string; data: { x: number; y: number; }[] }[]>([]);
+    const [circleImages, setCircleImages] = useState<{ circle1: string; circle2: string }>({
+        circle1: '/images/circle1.svg',
+        circle2: '/images/circle2.svg',
+    });
+    const [activeNewCurrency, setActiveNewCurrency] = useState<{ active1: string; active2: string }>({
+        active1: 'PLS',
+        active2: '9MM'
+    });
 
+    const { theme } = useTheme();
+
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        fontSize: '14px',
+        fontWeight: '500',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: theme === 'light' ? 'var(--white)' : 'var(--primary)',
+        boxShadow: 'rgba(0, 0, 0, 0.24) -40px 40px 80px -8px',
+        borderRadius: '16px',
+        color: theme === 'light' ? 'var(--primary)' : 'var(--white)',
+    };
+
+    const handleOpenToken = useCallback(() => setOpenToken(prev => !prev), []);
+    const handleCloseToken = () => setOpenToken(false);
+
+    const handleOpen = useCallback(() => setIsOpen(prev => !prev), []);
+    const handleClose = () => setIsOpen(false);
+
+    const handleOpenRecent = useCallback(() => setIsOpenRecent(prev => !prev), []);
+    const handleCloseRecent = () => setIsOpenRecent(false);
+
+    const handleOpenExpert = useCallback(() => setIsOpenExpert(prev => !prev), []);
+    const handleCloseExpert = () => setIsOpenExpert(false);
 
     const handleItemClick = (item: string) => {
         setActiveItem(prevItem => (prevItem === item ? null : item));
         if (item === 'settings') {
-            setBadgeVisible(false);
+            setIsOpen(true);
         }
         onToggle();
+    };
+
+    const toggleGraph = () => {
+        setSelectedGraph(prevGraph => (prevGraph === 'graph1' ? 'graph2' : 'graph1'));
+
+        if (activeCurrency === 'PLS/9MM') {
+            setSeries([
+                {
+                    name: 'Graph 1',
+                    data: [
+                        { x: new Date().getTime() - 1000, y: 45 },
+                        { x: new Date().getTime(), y: 50 }
+                    ]
+                }
+            ]);
+            setActiveCurrency('9MM/PLS');
+            setCircleImages({
+                circle1: '/images/circle2.svg',
+                circle2: '/images/circle1.svg',
+            });
+            setActiveNewCurrency({
+                active1: 'PLS',
+                active2: '9MM'
+            });
+        } else {
+            setSeries([
+                {
+                    name: 'Graph 1',
+                    data: [
+                        { x: new Date().getTime() - 1000, y: 50 },
+                        { x: new Date().getTime(), y: 45 }
+                    ]
+                }
+            ]);
+            setActiveCurrency('PLS/9MM');
+            setCircleImages({
+                circle1: '/images/circle1.svg',
+                circle2: '/images/circle2.svg',
+            });
+            setActiveNewCurrency({
+                active1: '9MM',
+                active2: 'PLS'
+            });
+        }
     };
 
     return (
@@ -30,8 +121,10 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                 <Box className="SwapWidgetInner">
                     <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                            <img src="/images/circle1.svg" alt="circle1" style={{ width: '20px', height: '20px' }} />
-                            <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center' }}>PLS <IoIosArrowDown /></Typography>
+                            <img src={circleImages.circle1} alt="circle1" style={{ width: '20px', height: '20px' }} />
+                            <Typography onClick={handleOpenToken} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                {activeNewCurrency.active1} <IoIosArrowDown />
+                            </Typography>
                         </Box>
                         <Box className="inputField">
                             <input type="text" placeholder='0.0' />
@@ -41,14 +134,16 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
                     <Box className="arrowBox">
                         <Box className="swapData" sx={{ display: 'flex', alignItems: 'center', margin: '0 auto' }}>
-                            <FaArrowRight />
+                            <FaArrowRight onClick={toggleGraph} />
                         </Box>
                     </Box>
 
                     <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                            <img src="/images/circle2.svg" alt="circle1" style={{ width: '20px', height: '20px' }} />
-                            <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center' }}>9MM <IoIosArrowDown /></Typography>
+                            <img src={circleImages.circle2} alt="circle2" style={{ width: '20px', height: '20px' }} />
+                            <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center' }}>
+                                {activeNewCurrency.active2} <IoIosArrowDown />
+                            </Typography>
                         </Box>
                         <Box className="inputField">
                             <input type="text" placeholder='0.0' />
@@ -80,13 +175,13 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 </ListItemButton>
                             </ListItem>
                             <ListItem className="widgetItem" disablePadding>
-                                <ListItemButton>
-                                    <Badge  color="secondary" variant="dot">
+                                <ListItemButton onClick={handleOpen}>
+                                    <Badge color="secondary" variant="dot">
                                         <IoSettingsOutline />
                                     </Badge>
                                 </ListItemButton>
                             </ListItem>
-                            <ListItem className="widgetItem" disablePadding>
+                            <ListItem onClick={handleOpenRecent} className="widgetItem" disablePadding>
                                 <ListItemButton>
                                     <RxCountdownTimer />
                                 </ListItemButton>
@@ -98,14 +193,37 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                             </ListItem>
                         </List>
                     </Box>
+                    <SettingsModal isOpen={isOpen} handleClose={handleClose} theme={theme} />
+
+
                 </Box>
+
+
+                <Modal
+                    open={isOpenRecent}
+                    onClose={handleCloseRecent}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={style}>
+                        <Box className="modal_head">
+                            <Typography id="modal-modal-title" variant="h6" component="h2">
+                                Recent Transactions
+                            </Typography>
+                            <Typography sx={{ position: 'absolute', right: '10px', top: '5px', lineHeight: 'normal', cursor: 'pointer' }}>
+                                <IoCloseOutline onClick={handleCloseRecent} size={24} />
+                            </Typography>
+                        </Box>
+                        <Box className="modal_body" sx={{ textAlign: 'center' }}>
+                            <Button variant="contained" color="secondary">Connect Wallet</Button>
+                        </Box>
+                    </Box>
+                </Modal>
+                
+                <SelectedToken openToken={openToken} handleCloseToken={handleCloseToken} mode={theme} />
             </Box>
         </>
     );
 }
 
 export default SwapWidget;
-function setBadgeVisible(arg0: boolean) {
-    throw new Error('Function not implemented.');
-}
-

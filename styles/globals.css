@@ -6,9 +6,9 @@
   font-family: 'Futura Bk BT';
   src: url('/fonts/FuturaBT-Book.eot');
   src: url('/fonts/FuturaBT-Book.eot?#iefix') format('embedded-opentype'),
-      url('/fonts/FuturaBT-Book.woff2') format('woff2'),
-      url('/fonts/FuturaBT-Book.woff') format('woff'),
-      url('/fonts/FuturaBT-Book.ttf') format('truetype');
+    url('/fonts/FuturaBT-Book.woff2') format('woff2'),
+    url('/fonts/FuturaBT-Book.woff') format('woff'),
+    url('/fonts/FuturaBT-Book.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -18,9 +18,9 @@
   font-family: 'Futura Md BT';
   src: url('/fonts/FuturaBT-Medium.eot');
   src: url('/fonts/FuturaBT-Medium.eot?#iefix') format('embedded-opentype'),
-      url('/fonts/FuturaBT-Medium.woff2') format('woff2'),
-      url('/fonts/FuturaBT-Medium.woff') format('woff'),
-      url('/fonts/FuturaBT-Medium.ttf') format('truetype');
+    url('/fonts/FuturaBT-Medium.woff2') format('woff2'),
+    url('/fonts/FuturaBT-Medium.woff') format('woff'),
+    url('/fonts/FuturaBT-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -30,9 +30,9 @@
   font-family: 'Futura Hv BT';
   src: url('/fonts/FuturaBT-Heavy.eot');
   src: url('/fonts/FuturaBT-Heavy.eot?#iefix') format('embedded-opentype'),
-      url('/fonts/FuturaBT-Heavy.woff2') format('woff2'),
-      url('/fonts/FuturaBT-Heavy.woff') format('woff'),
-      url('/fonts/FuturaBT-Heavy.ttf') format('truetype');
+    url('/fonts/FuturaBT-Heavy.woff2') format('woff2'),
+    url('/fonts/FuturaBT-Heavy.woff') format('woff'),
+    url('/fonts/FuturaBT-Heavy.ttf') format('truetype');
   font-weight: 900;
   font-style: normal;
   font-display: swap;
@@ -53,7 +53,41 @@ body {
   --secondary: #F6B41B;
   --light_clr: #F7F0DF;
   --creame_clr: #D1AC70;
+  --secondary-dark: #092626;
+  --background-gradient: linear-gradient(190deg, var(--primary), var(--black), var(--secondary-dark));
 }
+
+
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 10px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--primary); 
+  border-radius: 10px;
+  height: 30px; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #173d3d99; 
+}
+
+
+body.dark-mode {
+  background: var(--background-gradient);
+  color: var(--white);
+}
+
 
 .modal_head {
   display: flex;
@@ -62,6 +96,11 @@ body {
   border-bottom: 1px dashed rgba(145, 158, 171, 0.7);
   padding: 24px;
   padding-bottom: 10px;
+}
+
+.modal_head h6 {
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .modal_body {
@@ -78,8 +117,13 @@ body {
   right: 10px;
   top: 5px;
   line-height: normal;
-  cursor: pointer; 
+  cursor: pointer;
 }
+
+.mb-50 {
+  margin-bottom: 50px;
+}
+
 
 
 
@@ -146,7 +190,7 @@ body.dark-mode .white_box {
 }
 
 body.dark-mode .toolbar-button {
-  background:  #092626;
+  background: #092626;
 }
 
 body.dark-mode .toolbar-button button {
@@ -154,7 +198,7 @@ body.dark-mode .toolbar-button button {
 }
 
 body.dark-mode .toolbar-button button.active {
-  background:  var(--creame_clr);
+  background: var(--creame_clr);
   color: var(--primary);
 }
 
@@ -175,7 +219,8 @@ body.dark-mode .toolbar-button button.active {
   color: var(--white);
 }
 
-.chart_title svg, .chart_resize svg {
+.chart_title svg,
+.chart_resize svg {
   fill: var(--creame_clr);
   width: 21px;
   height: 21px;
@@ -191,13 +236,28 @@ body.dark-mode .toolbar-button button.active {
   border-radius: 10px;
 }
 
+.dark-mode .SwapWidgetInner .inputField {
+  background: var(--secondary-dark);
+}
+
+
+.dark-mode .SwapWidgetInner input {
+  color: var(--white);
+}
+
+
+.dark-mode .SwapWidgetInner p {
+  color: var(--white);
+}
+
+
 .SwapWidgetInner {
   display: flex;
   justify-content: space-between;
   max-width: 970px;
 }
 
-.SwapWidgetInner .inputBox input{
+.SwapWidgetInner .inputBox input {
   width: 100%;
   font-size: 14px;
   border: unset;
@@ -267,7 +327,7 @@ body.dark-mode .SwapWidgetBox {
 }
 
 .piechartIcon.active::before {
-display: none;
+  display: none;
 }
 
 .piechartIcon::before {
@@ -282,6 +342,10 @@ display: none;
   z-index: 9;
 }
 
+.dark-mode .piechartIcon::before {
+  background: var(--primary);
+}
+
 .widgetList ul {
   display: flex;
   justify-content: space-between;
@@ -291,8 +355,10 @@ display: none;
 
 .SwapWidgetBoxTitle h4 {
   font-size: 20px;
-  font-weight: 700;;
+  font-weight: 700;
+  ;
 }
+
 .widgetList ul svg {
   width: 24px;
   height: 24px;
@@ -312,10 +378,171 @@ body.dark-mode .widgetList ul svg {
   width: 437px;
   margin-top: 15px;
 }
+
 /***************** Home Page Css ****************/
 
+/***************** Common Token Css ****************/
+
+.token_box img {
+  width: 25px;
+  height: 25px;
+  border-radius: 30px;
+}
+
+.token_Outer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.token_Outer .token_box {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid #91a1a1;
+
+}
+
+.token_Outer p {
+  line-height: 2;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.token_list_item img {
+  width: 25px;
+  height: 25px;
+  border-radius: 30px;
+}
+
+.token_list_item {
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.token_list {
+  max-height: calc(100svh - 400px);
+  overflow: auto;
+}
+
+.token_title {
+  font-weight: 600;
+}
+
+.token_desc {
+  font-size: 12px;
+}
+
+.soil_sec {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 20px;
+}
 
 
+.unknown_sec {
+  padding: 5px 7px;
+  background: #e9e9ea;
+  border-radius: 30px;
+  font-size: 12px;
+  line-height: normal;
+  display: flex;
+  gap: 5px;
+  font-weight: 600;
+}
+
+
+/***************** Common Token Css ****************/
+
+/***************** Settings Modal ****************/
+
+.Slippage_Tolerance {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+
+}
+
+.Slippage_Tolerance .Slippage_items button,
+.Slippage_input input {
+  border: none;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  max-width: 80px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 30px;
+  text-align: center;
+  line-height: 1;
+  min-height: 36px;
+}
+
+
+.Slippage_items button.active {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.dark-mode .Slippage_items button.active {
+  background: #F7F0DF;
+  color: var(--primary);
+}
+
+
+.Slippage_input input:focus {
+  outline: none;
+  box-shadow: 0px 0px 7px #F6B41B;
+}
+
+.lightInput {
+  background-color: #F7F0DF;
+  color: var(--primary);
+}
+
+.lightInput::placeholder {
+  color: #173d3d90;
+}
+
+.darkInput {
+  background-color: #1f4e4e;
+  color: var(--white);
+  ;
+}
+
+.darkInput::placeholder {
+  color: #ffffff70;
+}
+
+.modalRight>label {
+  margin-right: 0;
+}
+
+
+.Slippage_Tolerance:has(.Slippage_items):has(.transFail)+.transFailContent {
+  display: block;
+}
+
+.transFailContent {
+  display: none;
+}
+
+.error-box {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--secondary);
+  border-radius: 16px;
+  padding: 10px;
+  justify-content: space-between;
+  background-color: var(--light_clr);
+
+}
+
+/***************** Settings Modal ****************/
 
 /******************  Footer Css  *****************/
 
@@ -333,6 +560,7 @@ body.dark-mode .widgetList ul svg {
   left: 0;
   bottom: 0;
 }
+
 .social_links ul li {
   display: flex;
   align-items: flex-end;
@@ -353,7 +581,7 @@ body.dark-mode .widgetList ul svg {
   padding: 0;
 }
 
-.social_links ul svg{
+.social_links ul svg {
   width: 20px;
   height: 20px;
 }

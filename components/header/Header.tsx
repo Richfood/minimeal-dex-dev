@@ -21,6 +21,7 @@ const CustomTooltip = styled(({ className, ...props }: TooltipProps) => (
     color: theme.palette.mode === 'light' ? 'var(--white)' : 'var(--primary)',
     boxShadow: theme.shadows[1],
     fontSize: 12,
+    padding: '10px'
   },
   [`& .${tooltipClasses.arrow}`]: {
     color: '#173D3D',
@@ -144,18 +145,19 @@ const Header = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed rgba(145, 158, 171, 0.7)', p: '24px', pb: '10px' }}>
+          <Box className="modal_head">
             <Typography id="modal-modal-title" variant="h6" component="h2">
               Settings
             </Typography>
-            <Typography sx={{ position: 'absolute', right: '10px', top: '5px', lineHeight: 'normal',cursor: 'pointer' }}>
+            <Typography sx={{ position: 'absolute', right: '10px', top: '5px', lineHeight: 'normal', cursor: 'pointer' }}>
               <IoCloseOutline onClick={handleClose} size={24} />
             </Typography>
           </Box>
 
           <Box sx={{ p: '24px' }}>
             <Box>
-              <Typography sx={{ fontSize: '14px', textTransform: 'uppercase', fontWeight: '600', mb: '15px' }}>
+
+              <Typography sx={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: '600', mb: '15px', color: 'var(--creame_clr)', letterSpacing: '1px' }}>
                 GLOBAL
               </Typography>
             </Box>

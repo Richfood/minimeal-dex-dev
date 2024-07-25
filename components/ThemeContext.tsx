@@ -4,20 +4,19 @@ import { Switch } from '@mui/material';
 import Button from '@mui/material/Button';
 
 import { lightTheme, darkTheme } from './theme'; // Import light and dark themes
+import { BiBorderRadius } from 'react-icons/bi';
 
-// Define types for theme and context
 type ThemeContextType = {
   theme: 'light' | 'dark';
   toggleTheme: () => void;
 };
 
-// Create context with initial values
 const ThemeContext = createContext<ThemeContextType>({
-  theme: 'light', // Default theme
-  toggleTheme: () => {},
+  theme: 'light',
+  toggleTheme: () => { },
 });
 
-// Custom Provider component
+
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
 
@@ -25,7 +24,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
-  // Create theme based on current theme mode
   const theme: Theme = createTheme({
     ...(currentTheme === 'light' ? lightTheme : darkTheme),
     palette: {
@@ -53,17 +51,35 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           },
           containedPrimary: {
             backgroundColor: '#F6B41B',
+            borderColor: '#F6B41B',
             '&:hover': {
               backgroundColor: '#F6B41B',
+              borderColor: '#F6B41B'
             },
           },
           containedSecondary: {
             backgroundColor: '#F6B41B',
+            borderColor: '#F6B41B',
             padding: '17px 30px',
             '&:hover': {
               backgroundColor: '#F6B41B',
+              borderColor: '#F6B41B'
             },
           },
+
+
+          outlinedSecondary: {
+            backgroundColor: '#fff',
+            borderColor: '#F6B41B',
+            color: '#F6B41B',
+            padding: '17px 30px',
+            '&:hover': {
+              backgroundColor: '#fff',
+              borderColor: '#F6B41B',
+              color: '#F6B41B'
+            },
+          },
+
         },
       },
       MuiContainer: {
@@ -74,6 +90,20 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           },
         },
       },
+      MuiBackdrop: {
+        styleOverrides: {
+          root: {
+            backgroundColor: '#1c252e7a ',
+          }
+        }
+      },
+      MuiTypography: {
+        styleOverrides: {
+          root: {
+            fontSize: '14px',
+          }
+        }
+      },
       MuiBadge: {
         styleOverrides: {
           dot: {
@@ -81,6 +111,33 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           },
         },
       },
+
+      MuiTabs: {
+        styleOverrides: {
+          indicator: {
+            backgroundColor: 'unset', // Removes the default indicator color
+            border: 'unset', // Ensures no border is present
+            minHeight: 'unset',
+            padding: '5px',
+          },
+        },
+      },
+      MuiTab: {
+        styleOverrides: {
+          root: {
+            '&.Mui-selected': {
+              color: 'var(--primary)',
+              fontWeight: 600,
+              background: 'var(--white)',
+              borderRadius: '5px',
+            },
+            minHeight: 'unset',
+            textTransform: 'unset',
+            padding: '8px 5px',
+          },
+        },
+      },
+
     },
   });
 

@@ -23,6 +23,14 @@ const IndexPage = () => {
         setIsWidgetListActive(prevState => !prevState); // Toggle the class state
     }, []);
 
+
+
+    const [zoomed, setZoomed] = useState(false);
+
+    const handleZoomClick = () => {
+        setZoomed(!zoomed);
+    };
+
     return (
         <Box>
             <Header />
@@ -30,7 +38,7 @@ const IndexPage = () => {
                 <Box className="swap_graph_sec" sx={{ minHeight: 'calc(100vh - 149px)' }}>
                     {show &&
                         <Box className={theme === 'light' ? 'swap_graph_box white_box light-section' : 'swap_graph_box white_box dark-section'}>
-                            <SwapGraph />
+                            <SwapGraph zoomed={zoomed} onClick={handleZoomClick} />
                         </Box>
                     }
                     <Box className="swap_widgets white_box" sx={{
@@ -39,7 +47,9 @@ const IndexPage = () => {
                             maxWidth: 'calc(100% - 40px)',
                         },
                     }}>
-                        <SwapWidget onToggle={handleToggle} />
+                        <Box>
+                            <SwapWidget onToggle={handleToggle} />
+                        </Box>
                     </Box>
                 </Box>
             </Container>

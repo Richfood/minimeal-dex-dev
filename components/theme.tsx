@@ -4,8 +4,8 @@ export interface CustomThemeOptions extends ThemeOptions {
     body: {
         backgroundColor: string;
         color: string;
-        lightClassName?: string; 
-        darkClassName?: string;  
+        lightClassName?: string;
+        darkClassName?: string;
     };
 }
 
@@ -25,7 +25,6 @@ export const lightTheme: CustomThemeOptions = {
     typography: {
         fontFamily: 'Epilogue, sans-serif',
         fontSize: 14,
-        
     },
     body: {
         backgroundColor: '#F7F0DF',
@@ -41,7 +40,9 @@ export const lightTheme: CustomThemeOptions = {
                 },
             },
         },
+        
     },
+    
 };
 
 export const darkTheme: CustomThemeOptions = {
@@ -54,7 +55,8 @@ export const darkTheme: CustomThemeOptions = {
             main: '#03DAC6',
         },
         background: {
-            default: '#08060b',
+            default: 'radial-gradient(#173D3D,#092626)',
+            paper: '#1F1F1F',
         },
     },
     typography: {
