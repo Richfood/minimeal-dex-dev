@@ -7,6 +7,7 @@ import InputBase from '@mui/material/InputBase';
 import { IoCloseOutline } from 'react-icons/io5';
 import { List, ListItem } from '@mui/material';
 import ManageToken from '../ManageToken/ManageToken';
+import Image from 'next/image';
 
 interface SelectedTokenProps {
     openToken: boolean;
@@ -51,7 +52,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
 
     const StyledInputBase = styled(InputBase)(({ theme }) => ({
         color: 'inherit',
-        background: mode === 'light' ? '#e9e9ea' : 'inherit',
+        background: mode === 'light' ? 'var(--gray)' : 'inherit',
         width: '100%',
         borderRadius: '10px',
         '& .MuiInputBase-input': {
@@ -90,8 +91,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                             <Box className="token_Outer" sx={{ py: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                                 {['PLS', '9MM', 'USDC', 'DAI', 'USDT', 'WPLS'].map((token, index) => (
                                     <Box className="token_box" key={index}>
-
-                                        <img src={`images/${token.toLowerCase()}.png`} alt={token} />
+                                        <Image src={`/images/${token.toLowerCase()}.png`} width={20} height={20} alt={token} />
                                         <Typography>{token}</Typography>
                                     </Box>
                                 ))}
@@ -101,7 +101,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                     {Array(10).fill(0).map((_, index) => (
                                         <ListItem className='token_list_item' disablePadding key={index}>
                                             <Box>
-                                                <img src="images/pulsechain.png" alt="PLS" />
+                                                <Image src="/images/pulsechain.png" width={20} height={20} alt="PLS" />
                                             </Box>
                                             <Box className="token_list_details">
                                                 <Typography className="token_title">PLS</Typography>
@@ -114,7 +114,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                             <Box sx={{ textAlign: 'center', mt: '20px' }}>
                                 <Typography
                                     variant="h6"
-                                    sx={{ color: 'var(--creame_clr)', cursor: 'pointer' }}
+                                    sx={{ color: 'var(--cream)', cursor: 'pointer' }}
                                     onClick={handleOpenManage}
                                 >
                                     Manage Tokens

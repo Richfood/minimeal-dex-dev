@@ -4,9 +4,9 @@ import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
 import { styled } from '@mui/material/styles';
 
 const BpIcon = styled('span')(({ theme }) => ({
-    borderRadius: 8,
-    width: 24,
-    height: 24,
+    borderRadius: 2,
+    width: 18,
+    height: 18,
     boxShadow:
         theme.palette.mode === 'dark'
             ? '0 0 0 1px rgb(16 22 26 / 40%)'
@@ -31,12 +31,12 @@ const BpIcon = styled('span')(({ theme }) => ({
 }));
 
 const BpCheckedIcon = styled(BpIcon)({
-    backgroundColor: '#00A413',
+    backgroundColor: 'var(--cream)',
     backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))',
     '&::before': {
         display: 'block',
-        width: 24,
-        height: 24,
+        width: 18,
+        height: 18,
         backgroundImage:
             "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath" +
             " fill-rule='evenodd' clip-rule='evenodd' d='M12 5c-.28 0-.53.11-.71.29L7 9.59l-2.29-2.3a1.003 " +
@@ -44,7 +44,7 @@ const BpCheckedIcon = styled(BpIcon)({
         content: '""',
     },
     'input:hover ~ &': {
-        backgroundColor: '#00A413',
+        backgroundColor: 'var(--cream)',
     },
 });
 
@@ -54,7 +54,7 @@ const Customcheckbox = (props: CheckboxProps) => {
         <Checkbox
             sx={{
                 '&:hover': { bgcolor: 'transparent' },
-                p: 0, // Remove padding from Checkbox
+                p: 0, 
             }}
             disableRipple
             color="default"

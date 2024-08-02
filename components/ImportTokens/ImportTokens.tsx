@@ -65,7 +65,7 @@ const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode }) 
 
     const StyledInputBase = styled(InputBase)(({ theme }) => ({
         color: 'inherit',
-        background: mode === 'light' ? '#e9e9ea' : 'inherit',
+        background: mode === 'light' ? 'var(--gray)' : 'inherit',
         width: '100%',
         borderRadius: '10px',
         '& .MuiInputBase-input': {
@@ -106,9 +106,9 @@ const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode }) 
 
                     <Box sx={{ my: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                            <Box sx={{ border: '1px solid var(--creame_clr)', padding: '5px 7px', borderRadius: '30px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                                <FiAlertCircle style={{ color: 'var(--creame_clr)', width: '18px', height: '18px' }} />
-                                <Typography sx={{ fontSize: '12px', color: 'var(--creame_clr)' }}>Unknown Source </Typography>
+                            <Box sx={{ border: '1px solid var(--cream)', padding: '5px 7px', borderRadius: '30px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                <FiAlertCircle style={{ color: 'var(--cream)', width: '18px', height: '18px' }} />
+                                <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>Unknown Source </Typography>
                             </Box>
                             <Box sx={{ display: 'flex', gap: '5px', mt: '10px' }}>
                                 <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>SUN Minimeal</Typography>
@@ -118,7 +118,7 @@ const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode }) 
                                 <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>0x13...9769</Typography>
                             </Box>
                             <Box>
-                                <Typography sx={{ fontSize: '16px', fontWeight: '600', color: 'var(--creame_clr)' }}>&#40; View on 9mmScan &#x29;</Typography>
+                                <Typography sx={{ fontSize: '16px', fontWeight: '600', color: 'var(--cream)' }}>&#40; View on 9mmScan &#x29;</Typography>
                             </Box>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>

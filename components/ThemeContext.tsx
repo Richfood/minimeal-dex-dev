@@ -2,20 +2,18 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ThemeProvider as MuiThemeProvider, createTheme, Theme } from '@mui/material/styles';
 import { Switch } from '@mui/material';
 import Button from '@mui/material/Button';
-
 import { lightTheme, darkTheme } from './theme'; // Import light and dark themes
-import { BiBorderRadius } from 'react-icons/bi';
 
 type ThemeContextType = {
+  mode: any;
   theme: 'light' | 'dark';
   toggleTheme: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: 'light',
-  toggleTheme: () => { },
+  toggleTheme: () => {},
 });
-
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
@@ -54,7 +52,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             borderColor: '#F6B41B',
             '&:hover': {
               backgroundColor: '#F6B41B',
-              borderColor: '#F6B41B'
+              borderColor: '#F6B41B',
             },
           },
           containedSecondary: {
@@ -63,23 +61,33 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             padding: '17px 30px',
             '&:hover': {
               backgroundColor: '#F6B41B',
-              borderColor: '#F6B41B'
+              borderColor: '#F6B41B',
             },
           },
-
-
-          outlinedSecondary: {
-            backgroundColor: '#fff',
+          outlined: {
             borderColor: '#F6B41B',
             color: '#F6B41B',
-            padding: '17px 30px',
             '&:hover': {
-              backgroundColor: '#fff',
               borderColor: '#F6B41B',
-              color: '#F6B41B'
+              backgroundColor: 'rgba(246, 180, 27, 0.1)',
             },
           },
-
+          outlinedPrimary: {
+            borderColor: '#F6B41B',
+            color: '#F6B41B',
+            '&:hover': {
+              borderColor: '#F6B41B',
+              backgroundColor: 'rgba(246, 180, 27, 0.1)',
+            },
+          },
+          outlinedSecondary: {
+            borderColor: '#F6B41B',
+            color: '#F6B41B',
+            '&:hover': {
+              borderColor: '#F6B41B',
+              backgroundColor: 'rgba(246, 180, 27, 0.1)',
+            },
+          },
         },
       },
       MuiContainer: {
@@ -93,30 +101,29 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       MuiBackdrop: {
         styleOverrides: {
           root: {
-            backgroundColor: '#1c252e7a ',
-          }
-        }
+            backgroundColor: '#1c252e7a',
+          },
+        },
       },
       MuiTypography: {
         styleOverrides: {
           root: {
             fontSize: '14px',
-          }
-        }
+          },
+        },
       },
       MuiBadge: {
         styleOverrides: {
           dot: {
-            backgroundColor: '#FF5630', // Different colors for light and dark mode
+            backgroundColor: '#FF5630',
           },
         },
       },
-
       MuiTabs: {
         styleOverrides: {
           indicator: {
-            backgroundColor: 'unset', // Removes the default indicator color
-            border: 'unset', // Ensures no border is present
+            backgroundColor: 'unset',
+            border: 'unset',
             minHeight: 'unset',
             padding: '5px',
           },
@@ -137,12 +144,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           },
         },
       },
-
     },
   });
 
   useEffect(() => {
-    // Add class to body based on theme
     document.body.classList.toggle('dark-mode', currentTheme === 'dark');
     document.body.classList.toggle('light-mode', currentTheme === 'light');
   }, [currentTheme]);
@@ -182,6 +187,9 @@ export const MyComponent: React.FC = () => {
       </Button>
       <Button variant="contained" color="secondary">
         Secondary Button
+      </Button>
+      <Button variant="outlined" color="secondary">
+        Secondary Outline Button
       </Button>
     </div>
   );

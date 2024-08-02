@@ -1,15 +1,22 @@
+// src/components/SwapWidget.tsx
 import React, { useState, useCallback } from 'react';
-import { Box, Typography, Button, List, ListItem, ListItemButton, Badge, Modal } from '@mui/material';
+import { Box, Typography, Button, List, ListItem, ListItemButton, Badge } from '@mui/material';
 import { IoIosArrowDown } from 'react-icons/io';
 import { FaArrowRight } from 'react-icons/fa';
-import { PiChartBar } from 'react-icons/pi';
+import { PiChartBar, PiCopy } from 'react-icons/pi';
 import { RxCountdownTimer } from 'react-icons/rx';
 import { GrRefresh } from 'react-icons/gr';
-import { IoCloseOutline, IoSettingsOutline } from 'react-icons/io5';
+import { IoSettingsOutline } from 'react-icons/io5';
 import { PiPencilSimpleBold } from 'react-icons/pi';
 import { useTheme } from '../ThemeContext';
 import SettingsModal from '../SettingModal/SettingModal';
 import SelectedToken from '../SelectToken/SelectedToken';
+import RecentTransactions from '../../components/RecentTransactions/RecentTransactions';
+import { BsFire } from "react-icons/bs";
+
+
+
+
 
 interface SwapWidgetProps {
     onToggle: () => void;
@@ -36,20 +43,6 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     });
 
     const { theme } = useTheme();
-
-    const style = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        fontSize: '14px',
-        fontWeight: '500',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        bgcolor: theme === 'light' ? 'var(--white)' : 'var(--primary)',
-        boxShadow: 'rgba(0, 0, 0, 0.24) -40px 40px 80px -8px',
-        borderRadius: '16px',
-        color: theme === 'light' ? 'var(--primary)' : 'var(--white)',
-    };
 
     const handleOpenToken = useCallback(() => setOpenToken(prev => !prev), []);
     const handleCloseToken = () => setOpenToken(false);
@@ -142,7 +135,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                             <img src={circleImages.circle2} alt="circle2" style={{ width: '20px', height: '20px' }} />
                             <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center' }}>
-                                {activeNewCurrency.active2} <IoIosArrowDown />
+                                {activeNewCurrency.active2} <IoIosArrowDown /> <Typography component="span" sx={{ml: '5px',cursor: 'pointer'}}><PiCopy /></Typography>
                             </Typography>
                         </Box>
                         <Box className="inputField">
@@ -164,7 +157,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
                 <Box className="SwapWidgetBox">
                     <Box className="SwapWidgetBoxTitle">
-                        <Typography variant="h4">Swap</Typography>
+                        <Typography variant="h4" className='sec_title'>Swap</Typography>
                         <Typography sx={{ fontSize: '12px', mb: '20px' }}>Trade Token in an instant</Typography>
                     </Box>
                     <Box className={`widgetList ${activeItem ? 'active' : ''}`}>
@@ -172,6 +165,11 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                             <ListItem className={`widgetItem piechartIcon ${activeItem === 'chart' ? 'active' : ''}`} onClick={() => handleItemClick('chart')} disablePadding>
                                 <ListItemButton>
                                     <PiChartBar />
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem className="widgetItem" disablePadding>
+                                <ListItemButton onClick={handleOpen}>
+                                    <BsFire  />
                                 </ListItemButton>
                             </ListItem>
                             <ListItem className="widgetItem" disablePadding>
@@ -193,37 +191,14 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                             </ListItem>
                         </List>
                     </Box>
-                    <SettingsModal isOpen={isOpen} handleClose={handleClose} theme={theme} />
-
-
                 </Box>
 
-
-                <Modal
-                    open={isOpenRecent}
-                    onClose={handleCloseRecent}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                >
-                    <Box sx={style}>
-                        <Box className="modal_head">
-                            <Typography id="modal-modal-title" variant="h6" component="h2">
-                                Recent Transactions
-                            </Typography>
-                            <Typography sx={{ position: 'absolute', right: '10px', top: '5px', lineHeight: 'normal', cursor: 'pointer' }}>
-                                <IoCloseOutline onClick={handleCloseRecent} size={24} />
-                            </Typography>
-                        </Box>
-                        <Box className="modal_body" sx={{ textAlign: 'center' }}>
-                            <Button variant="contained" color="secondary">Connect Wallet</Button>
-                        </Box>
-                    </Box>
-                </Modal>
-                
+                <SettingsModal isOpen={isOpen} handleClose={handleClose} theme={theme} />
+                <RecentTransactions open={isOpenRecent} onClose={handleCloseRecent} />
                 <SelectedToken openToken={openToken} handleCloseToken={handleCloseToken} mode={theme} />
             </Box>
         </>
     );
-}
+};
 
 export default SwapWidget;

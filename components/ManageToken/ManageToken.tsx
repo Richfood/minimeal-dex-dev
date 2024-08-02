@@ -61,7 +61,7 @@ const ManageToken: React.FC<ManageTokenProps> = ({ open, handleClose, mode }) =>
 
     const StyledInputBase = styled(InputBase)(({ theme }) => ({
         color: 'inherit',
-        background: mode === 'light' ? '#e9e9ea' : 'inherit',
+        background: mode === 'light' ? 'var(--gray)' : 'inherit',
         width: '100%',
         borderRadius: '10px',
         '& .MuiInputBase-input': {
@@ -84,7 +84,7 @@ const ManageToken: React.FC<ManageTokenProps> = ({ open, handleClose, mode }) =>
                 <Box sx={style}>
                     <Box className="modal_head" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="h6">
-                            Manage
+                            Manage Token
                         </Typography>
                         <IoCloseOutline onClick={handleClose} size={24} style={{ cursor: 'pointer' }} />
                     </Box>
@@ -97,7 +97,7 @@ const ManageToken: React.FC<ManageTokenProps> = ({ open, handleClose, mode }) =>
                                     variant="scrollable"
                                     scrollButtons="auto"
                                     aria-label="scrollable auto tabs example"
-                                    sx={{ bgcolor: mode === 'light' ? '#e9e9ea' : '#274343', border: 'unset', p: '10px' }}
+                                    sx={{ bgcolor: mode === 'light' ? 'var(--gray)' : '#274343', border: 'unset', p: '10px' }}
                                 >
                                     <Tab label="Lists" sx={{ border: 'unset' }} value="0" />
                                     <Tab label="Tokens" sx={{ border: 'unset' }} value="1" />
@@ -136,7 +136,7 @@ const ManageToken: React.FC<ManageTokenProps> = ({ open, handleClose, mode }) =>
                                         </Box>
                                     </Box>
                                     <Box sx={{ mt: '15px' }}>
-                                        <Typography sx={{ color: 'var(--creame_clr)', fontSize: '16px', fontWeight: '600' }}>0 Imported Tokens</Typography>
+                                        <Typography sx={{ color: 'var(--cream)', fontSize: '16px', fontWeight: '600' }}>0 Imported Tokens</Typography>
                                     </Box>
                                 </TabPanel>
                             </TabContext>
