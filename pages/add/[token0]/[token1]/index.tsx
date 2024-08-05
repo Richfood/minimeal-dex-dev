@@ -3,10 +3,13 @@ import AddLiquidity from '@/components/AddLiquidity/AddLiquidity'
 import { Box, Container } from '@mui/material'
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
-
+import { useRouter } from 'next/router';
 
 
 const index = () => {
+
+  
+
   return (
     <>
       <Header />

@@ -669,7 +669,7 @@ body.dark-mode .widgetList ul svg {
   display: none;
 }
 
-.error-box {
+.warning-box {
   display: flex;
   flex-wrap: wrap;
   border: 1px solid var(--secondary);
@@ -679,12 +679,12 @@ body.dark-mode .widgetList ul svg {
   background-color: var(--light_clr);
 }
 
-.dark-mode .error-box {
+.dark-mode .warning-box {
   background-color: var(--secondary-dark);
   border: 1px solid var(--secondary);
 }
 
-.dark-mode .error-box p {
+.dark-mode .warning-box p {
   color: var(--light);
 }
 
@@ -869,19 +869,21 @@ body.dark-mode .tabsOuter {
   border: 1px solid var(--cream);
 }
 
-.free_tier.active .ftcardBox {
+/* .free_tier.active .ftcardBoxOuter {
   height: auto; 
   opacity: 1;
   visibility: visible; 
   transition: height 0.5s ease, opacity 0.5s ease;
+  display: block;
 }
 
-.free_tier .ftcardBox {
+.free_tier .ftcardBoxOuter {
+  display: none;
   height: 0;
   opacity: 0; 
   visibility: hidden; 
   transition: height 0.5s ease, opacity 0.5s ease;
-}
+} */
 
 .rangeTag {
   display: flex;
@@ -891,6 +893,9 @@ body.dark-mode .tabsOuter {
   justify-content: space-between;
 }
 
+.ftcardBox.active {
+  display: none;
+}
 
 
 /******************  Add Liquidity Css  *****************/

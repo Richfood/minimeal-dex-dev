@@ -53,7 +53,7 @@ const ExpertModeModal: React.FC<ExpertModeModalProps> = ({ isOpen, handleCloseEx
                 </Box>
 
                 <Box className="modal_body" sx={{ my: '15px' }}>
-                    <Box className="error-box">
+                    <Box className="warning-box">
                         <Box sx={{ color: 'var(--secondary)', fontSize: 20 }}>
                             <GoAlertFill />
                         </Box>

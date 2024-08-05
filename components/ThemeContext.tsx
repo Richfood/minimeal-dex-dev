@@ -5,14 +5,15 @@ import Button from '@mui/material/Button';
 import { lightTheme, darkTheme } from './theme'; // Import light and dark themes
 
 type ThemeContextType = {
-  mode: any;
+  mode: 'light' | 'dark'; // Adjusted type to match possible values
   theme: 'light' | 'dark';
   toggleTheme: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: 'light',
-  toggleTheme: () => {},
+  mode: 'light', // Provide default mode
+  toggleTheme: () => { },
 });
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -153,7 +154,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [currentTheme]);
 
   return (
-    <ThemeContext.Provider value={{ theme: currentTheme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme: currentTheme, mode: currentTheme, toggleTheme }}>
       <MuiThemeProvider theme={theme}>
         {children}
       </MuiThemeProvider>

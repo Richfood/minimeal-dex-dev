@@ -91,7 +91,7 @@ const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode }) 
                     <IoCloseOutline onClick={handleClose} size={24} style={{ cursor: 'pointer' }} />
                 </Box>
                 <Box className="modal_body">
-                    <Box className="error-box">
+                    <Box className="warning-box">
                         <Box sx={{ color: 'var(--secondary)', fontSize: 20 }}>
                             <GoAlertFill />
                         </Box>
