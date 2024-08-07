@@ -16,7 +16,7 @@ import { FaPlus } from "react-icons/fa6";
 import Image from 'next/image';
 import { SlGraph } from "react-icons/sl";
 import { useRouter } from 'next/router';
-
+import RoiCalculator from '../RoiCalculator/RoiCalculator'
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -36,6 +36,13 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
   const [activeNewCurrency, setActiveNewCurrency] = useState<'PLS/9MM' | '9MM/PLS'>('PLS/9MM');
   const [openToken, setOpenToken] = useState(false);
   const [tier, setTier] = useState<string>('0.01%');
+
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+
 
   const handleClick = (index: number) => {
     setActiveCard(index);
@@ -101,13 +108,13 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
               <Box>
                 <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>0%</Typography>
               </Box>
-              <Box>
-                <Typography><CiCalculator2 size={20} style={{ color: palette.text.secondary }} /></Typography>
+              <Box onClick={handleOpen} sx={{cursor: "pointer"}}>
+                <Typography><CiCalculator2  size={20} style={{ color: palette.text.secondary }} /></Typography>
               </Box>
-              <Box>
+              <Box sx={{cursor: "pointer"}}>
                 <Typography><BsQuestionCircle size={20} style={{ color: palette.text.secondary }} /></Typography>
               </Box>
-              <Box>
+              <Box sx={{cursor: "pointer"}}>
                 <Typography><IoSettingsOutline size={20} style={{ color: palette.text.secondary }} /></Typography>
               </Box>
             </Box>
@@ -285,7 +292,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                     </Typography>
                   </Box>
                   <Box className="inputField">
-                    <input type="text" placeholder='0.0' style={{ textAlign: 'end' }} />
+                    <input type="number" placeholder='0.0' style={{ textAlign: 'end' }} />
                     <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}>~195,194.61 USD</Typography>
                   </Box>
                 </Box>
@@ -299,7 +306,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                     </Typography>
                   </Box>
                   <Box className="inputField">
-                    <input type="text" placeholder='0.0' style={{ textAlign: 'end' }} />
+                    <input type="number" placeholder='0.0' style={{ textAlign: 'end' }} />
                     <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}>~195,194.61 USD</Typography>
                   </Box>
                 </Box>
@@ -325,7 +332,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                     <Box className="SwapWidgetInner" sx={{ mb: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
                       <Box className="inputBox" sx={{ width: '100%' }}>
                         <Box className="inputField">
-                          <input type="text" placeholder='0.0' style={{ textAlign: 'end' }} />
+                          <input type="number" placeholder='0.0' style={{ textAlign: 'end' }} />
 
                         </Box>
                       </Box>
@@ -749,6 +756,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
         handleCloseToken={handleCloseToken}
         mode={theme} // Ensure `theme` is passed correctly
       />
+
+<RoiCalculator open={open} handleClose={handleClose} />
+
+
+
     </Box>
   );
 };

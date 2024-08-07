@@ -272,7 +272,8 @@ body.dark-mode .toolbar-button button.active {
 input[type="number"] {
   -webkit-appearance: none;
   -moz-appearance: textfield;
-  appearance: none; /* Standard */
+  appearance: none;
+  /* Standard */
 }
 
 input::-webkit-outer-spin-button,
@@ -281,7 +282,7 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
- .inputBox input:focus-visible {
+.inputBox input:focus-visible {
   border: unset;
   outline: unset;
 }
@@ -900,7 +901,35 @@ body.dark-mode .tabsOuter {
 
 /******************  Add Liquidity Css  *****************/
 
+/******************  ROI CALCULATOR Css  *****************/
 
+.daBtnOuter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  flex-direction: row;
+}
+
+.daBtnOuter button {
+  min-height: unset;
+  border-radius: 30px !important;
+  height: 34px;
+  min-width: unset;
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 14px;
+  width: calc(33.33% - 20px);
+  background: var(--light_clr);
+}
+
+.daBtnOuter button.active {
+  background: var(--primary);
+  color: var(--white);
+}
+
+
+/******************  ROI CALCULATOR Css  *****************/
 
 /******************  Responsive CSS  *****************/
 @media only screen and (max-width: 1399px) {

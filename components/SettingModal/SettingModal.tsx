@@ -122,7 +122,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
 
                             <Box className="Slippage_items Slippage_input" sx={{ display: 'flex', alignItems: 'center', gap: '5px', mb: 2 }}>
                                 <input
-                                    type="text"
+                                    type="number"
                                     placeholder="2.00"
                                     className={theme === 'light' ? 'lightInput' : 'darkInput'}
                                 />
@@ -157,7 +157,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
                             </Typography>
                             <Box className="Slippage_input">
                                 <input
-                                    type="text"
+                                    type="number"
                                     placeholder="2.00"
                                     className={theme === 'light' ? 'lightInput' : 'darkInput'}
                                 />

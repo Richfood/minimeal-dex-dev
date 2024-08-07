@@ -120,7 +120,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                             </Typography>
                         </Box>
                         <Box className="inputField">
-                            <input type="text" placeholder='0.0' />
+                            <input type="number" placeholder='0.0' />
                             <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}>~195,194.61 USD</Typography>
                         </Box>
                     </Box>
@@ -139,7 +139,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                             </Typography>
                         </Box>
                         <Box className="inputField">
-                            <input type="text" placeholder='0.0' />
+                            <input type="number" placeholder='0.0' />
                             <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}>~195,194.61 USD</Typography>
                         </Box>
                     </Box>
