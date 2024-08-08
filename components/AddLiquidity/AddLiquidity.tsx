@@ -64,7 +64,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
   const handleOpenToken = useCallback(() => setOpenToken(prev => !prev), []);
   const handleCloseToken = () => setOpenToken(false);
 
-  
+
   const router = useRouter();
 
   const handleGoBack = () => {
@@ -108,13 +108,13 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
               <Box>
                 <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>0%</Typography>
               </Box>
-              <Box onClick={handleOpen} sx={{cursor: "pointer"}}>
-                <Typography><CiCalculator2  size={20} style={{ color: palette.text.secondary }} /></Typography>
+              <Box onClick={handleOpen} sx={{ cursor: "pointer" }}>
+                <Typography><CiCalculator2 size={20} style={{ color: palette.text.secondary }} /></Typography>
               </Box>
-              <Box sx={{cursor: "pointer"}}>
+              <Box sx={{ cursor: "pointer" }}>
                 <Typography><BsQuestionCircle size={20} style={{ color: palette.text.secondary }} /></Typography>
               </Box>
-              <Box sx={{cursor: "pointer"}}>
+              <Box sx={{ cursor: "pointer" }}>
                 <Typography><IoSettingsOutline size={20} style={{ color: palette.text.secondary }} /></Typography>
               </Box>
             </Box>
@@ -757,7 +757,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
         mode={theme} // Ensure `theme` is passed correctly
       />
 
-<RoiCalculator open={open} handleClose={handleClose} />
+      <RoiCalculator open={open} handleClose={handleClose} />
 
 
 

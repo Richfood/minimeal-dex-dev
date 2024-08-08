@@ -2,6 +2,7 @@
 import React from 'react';
 import { styled, Switch, SwitchProps } from '@mui/material';
 import { useTheme } from '../ThemeContext';
+import { url } from 'inspector';
 
 // Define the custom switch using styled
 const CustomSwitch = styled((props: SwitchProps) => (
@@ -41,7 +42,7 @@ const CustomSwitch = styled((props: SwitchProps) => (
     },
   },
   '& .MuiSwitch-thumb': {
-    background: '../../',
+    backgroundImage: 'url(../public/images/pls.png)',
     width: 22,
     height: 22,
   },

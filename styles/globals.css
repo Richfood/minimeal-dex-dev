@@ -62,6 +62,7 @@ body {
 /* width */
 ::-webkit-scrollbar {
   width: 5px;
+  height: 5px;
 }
 
 /* Track */
@@ -74,12 +75,13 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #696969;
   border-radius: 10px;
-  height: 30px;
+  height: 10px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #173d3d99;
+   height: 10px;
 }
 
 
@@ -128,6 +130,15 @@ body.dark-mode {
   font-size: 20px;
   font-weight: 700;
 }
+
+
+.mainTitle {
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--cream);
+}
+
 
 
 /***************** Common Css ****************/
@@ -220,6 +231,20 @@ body.dark-mode .toolbar-button button.active {
   background: var(--primary);
   border-radius: 30px;
   color: var(--white);
+}
+
+
+.toolbar-button button.active:not(:disabled) {
+  background: var(--primary);
+  border-radius: 30px;
+  color: var(--white);
+}
+
+.toolbar-button button:disabled {
+  background: var(--gray); /* Example disabled state color */
+  color: var(--light-gray);
+  cursor: not-allowed;
+  pointer-events: none; /* Prevent click events */
 }
 
 
@@ -903,6 +928,7 @@ body.dark-mode .tabsOuter {
 
 /******************  ROI CALCULATOR Css  *****************/
 
+
 .daBtnOuter {
   display: flex;
   justify-content: space-between;
@@ -929,6 +955,95 @@ body.dark-mode .tabsOuter {
 }
 
 
+.historyPrice .toolbar-button {
+  width: 100%;
+}
+
+.historyPrice .toolbar-button button {
+  width: 25%;
+}
+
+.roiCalculator  .modal_footer {
+  padding: 20px 15px;
+  text-align: center;
+  border-radius: 16px 16px 0 0 ;
+}
+
+.roiList li {
+  padding-left: 10px;
+  position: relative;
+}
+
+.roiList li::before {
+  content: '';
+  position: absolute;
+  height: 4px;
+  width: 4px;
+  top: 4px;
+  left: 0%;
+  background: var(--cream);
+  border-radius: 50%;
+}
+
+
+.roiCalculator {
+  overflow: hidden;
+} 
+.roiCalculator .modal_body {
+  max-height: calc(80vh - 122px);
+  overflow: auto;
+}
+
+
+.active.roiCalculator .modal_body {
+  max-height: calc(80vh - 342px);
+}
+
+
+.hideBtn {
+  height: 0;
+  opacity: 0;
+  display: none;
+  visibility: hidden;
+}
+
+.active.roiCalculator .hideBtn {
+  height: 100%;
+  opacity: 1;
+  display: block;
+  visibility: visible;
+}
+
+.active.roiCalculator  .detailsBtn {
+  visibility: hidden;
+  opacity: 0;
+  display: none;
+  height: 0;
+}
+
+
+.commonBadge {
+  color: var(--cream);
+  border: 2px solid var(--cream);
+  padding: 3px 10px;
+  border-radius: 30px;
+  font-size: 12px;
+}
+
+
+.switchData {
+  display: block;
+}
+.switchData.active {
+  display: none;
+}
+
+.editBal input {
+  padding: 0;
+  text-align: center;
+  font-size: 14px;
+}
+
 /******************  ROI CALCULATOR Css  *****************/
 
 /******************  Responsive CSS  *****************/
@@ -939,3 +1054,4 @@ body.dark-mode .tabsOuter {
 }
 
 /******************  Responsive CSS  *****************/
+
