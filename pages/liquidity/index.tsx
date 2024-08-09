@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { Box, Container } from '@mui/material'
-import Header from '@/components/Header/Header';
-import Footer from '@/components/Footer/Footer';
-import Liquidity from '@/components/Liquidity/Liquidity';
+import Liquidity from '../../components/Liquidity/Liquidity';
+import Header from '../../components/header/Header';
+import Footer from '../../components/footer/Footer';
 
 const index = () => {
     return (
