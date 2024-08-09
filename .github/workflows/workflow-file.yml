@@ -1,0 +1,27 @@
+name: Next.js Self-Hosted Runner Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: [self-hosted, runner-dex]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install --force
+        
+      - name: Build Next.js app
+        run: npm run build
+
+      - name: Deploy to production
+        run: APP_NAME=frontend-dex APP_CWD=/home/ubuntu/actions-runner-dex/_work/minimeal-dex/minimeal-dex/ PORT=5000 pm2 start pm2.config.js
