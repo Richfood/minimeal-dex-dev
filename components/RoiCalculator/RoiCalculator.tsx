@@ -23,8 +23,13 @@ import ThemeModeSwitch from '../ThemeModeSwitch/ThemeModeSwitch';
 import InputAdornment from '@mui/material/InputAdornment';
 import { RxDoubleArrowDown } from "react-icons/rx";
 
+interface RoiCalculatorProps {
+    open: boolean;
+    handleClose: () => void;
+  }
 
-const RoiCalculator = ({ open, handleClose }) => {
+  
+  const RoiCalculator: React.FC<RoiCalculatorProps> = ({ open, handleClose }) => {
 
     // State to manage edit mode
     const [isEditing, setIsEditing] = useState(false);
@@ -37,7 +42,7 @@ const RoiCalculator = ({ open, handleClose }) => {
     };
 
     // Handle balance change
-    const handleBalanceChange = () => {
+    const handleBalanceChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
         setBalance(event.target.value);
     };
 
@@ -67,15 +72,15 @@ const RoiCalculator = ({ open, handleClose }) => {
     }
 
 
-    const handleStakeTime = (index) => {
+    const handleStakeTime = (index: React.SetStateAction<string>) => {
         setStakedTime(index);
     };
 
-    const handleClickInterval = (index) => {
+    const handleClickInterval = (index: React.SetStateAction<string>) => {
         setTimeInterval(index);
     };
 
-    const handleCompounding = (time) => {
+    const handleCompounding = (time: React.SetStateAction<string>) => {
         if (!disableTime) {
             setCompoundingTime(time);
         }
@@ -85,7 +90,7 @@ const RoiCalculator = ({ open, handleClose }) => {
         setDisableTime(prev => !prev);
     };
 
-    const handleClick = (index) => {
+    const handleClick = (index: React.SetStateAction<number>) => {
         setActive(index);
     };
 
@@ -180,7 +185,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                             <Box>
                                                 <Box sx={{ display: "flex", alignItems: 'center', justifyContent: "space-between", mb: '15px' }}>
                                                     <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                        <Image src="/images/pls.png" width={30} height={30} />
+                                                        <Image src="/images/pls.png" width={30} height={30} alt={''} />
                                                         <Typography component="span">PLS</Typography>
                                                     </Box>
                                                     <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
@@ -189,7 +194,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                 </Box>
                                                 <Box sx={{ display: "flex", alignItems: 'center', justifyContent: "space-between" }}>
                                                     <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                        <Image src="/images/9mm.png" width={30} height={30} />
+                                                        <Image src="/images/9mm.png" width={30} height={30} alt={''} />
                                                         <Typography component="span">9MM</Typography>
                                                     </Box>
                                                     <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
@@ -206,7 +211,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                         History price
                                     </Typography>
 
-                                    <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', justifyContent: "end", mb: "15px", width: '100%' }}>
+                                    <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', justifyContent: "end", mb: "15px", }}>
                                         <Typography sx={{
                                             fontSize: '14px',
                                             fontWeight: '600',
@@ -303,7 +308,6 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                 30D
                                             </Button>
                                         </Box>
-
                                     </Box>
                                 </Box>
 
@@ -320,7 +324,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                             </Box>
                                         </Box>
                                     </Box>
-                                    <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', justifyContent: "end", mb: "15px", width: '100%' }}>
+                                    <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', justifyContent: "end", mb: "15px" }}>
                                         <Typography sx={{
                                             fontSize: '14px',
                                             fontWeight: '600',
@@ -413,8 +417,8 @@ const RoiCalculator = ({ open, handleClose }) => {
                                 <Box sx={{ mb: '15px' }}>
                                     <Typography variant="h6" className='mainTitle'>Calculate impermanent loss</Typography>
                                 </Box>
-                                <Box onClick={switchActive}>
-                                    <IOSSwitch />
+                                <Box>
+                                    <IOSSwitch onClick={switchActive} />
                                 </Box>
                                 <Box className={`${activeSwitch ? 'active' : ''} switchData `}>
                                     <Grid container spacing={0} sx={{ mt: '15px' }}>
@@ -460,7 +464,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                     <TableRow>
                                                                         <TableCell>
                                                                             <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                                <Image src="/images/pls.png" width={30} height={30} />
+                                                                                <Image src="/images/pls.png" width={30} height={30} alt={''} />
                                                                                 <Typography component="span">PLS</Typography>
                                                                             </Box>
                                                                         </TableCell>
@@ -492,7 +496,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                     <TableRow>
                                                                         <TableCell>
                                                                             <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                                <Image src="/images/pls.png" width={30} height={30} />
+                                                                                <Image src="/images/pls.png" width={30} height={30} alt={''} />
                                                                                 <Typography component="span">PLS</Typography>
                                                                             </Box>
                                                                         </TableCell>
@@ -567,7 +571,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                     <TableCell>
 
                                                                         <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                            <Image src="/images/pls.png" width={30} height={30} />
+                                                                            <Image src="/images/pls.png" width={30} height={30} alt={''} />
                                                                             <Typography component="span">PLS</Typography>
                                                                         </Box>
                                                                     </TableCell>
@@ -582,7 +586,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                 <TableRow>
                                                                     <TableCell>
                                                                         <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                            <Image src="/images/9mm.png" width={30} height={30} />
+                                                                            <Image src="/images/9mm.png" width={30} height={30} alt={''} />
                                                                             <Typography component="span">9MM</Typography>
                                                                         </Box>
                                                                     </TableCell>
@@ -647,7 +651,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                     <TableRow>
                                                                         <TableCell>
                                                                             <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                                <Image src="/images/pls.png" width={30} height={30} />
+                                                                                <Image src="/images/pls.png" width={30} height={30} alt={''} />
                                                                                 <Typography component="span">PLS</Typography>
                                                                             </Box>
                                                                         </TableCell>
@@ -679,7 +683,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                     <TableRow>
                                                                         <TableCell>
                                                                             <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                                <Image src="/images/pls.png" width={30} height={30} />
+                                                                                <Image src="/images/pls.png" width={30} height={30} alt={''} />
                                                                                 <Typography component="span">PLS</Typography>
                                                                             </Box>
                                                                         </TableCell>
@@ -754,7 +758,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                     <TableCell>
 
                                                                         <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                            <Image src="/images/pls.png" width={30} height={30} />
+                                                                            <Image src="/images/pls.png" width={30} height={30} alt={''} />
                                                                             <Typography component="span">PLS</Typography>
                                                                         </Box>
                                                                     </TableCell>
@@ -769,7 +773,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                 <TableRow>
                                                                     <TableCell>
                                                                         <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                            <Image src="/images/9mm.png" width={30} height={30} />
+                                                                            <Image src="/images/9mm.png" width={30} height={30} alt={''} />
                                                                             <Typography component="span">9MM</Typography>
                                                                         </Box>
                                                                     </TableCell>
@@ -786,8 +790,8 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                 <TableRow>
                                                                     <TableCell>
                                                                         <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                            <Image src="/images/9mm.png" width={20} height={20} />
-                                                                            <Image src="/images/9mm.png" width={20} height={20} />
+                                                                            <Image src="/images/9mm.png" width={20} height={20} alt={''} />
+                                                                            <Image src="/images/9mm.png" width={20} height={20} alt={''} />
                                                                             <Typography component="span">9MM</Typography>
                                                                         </Box>
                                                                     </TableCell>

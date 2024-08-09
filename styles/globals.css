@@ -283,6 +283,7 @@ body.dark-mode .toolbar-button button.active {
 .SwapWidgetInner {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   max-width: 970px;
 }
 
@@ -1053,5 +1054,50 @@ body.dark-mode .tabsOuter {
   }
 }
 
+
+
+@media only screen and (max-width: 900px) {
+  .SwapWidgetBox {
+    position: relative;
+    top: 50%;
+    order: 1;
+    transform: translateX(-50%);
+    left: 50%;
+    margin-top: -60px;
+    max-width: 100%;
+    margin-bottom: 30px;
+    align-items: flex-end;
+}
+
+.SwapWidgetSec {
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.SwapWidgetInner {
+    order: 2;
+}
+
+.swap_widgets {
+    max-width: 100%;
+}
+
+.SwapWidgetBox .SwapWidgetBoxTitle {
+    width: 50%;
+}
+
+.SwapWidgetBox .widgetList {
+    width: 50%;
+    max-width: 150px;
+    margin-left: auto;
+}
+
+.SwapWidgetBox .SwapWidgetBoxTitle p {
+    margin-bottom: 0;
+}
+
+
+}
 /******************  Responsive CSS  *****************/
 

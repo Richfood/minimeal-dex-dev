@@ -123,10 +123,22 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                             <input type="number" placeholder='0.0' />
                             <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}>~195,194.61 USD</Typography>
                         </Box>
+
+                        <Box className="slippageSec">
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                                <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>Slippage Tolerance <PiPencilSimpleBold /></Typography>
+                                <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
+                            </Box>
+                            <Box sx={{ mt: '25px' }}>
+                                <Button variant="contained" color="secondary">Connect Wallet</Button>
+                            </Box>
+                        </Box>
+
+
                     </Box>
 
-                    <Box className="arrowBox">
-                        <Box className="swapData" sx={{ display: 'flex', alignItems: 'center', margin: '0 auto' }}>
+                    <Box className="arrowBox" sx={{pt: '40px'}}>
+                        <Box className="swapData" sx={{ display: 'flex', alignItems: 'flex-start', margin: '0 auto' }}>
                             <FaArrowRight onClick={toggleGraph} />
                         </Box>
                     </Box>
@@ -135,7 +147,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                             <img src={circleImages.circle2} alt="circle2" style={{ width: '20px', height: '20px' }} />
                             <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center' }}>
-                                {activeNewCurrency.active2} <IoIosArrowDown /> <Typography component="span" sx={{ml: '5px',cursor: 'pointer'}}><PiCopy /></Typography>
+                                {activeNewCurrency.active2} <IoIosArrowDown /> <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
                             </Typography>
                         </Box>
                         <Box className="inputField">
@@ -145,15 +157,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                     </Box>
                 </Box>
 
-                <Box className="slippageSec">
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                        <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>Slippage Tolerance <PiPencilSimpleBold /></Typography>
-                        <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
-                    </Box>
-                    <Box sx={{ mt: '25px' }}>
-                        <Button variant="contained" color="secondary">Connect Wallet</Button>
-                    </Box>
-                </Box>
+
 
                 <Box className="SwapWidgetBox">
                     <Box className="SwapWidgetBoxTitle">
@@ -167,11 +171,11 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                     <PiChartBar />
                                 </ListItemButton>
                             </ListItem>
-                            <ListItem className="widgetItem" disablePadding>
+                            {/* <ListItem className="widgetItem" disablePadding>
                                 <ListItemButton onClick={handleOpen}>
-                                    <BsFire  />
+                                    <BsFire />
                                 </ListItemButton>
-                            </ListItem>
+                            </ListItem> */}
                             <ListItem className="widgetItem" disablePadding>
                                 <ListItemButton onClick={handleOpen}>
                                     <Badge color="secondary" variant="dot">
