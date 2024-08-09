@@ -240,7 +240,7 @@ body.dark-mode .toolbar-button button.active {
   color: var(--white);
 }
 
-.toolbar-button button:disabled {
+.toolbar-button button:disabled,body.dark-mode .toolbar-button button:disabled{
   background: var(--gray); /* Example disabled state color */
   color: var(--light-gray);
   cursor: not-allowed;
@@ -1032,10 +1032,10 @@ body.dark-mode .tabsOuter {
 
 
 .switchData {
-  display: block;
+  display: none;
 }
 .switchData.active {
-  display: none;
+  display: block;
 }
 
 .editBal input {

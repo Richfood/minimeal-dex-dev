@@ -21,6 +21,7 @@ import IOSSwitch from '../IOSSwitch/IOSSwitch';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import ThemeModeSwitch from '../ThemeModeSwitch/ThemeModeSwitch';
 import InputAdornment from '@mui/material/InputAdornment';
+import { RxDoubleArrowDown } from "react-icons/rx";
 
 
 const RoiCalculator = ({ open, handleClose }) => {
@@ -28,7 +29,7 @@ const RoiCalculator = ({ open, handleClose }) => {
     // State to manage edit mode
     const [isEditing, setIsEditing] = useState(false);
     // State to manage balance value
-    const [balance, setBalance] = useState('$0.000036158');
+    const [balance, setBalance] = useState('0.000036158');
 
     // Toggle edit mode
     const handleEditClick = () => {
@@ -44,7 +45,7 @@ const RoiCalculator = ({ open, handleClose }) => {
     const handleResetClick = () => {
         setIsEditing(false);
         // Optionally reset the balance to its original value
-        setBalance('$0.000036158');
+        setBalance('0.000036158');
     };
 
 
@@ -108,9 +109,11 @@ const RoiCalculator = ({ open, handleClose }) => {
         border: 'unset'
     };
 
+
+
     return (
         <Modal
-            open={true}
+            open={open}
             onClose={handleClose}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
@@ -361,7 +364,6 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                 <Typography sx={{ fontWeight: '600' }}>Per</Typography>
                                                 <Typography sx={{ fontWeight: '600' }}>PLS</Typography>
                                             </Box>
-
                                         </Box>
                                         {/* free_tier */}
 
@@ -416,7 +418,9 @@ const RoiCalculator = ({ open, handleClose }) => {
                                 </Box>
                                 <Box className={`${activeSwitch ? 'active' : ''} switchData `}>
                                     <Grid container spacing={0} sx={{ mt: '15px' }}>
-                                        <Grid item xs={6}>
+
+                                        {/*** Grid ***/}
+                                        <Grid item xs={6} sx={{ pr: '10px' }}>
                                             <Box>
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: '15px' }}>
                                                     <Box>
@@ -464,6 +468,9 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                         <TableCell>
                                                                             {isEditing ? (
                                                                                 <TextField
+                                                                                    InputProps={{
+                                                                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                                                                    }}
                                                                                     className='editBal'
                                                                                     value={balance}
                                                                                     onChange={handleBalanceChange}
@@ -494,7 +501,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                             {isEditing ? (
                                                                                 <TextField
                                                                                     InputProps={{
-                                                                                        startAdornment: <InputAdornment position="start">kg</InputAdornment>,
+                                                                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                                                                     }}
                                                                                     className='editBal'
                                                                                     value={balance}
@@ -521,21 +528,102 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                 </Box>
                                             </Box>
 
-
-                                            <Box sx={{ mt: '30px' }}>
-                                                <Typography variant="h6" className='mainTitle'>Projected results</Typography>
-                                            </Box>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', my: '15px' }}>
-                                                <Box>
-                                                    <Typography variant="h6">100$ <Typography component="span" sx={{ color: '#11c711' }}>(0%)</Typography></Typography>
+                                            <Box>
+                                                <Box sx={{ mt: '30px' }}>
+                                                    <Typography variant="h6" className='mainTitle'>Projected results</Typography>
                                                 </Box>
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', my: '15px' }}>
+                                                    <Box>
+                                                        <Typography variant="h6">$100 <Typography component="span" sx={{ color: '#11c711' }}>(0%)</Typography></Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
 
-                                                    <Box><Typography className='commonBadge' sx={{ cursor: 'pointer' }}>HOLD  Tokens</Typography></Box>
+                                                        <Box><Typography className='commonBadge' sx={{ cursor: 'pointer' }}>HOLD  Tokens</Typography></Box>
+                                                    </Box>
                                                 </Box>
+
+
+
+
+                                                <Box className="daBox" sx={{ border: '1px solid var(--cream)', borderRadius: '8px', boxShadow: 'var(--cream) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px' }}>
+                                                    <Box className="free_tier" sx={{ bgcolor: theme === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', textAlign: 'center', p: '0 !important' }}>
+                                                        <Table>
+                                                            <TableHead>
+                                                                <TableRow>
+                                                                    <TableCell>
+                                                                        <Typography variant="h6" className='mainTitle'>Asset</Typography>
+                                                                    </TableCell>
+
+                                                                    <TableCell>
+                                                                        <Typography variant="h6" className='mainTitle'>Balance</Typography>
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <Typography variant="h6" className='mainTitle'>Value</Typography>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableHead>
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell>
+
+                                                                        <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
+                                                                            <Image src="/images/pls.png" width={30} height={30} />
+                                                                            <Typography component="span">PLS</Typography>
+                                                                        </Box>
+                                                                    </TableCell>
+
+                                                                    <TableCell>
+                                                                        <Typography component="span" sx={{ fontWeight: '600' }}>1.41M</Typography>
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <Typography component="span" sx={{ fontWeight: '600' }}>$50.81</Typography>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                                <TableRow>
+                                                                    <TableCell>
+                                                                        <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
+                                                                            <Image src="/images/9mm.png" width={30} height={30} />
+                                                                            <Typography component="span">9MM</Typography>
+                                                                        </Box>
+                                                                    </TableCell>
+
+                                                                    <TableCell>
+                                                                        <Typography component="span" sx={{ fontWeight: '600' }}>1.41M</Typography>
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <Typography component="span" sx={{ fontWeight: '600' }}>$50.81</Typography>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableBody>
+                                                        </Table>
+                                                    </Box>
+                                                </Box>
+
+
                                             </Box>
 
-                                        <Box className="daBox" sx={{ border: '1px solid var(--cream)', borderRadius: '8px', boxShadow: 'var(--cream) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px' }}>
+                                        </Grid>
+                                        {/*** Grid ***/}
+
+
+                                        {/*** Grid ***/}
+                                        <Grid item xs={6} sx={{ pl: '10px' }}>
+                                            <Box>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: '15px' }}>
+                                                    <Box>
+                                                        <Typography variant="h6" className='mainTitle'>End Price</Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                        <Typography onClick={handleEditClick} className='commonBadge' sx={{ cursor: 'pointer' }}>
+                                                            {isEditing ? 'Save' : 'Edit'}
+                                                        </Typography>
+                                                        <Typography onClick={handleResetClick} className='commonBadge' sx={{ cursor: 'pointer' }}>
+                                                            Reset
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+
+                                                <Box className="daBox" sx={{ border: '1px solid var(--cream)', borderRadius: '8px', boxShadow: 'var(--cream) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px' }}>
                                                     <Box className="free_tier" sx={{ bgcolor: theme === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', textAlign: 'center', p: '0 !important' }}>
                                                         <TableContainer>
                                                             <Table>
@@ -567,6 +655,9 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                         <TableCell>
                                                                             {isEditing ? (
                                                                                 <TextField
+                                                                                    InputProps={{
+                                                                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                                                                    }}
                                                                                     className='editBal'
                                                                                     value={balance}
                                                                                     onChange={handleBalanceChange}
@@ -597,7 +688,7 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                                             {isEditing ? (
                                                                                 <TextField
                                                                                     InputProps={{
-                                                                                        startAdornment: <InputAdornment position="start">kg</InputAdornment>,
+                                                                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                                                                     }}
                                                                                     className='editBal'
                                                                                     value={balance}
@@ -622,151 +713,156 @@ const RoiCalculator = ({ open, handleClose }) => {
                                                         </TableContainer>
                                                     </Box>
                                                 </Box>
+                                            </Box>
 
+                                            <Box>
+                                                <Box sx={{ mt: '30px' }}>
+                                                    <Typography variant="h6" className='mainTitle'>&nbsp;</Typography>
+                                                </Box>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', my: '15px' }}>
+                                                    <Box>
+                                                        <Typography variant="h6">$661.352 <Typography component="span" sx={{ color: '#11c711' }}>(561.35%)</Typography></Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
+
+                                                        <Box><Typography className='commonBadge' sx={{ cursor: 'pointer' }}>Provide Liquidity</Typography></Box>
+                                                    </Box>
+                                                </Box>
+
+
+
+
+                                                <Box className="daBox" sx={{ border: '1px solid var(--cream)', borderRadius: '8px', boxShadow: 'var(--cream) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px' }}>
+                                                    <Box className="free_tier" sx={{ bgcolor: theme === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', textAlign: 'center', p: '0 !important' }}>
+                                                        <Table>
+                                                            <TableHead>
+                                                                <TableRow>
+                                                                    <TableCell>
+                                                                        <Typography variant="h6" className='mainTitle'>Asset</Typography>
+                                                                    </TableCell>
+
+                                                                    <TableCell>
+                                                                        <Typography variant="h6" className='mainTitle'>Balance</Typography>
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <Typography variant="h6" className='mainTitle'>Value</Typography>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            </TableHead>
+                                                            <TableBody>
+                                                                <TableRow>
+                                                                    <TableCell>
+
+                                                                        <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
+                                                                            <Image src="/images/pls.png" width={30} height={30} />
+                                                                            <Typography component="span">PLS</Typography>
+                                                                        </Box>
+                                                                    </TableCell>
+
+                                                                    <TableCell>
+                                                                        <Typography component="span" sx={{ fontWeight: '600' }}>1.41M</Typography>
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <Typography component="span" sx={{ fontWeight: '600' }}>$50.81</Typography>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                                <TableRow>
+                                                                    <TableCell>
+                                                                        <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
+                                                                            <Image src="/images/9mm.png" width={30} height={30} />
+                                                                            <Typography component="span">9MM</Typography>
+                                                                        </Box>
+                                                                    </TableCell>
+
+                                                                    <TableCell>
+                                                                        <Typography component="span" sx={{ fontWeight: '600' }}>1.41M</Typography>
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <Typography component="span" sx={{ fontWeight: '600' }}>$50.81</Typography>
+                                                                    </TableCell>
+                                                                </TableRow>
+
+
+                                                                <TableRow>
+                                                                    <TableCell>
+                                                                        <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
+                                                                            <Image src="/images/9mm.png" width={20} height={20} />
+                                                                            <Image src="/images/9mm.png" width={20} height={20} />
+                                                                            <Typography component="span">9MM</Typography>
+                                                                        </Box>
+                                                                    </TableCell>
+
+                                                                    <TableCell>
+                                                                        <Typography component="span" sx={{ fontWeight: '600' }}></Typography>
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <Typography component="span" sx={{ fontWeight: '600' }}>$50.81</Typography>
+                                                                    </TableCell>
+                                                                </TableRow>
+
+
+
+                                                            </TableBody>
+                                                        </Table>
+                                                    </Box>
+                                                </Box>
+
+
+                                            </Box>
 
                                         </Grid>
-
-                                        <Grid item xs={6} sx={{ pl: '15px' }}>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: '15px' }}>
-                                                <Box>
-                                                    <Typography variant="h6" className='mainTitle'>Entry Price</Typography>
-                                                </Box>
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
-                                                    <Box><Typography className='commonBadge' sx={{ cursor: 'pointer' }}>Edit</Typography></Box>
-                                                    <Box><Typography className='commonBadge' sx={{ cursor: 'pointer' }}>Reset</Typography></Box>
-                                                </Box>
-                                            </Box>
-
-                                           
-                                            <Box className="daBox" sx={{ border: '1px solid var(--cream)', borderRadius: '8px', boxShadow: 'var(--cream) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px' }}>
-                                                <Box className="free_tier" sx={{ bgcolor: theme === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', textAlign: 'center', p: '0 !important' }}>
-                                                    <Table>
-                                                        <TableHead>
-                                                            <TableRow>
-                                                                <TableCell>
-                                                                    <Typography variant="h6" className='mainTitle'>Asset</Typography>
-                                                                </TableCell>
-
-                                                                <TableCell>
-                                                                    <Typography variant="h6" className='mainTitle'>Balance</Typography>
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Typography variant="h6" className='mainTitle'>Value</Typography>
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        </TableHead>
-                                                        <TableBody>
-                                                            <TableRow>
-                                                                <TableCell>
-
-                                                                    <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                        <Image src="/images/pls.png" width={30} height={30} />
-                                                                        <Typography component="span">PLS</Typography>
-                                                                    </Box>
-                                                                </TableCell>
-
-                                                                <TableCell>
-                                                                    <Typography component="span" sx={{ fontWeight: '600' }}>1.41M</Typography>
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Typography component="span" sx={{ fontWeight: '600' }}>$50.81</Typography>
-                                                                </TableCell>
-                                                            </TableRow>
-                                                            <TableRow>
-                                                                <TableCell>
-                                                                    <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                        <Image src="/images/9mm.png" width={30} height={30} />
-                                                                        <Typography component="span">9MM</Typography>
-                                                                    </Box>
-                                                                </TableCell>
-
-                                                                <TableCell>
-                                                                    <Typography component="span" sx={{ fontWeight: '600' }}>1.41M</Typography>
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Typography component="span" sx={{ fontWeight: '600' }}>$50.81</Typography>
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        </TableBody>
-                                                    </Table>
-                                                </Box>
-                                            </Box>
-
-
-                                            <Box sx={{ mt: '30px' }}>
-                                                <Typography variant="h6" className='mainTitle'> &nbsp;</Typography>
-                                            </Box>
-
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', my: '15px' }}>
-                                                <Box>
-                                                    <Typography variant="h6">$652.772 <Typography component="span" sx={{ color: '#11c711' }}>(552.77%)</Typography></Typography>
-                                                </Box>
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
-
-                                                    <Box><Typography className='commonBadge' sx={{ cursor: 'pointer' }}>Provide Liquidity</Typography></Box>
-                                                </Box>
-                                            </Box>
-
-                                            <Box className="daBox" sx={{ border: '1px solid var(--cream)', borderRadius: '8px', boxShadow: 'var(--cream) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px' }}>
-                                                <Box className="free_tier" sx={{ bgcolor: theme === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', textAlign: 'center', p: '0 !important' }}>
-                                                    <Table>
-                                                        <TableHead>
-                                                            <TableRow>
-                                                                <TableCell>
-                                                                    <Typography variant="h6" className='mainTitle'>Asset</Typography>
-                                                                </TableCell>
-
-                                                                <TableCell>
-                                                                    <Typography variant="h6" className='mainTitle'>Balance</Typography>
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Typography variant="h6" className='mainTitle'>Value</Typography>
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        </TableHead>
-                                                        <TableBody>
-                                                            <TableRow>
-                                                                <TableCell>
-
-                                                                    <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                        <Image src="/images/pls.png" width={30} height={30} />
-                                                                        <Typography component="span">PLS</Typography>
-                                                                    </Box>
-                                                                </TableCell>
-
-                                                                <TableCell>
-                                                                    <Typography component="span" sx={{ fontWeight: '600' }}>1.41M</Typography>
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Typography component="span" sx={{ fontWeight: '600' }}>$50.81</Typography>
-                                                                </TableCell>
-                                                            </TableRow>
-                                                            <TableRow>
-                                                                <TableCell>
-                                                                    <Box sx={{ display: "flex", alignItems: 'center', gap: '10px' }}>
-                                                                        <Image src="/images/9mm.png" width={30} height={30} />
-                                                                        <Typography component="span">9MM</Typography>
-                                                                    </Box>
-                                                                </TableCell>
-
-                                                                <TableCell>
-                                                                    <Typography component="span" sx={{ fontWeight: '600' }}>1.41M</Typography>
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Typography component="span" sx={{ fontWeight: '600' }}>$50.81</Typography>
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        </TableBody>
-                                                    </Table>
-                                                </Box>
-                                            </Box>
-
-
-                                        </Grid>
+                                        {/*** Grid ***/}
                                     </Grid>
                                 </Box>
                             </Box>
                         </Box>
+
+                        <Box sx={{ p: '16px', textAlign: 'center' }}>
+                            <RxDoubleArrowDown
+                                style={{
+                                    color: 'var(--cream)',
+                                    fontSize: '30px',
+                                    animation: 'bounce 1.5s infinite'
+                                }}
+                            />
+                            <style>
+                                {`
+                                    @keyframes bounce {
+                                        0%, 20%, 50%, 80%, 100% {
+                                        transform: translateY(0);
+                                        }
+                                        40% {
+                                        transform: translateY(-8px);
+                                        }
+                                        60% {
+                                        transform: translateY(-5px);
+                                        }
+                                    }
+                                `}
+                            </style>
+                        </Box>
+
+
+
+                        <Box className="free_tier" sx={{ bgcolor: theme === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', textAlign: 'start !important',mb: '15px' }}>
+                            <Box>
+                                <Typography className='mainTitle' variant='h6' >
+                                    ROI at current rates
+                                </Typography>
+
+                                <Typography variant="h6" sx={{ fontSize: '18px', fontWeight: '600' }}>$24.26 <Typography component="span" sx={{ color: '#11c711' }}>(24.26%)</Typography></Typography>
+                            </Box>
+
+                           
+                        </Box>
+
+                        <Box>
+                                <Button variant="contained" color="secondary" sx={{width: '100%'}}>
+                                    Apply Settings
+                                </Button>
+                            </Box>
+
+
                     </Box>
                 </Box>
                 <Box className="modal_footer" sx={{ bgcolor: theme === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', }}>
