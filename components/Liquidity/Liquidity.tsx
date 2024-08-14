@@ -1,14 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { Badge, Box, Typography, List, ListItem, ListItemButton, FormGroup, FormControlLabel, Tab, Tabs, Button } from '@mui/material';
+import { Box, Typography, List, ListItem, ListItemButton, FormGroup, FormControlLabel, Tab, Tabs, Button } from '@mui/material';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { RxCountdownTimer } from 'react-icons/rx';
 import SettingsModal from '../SettingModal/SettingModal';
 import RecentTransactions from '../RecentTransactions/RecentTransactions';
 import Customcheckbox from '../Customcheckbox/Customcheckbox';
-import { TabContext, TabPanel } from '@mui/lab';
+import { TabContext } from '@mui/lab';
 import { FiPlus } from "react-icons/fi";
-import { useTheme } from '../ThemeContext'; // Ensure this is being used correctly if needed
 import router from 'next/router';
+import ImportPool from '../ImportPool/ImportPool'; 
 
 interface LiquidityProps {
   theme: 'light' | 'dark';
@@ -16,23 +16,24 @@ interface LiquidityProps {
 }
 
 const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
-  // State management for the dropdown or modal visibility
+  const [openPool, setOpenPool] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenRecent, setIsOpenRecent] = useState(false);
   const [value, setValue] = React.useState('0');
 
-  // Handlers for opening and closing the components
-  const handleOpen = useCallback(() => setIsOpen(prev => !prev), []);
+  const handleOpen = useCallback(() => setIsOpen(true), []);
   const handleClose = () => setIsOpen(false);
 
-  const handleOpenRecent = useCallback(() => setIsOpenRecent(prev => !prev), []);
+  const handleOpenPool = useCallback(() => setOpenPool(true), []); // Changed to openPool
+  const handleClosePool = () => setOpenPool(false); // Changed to openPool
+
+  const handleOpenRecent = useCallback(() => setIsOpenRecent(true), []);
   const handleCloseRecent = () => setIsOpenRecent(false);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
 
-  // Determine color based on theme
   const color = theme === 'light' ? 'var(--primary)' : 'var(--cream)';
 
   return (
@@ -106,7 +107,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
           {value === '2' && (
             <Box sx={{ py: '15px', textAlign: 'center' }}>
               <Typography sx={{ color: 'var(--cream)', fontWeight: '600', mb: '10px' }}>Don't see a pair you joined?</Typography>
-              <Button sx={{ color: 'var(--cream)', border: '1px solid var(--cream)' }}>
+              <Button  onClick={() => router.push('/find')}  sx={{ color: 'var(--cream)', border: '1px solid var(--cream)' }}>
                 Find other LP tokens
               </Button>
             </Box>
@@ -122,6 +123,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
 
       <RecentTransactions open={isOpenRecent} onClose={handleCloseRecent} />
       <SettingsModal isOpen={isOpen} handleClose={handleClose} theme={theme} />
+      <ImportPool open={openPool} onClose={handleClosePool} /> 
     </>
   );
 }

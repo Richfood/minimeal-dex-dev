@@ -102,7 +102,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       MuiBackdrop: {
         styleOverrides: {
           root: {
-            backgroundColor: '#1c252e7a',
+           
+            backgroundColor: currentTheme === 'light' ? 'rgba(0,0,0,0.5)': 'rgba(255,255,255,0.5)',
           },
         },
       },

@@ -124,7 +124,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                             <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}>~195,194.61 USD</Typography>
                         </Box>
 
-                        <Box className="slippageSec">
+                        <Box className="slippageSec dsls">
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                                 <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>Slippage Tolerance <PiPencilSimpleBold /></Typography>
                                 <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
@@ -137,7 +137,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
                     </Box>
 
-                    <Box className="arrowBox" sx={{pt: '40px'}}>
+                    <Box className="arrowBox" sx={{ pt: '40px' }}>
                         <Box className="swapData" sx={{ display: 'flex', alignItems: 'flex-start', margin: '0 auto' }}>
                             <FaArrowRight onClick={toggleGraph} />
                         </Box>
@@ -155,6 +155,20 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                             <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}>~195,194.61 USD</Typography>
                         </Box>
                     </Box>
+
+
+                    <Box className="slippageSec msls" sx={{display: "none"}}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                            <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>Slippage Tolerance <PiPencilSimpleBold /></Typography>
+                            <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
+                        </Box>
+                        <Box sx={{ mt: '25px' }}>
+                            <Button variant="contained" color="secondary">Connect Wallet</Button>
+                        </Box>
+                    </Box>
+
+
+
                 </Box>
 
 

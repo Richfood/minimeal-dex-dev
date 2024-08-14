@@ -81,7 +81,7 @@ body {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #173d3d99;
-   height: 10px;
+  height: 10px;
 }
 
 
@@ -204,7 +204,7 @@ body.dark-mode .white_box {
 }
 
 body.dark-mode .toolbar-button {
-  background: #092626;
+  background: var(--secondary-dark);
 }
 
 body.dark-mode .toolbar-button button {
@@ -240,11 +240,14 @@ body.dark-mode .toolbar-button button.active {
   color: var(--white);
 }
 
-.toolbar-button button:disabled,body.dark-mode .toolbar-button button:disabled{
-  background: var(--gray); /* Example disabled state color */
+.toolbar-button button:disabled,
+body.dark-mode .toolbar-button button:disabled {
+  background: var(--gray);
+  /* Example disabled state color */
   color: var(--light-gray);
   cursor: not-allowed;
-  pointer-events: none; /* Prevent click events */
+  pointer-events: none;
+  /* Prevent click events */
 }
 
 
@@ -434,7 +437,6 @@ body.dark-mode .widgetList ul svg {
 
 .token_Outer {
   display: flex;
-  justify-content: space-between;
 }
 
 .token_Outer .token_box {
@@ -817,7 +819,7 @@ body.dark-mode .tabsOuter button {
 }
 
 body.dark-mode .tabsOuter {
-  background: #092626;
+  background: var(--secondary-dark);
 }
 
 
@@ -955,6 +957,15 @@ body.dark-mode .tabsOuter {
   color: var(--white);
 }
 
+.dark-mode .daBtnOuter button.active {
+  background: var(--cream);
+  color: var(--primary);
+}
+
+.dark-mode .daBtnOuter button {
+  background-color: var(--secondary-dark);
+  color: var(--cream);
+}
 
 .historyPrice .toolbar-button {
   width: 100%;
@@ -964,10 +975,10 @@ body.dark-mode .tabsOuter {
   width: 25%;
 }
 
-.roiCalculator  .modal_footer {
+.roiCalculator .modal_footer {
   padding: 20px 15px;
   text-align: center;
-  border-radius: 16px 16px 0 0 ;
+  border-radius: 16px 16px 0 0;
 }
 
 .roiList li {
@@ -989,7 +1000,8 @@ body.dark-mode .tabsOuter {
 
 .roiCalculator {
   overflow: hidden;
-} 
+}
+
 .roiCalculator .modal_body {
   max-height: calc(80vh - 122px);
   overflow: auto;
@@ -1015,7 +1027,7 @@ body.dark-mode .tabsOuter {
   visibility: visible;
 }
 
-.active.roiCalculator  .detailsBtn {
+.active.roiCalculator .detailsBtn {
   visibility: hidden;
   opacity: 0;
   display: none;
@@ -1035,6 +1047,7 @@ body.dark-mode .tabsOuter {
 .switchData {
   display: none;
 }
+
 .switchData.active {
   display: block;
 }
@@ -1054,50 +1067,206 @@ body.dark-mode .tabsOuter {
   }
 }
 
+@media only screen and (max-width: 1199px) {
+  .al-inner {
+    flex-direction: column;
+    gap: 30px;
+  }
 
+  .al-inner .SwapWidgetInner {
+    max-width: 100%;
+  }
+
+  .ftCards {
+    min-height: 90px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    max-width: 25%;
+    width: 100%;
+    min-width: 130px;
+  }
+
+  .ftCards_list {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
 
 @media only screen and (max-width: 900px) {
   .SwapWidgetBox {
+    flex-direction: column;
+    left: 0;
+    transform: unset;
     position: relative;
     top: 50%;
     order: 1;
-    transform: translateX(-50%);
-    left: 50%;
-    margin-top: -60px;
-    max-width: 100%;
+    margin-top: -55px;
     margin-bottom: 30px;
-    align-items: flex-end;
-}
+  }
 
-.SwapWidgetSec {
+  .swap_graph_box {
+    margin-bottom: 70px;
+  }
+
+  .SwapWidgetSec {
     max-width: 100%;
     display: flex;
     flex-direction: column;
-}
+  }
 
-.SwapWidgetInner {
+  .SwapWidgetInner {
     order: 2;
-}
+  }
 
-.swap_widgets {
+  .swap_widgets {
     max-width: 100%;
-}
+  }
 
-.SwapWidgetBox .SwapWidgetBoxTitle {
-    width: 50%;
-}
+  .SwapWidgetBox .widgetList {
+    margin: 15px 0 0 0;
+    width: 100%;
+  }
 
-.SwapWidgetBox .widgetList {
-    width: 50%;
-    max-width: 150px;
-    margin-left: auto;
-}
-
-.SwapWidgetBox .SwapWidgetBoxTitle p {
+  .SwapWidgetBox .SwapWidgetBoxTitle p {
     margin-bottom: 0;
+  }
+
+  body .MuiButton-containedSecondary {
+    padding: 12px;
+  }
+
+  .white_box {
+    padding: 15px;
+  }
+
+
+  .ftCards {
+    min-width: 110px;
+  }
+
+  .CalculateSec>div {
+    padding: 0;
+  }
+
+  .modal_head,
+  .modal_body {
+    padding: 15px;
+  }
+
 }
 
 
+@media only screen and (max-width: 767px) {
+  .chart_bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .toolbar-button button {
+    font-size: 12px;
+    
+  }
 }
+
+
+@media only screen and (max-width: 600px) {
+
+  .ftCards_list {
+    justify-content: center;
+  }
+
+  .SwapWidgetInner {
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+  }
+
+  .inputBox {
+    width: 100%;
+  }
+
+  .arrowBox {
+    padding: 0;
+    width: 100%;
+    transform: rotate(90deg);
+  }
+
+  .slippageSec.dsls {
+    display: none;
+  }
+
+  .slippageSec.msls {
+    display: block !important;
+    width: 100%;
+  }
+
+  .slippageSec.msls {
+    margin-top: 0;
+  }
+
+  .slippageSec.msls div:nth-child(2) {
+    margin-top: 15px;
+  }
+
+  .SwapWidgetBox .SwapWidgetBoxTitle {
+    width: 100%;
+  }
+
+  .Liq_mid {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .Liq_mid div:nth-child(2) {
+    width: 100%;
+  }
+
+  .Liq_mid div:nth-child(2) button {
+    width: 33.33%;
+  }
+
+  .fullRangeSec {
+    justify-content: center;
+  }
+
+  .fullRangeSec>div {
+    min-width: 80px;
+    font-size: 12px;
+  }
+}
+
+
+
+
+@media only screen and (max-width: 480px) {
+
+  .al-inner .token-sec {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .token-pair .token-pair {
+    width: 100%;
+    flex: 100%;
+  }
+
+  .al-inner .token-sec .token-pair {
+    flex: 0 100%;
+    width: 100%;
+  }
+
+  .viewPrice {
+    flex-direction: column;
+  }
+
+  .viewPrice .free_tier {
+    width: 100%;
+  }
+
+}
+
+
 /******************  Responsive CSS  *****************/
-

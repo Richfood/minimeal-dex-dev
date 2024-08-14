@@ -4,8 +4,8 @@ import SwapWidget from '../components/SwapWidget/SwapWidget';
 import { useTheme } from '../components/ThemeContext';
 
 import { Box, Container } from '@mui/material';
-import Header from '../components/header/Header';
-import Footer from '../components/footer/Footer';
+import Header from '../components/Header/Header';
+import Footer from '../components/Footer/Footer';
 
 
 const IndexPage = () => {
@@ -42,7 +42,7 @@ const IndexPage = () => {
                         </Box>
                     }
                     <Box className="swap_widgets white_box" sx={{
-                        mt: '50px', maxWidth: '1200px', position: 'relative', mb: '175px',
+                        mt: '50px', maxWidth: '1200px', position: 'relative', mb: '50px',
                         '@media (max-width: 1269px)': {
                             maxWidth: 'calc(100% - 40px)',
                         },

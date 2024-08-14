@@ -128,7 +128,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
             <Box className="al-inner-left" sx={{ flex: 1 }}>
               <Box sx={{ mb: "15px" }}>
-                <Typography sx={{ color: 'var(--cream)', fontWeight: '600' }}>CHOOSE TOKEN PAIR</Typography>
+                <Typography className='mainTitle' sx={{ color: 'var(--cream)' }}>CHOOSE TOKEN PAIR</Typography>
                 <Box className="token-sec">
                   <Box className="token-pair" onClick={handleOpenToken} sx={{ cursor: 'pointer', color: palette.mode === 'light' ? 'var(--black)' : 'var(--white)', bgcolor: palette.mode === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)' }}>
                     <Box >
@@ -138,11 +138,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                       <IoIosArrowDown size={17} />
                     </Box>
                   </Box>
-                  <Box>
+                  <Box sx={{display: 'flex',alignItems: 'center',justifyContent: 'center'}}>
                     <HiPlus size={20} />
                   </Box>
                   <Box onClick={handleOpenToken} className="token-pair" sx={{ color: palette.mode === 'light' ? 'var(--black)' : 'var(--white)', bgcolor: palette.mode === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)' }}>
-                    <Box>
+                    <Box >
                       <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>PLS</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -281,7 +281,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
               <Box className="SwapWidgetInner" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
-                  <Typography sx={{ color: 'var(--cream)', fontWeight: '600', textAlign: 'start', }}>DEPOSIT AMOUNT</Typography>
+                  <Typography className="mainTitle" sx={{ color: 'var(--cream)', textAlign: 'start', }}>DEPOSIT AMOUNT</Typography>
                 </Box>
 
                 <Box className="inputBox" sx={{ width: '100%', textAlign: 'end' }}>
@@ -345,7 +345,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
                     <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: "15px" }}>
                       <Box sx={{ width: '50%' }}>
-                        <Typography sx={{ color: 'var(--cream)', fontWeight: '600' }}>SET PRICE RANGE</Typography>
+                        <Typography className='mainTitle' sx={{ color: 'var(--cream)',}}>SET PRICE RANGE</Typography>
                       </Box>
                       <Box sx={{ width: '50%', display: 'flex', alignItems: 'center', gap: '10px', justifyContent: "end" }}>
 
@@ -376,7 +376,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                     </Box>
 
 
-                    <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '15px' }}>
+                    <Box className="viewPrice" sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '15px' }}>
                       {/* free_tier */}
                       <Box className="free_tier" sx={{ bgcolor: palette.mode === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', width: '50%', textAlign: 'center' }}>
                         <Typography sx={{ fontWeight: '600' }}>Min Price</Typography>
@@ -419,7 +419,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                     </Box>
 
 
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', textAlign: 'center', mb: '15px' }}>
+                    <Box className="fullRangeSec" sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', textAlign: 'center', mb: '15px' }}>
                       <Box sx={{
                         width: 'calc(25% - 15px)',
                         border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
@@ -586,7 +586,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
 
 
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', textAlign: 'center', mb: '15px' }}>
+                    <Box className="fullRangeSec" sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', textAlign: 'center', mb: '15px' }}>
                       <Box sx={{
                         width: 'calc(25% - 15px)',
                         border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
@@ -679,10 +679,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
               <Box sx={{ display: vTwo ? 'block' : 'none' }}>
                 <Box>
 
-
-
-
-
                   <Box sx={{ textAlign: 'center', minHeight: '200px', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center', }}>
                     <SlGraph size={50} />
                     <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>Your position will appear here.
@@ -703,7 +699,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                         <Box><FaPlus /></Box>
                       </Box>
 
-                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
+                      <Box className="" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
                         <Typography sx={{ fontWeight: '600' }}>9MM</Typography>
                         <Typography sx={{ fontWeight: '600' }}>Per</Typography>
                         <Typography sx={{ fontWeight: '600' }}>PLS</Typography>
@@ -731,12 +727,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                     </Box>
                     {/* free_tier */}
                   </Box>
-
-
-
-
-
-
 
                   <Box>
                     <Button variant="contained" color="secondary" sx={{ width: '100%' }}>

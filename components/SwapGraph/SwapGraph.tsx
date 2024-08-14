@@ -73,7 +73,7 @@ const SwapGraph = ({ zoomed, onClick }: SwapGraphsProps) => {
             },
         },
         dataLabels: { enabled: false },
-        stroke: { curve: 'smooth' },
+        stroke: { curve: 'straight' },
         yaxis: { labels: { style: { colors: theme === 'light' ? 'var(--primary)' : 'var(--light)' } } },
         xaxis: {
             type: 'datetime',
