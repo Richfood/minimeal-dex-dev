@@ -4,9 +4,8 @@ import SwapWidget from '../components/SwapWidget/SwapWidget';
 import { useTheme } from '../components/ThemeContext';
 
 import { Box, Container } from '@mui/material';
-import Header from '../components/Header/Header';
-import Footer from '../components/Footer/Footer';
-
+import Header from '../components/header/Header';
+import Footer from '../components/footer/Footer';
 
 const IndexPage = () => {
     const { theme, toggleTheme } = useTheme();

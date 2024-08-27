@@ -95,7 +95,7 @@ const Header = () => {
                     aria-haspopup="true"
                     aria-expanded={openMenu ? 'true' : undefined}
                   >
-                    <Image src={networkImages[selectedNetwork]} width={24} height={24} alt="Profile" />
+                    <Image src={networkImages['PulseChain']} width={24} height={24} alt="Profile" />
                     <Typography sx={{ fontWeight: '700', fontSize: '12px', display: 'flex', gap: '3px', color: 'var(--white)' }}>
                       {selectedNetwork} <IoIosArrowDown size={16} />
                     </Typography>

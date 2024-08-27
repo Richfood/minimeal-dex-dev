@@ -6,10 +6,10 @@ import { useTheme } from '../../components/ThemeContext';
 import SelectedToken from '../../components/SelectToken/SelectedToken';
 import { IoIosArrowDown } from 'react-icons/io';
 import { HiPlus } from 'react-icons/hi2';
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
 import { useRouter } from 'next/router';
 import { BsArrowLeft } from 'react-icons/bs';
+import Header from '../../components/header/Header';
+import Footer from '../../components/footer/Footer';
 
 
 
