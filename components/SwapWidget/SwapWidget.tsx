@@ -112,7 +112,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
         <>
             <Box className="SwapWidgetSec">
                 <Box className="SwapWidgetInner">
-                    <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
+                    <Box className="inputBox" sx={{ width: 'calc(50% - 30px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                             <img src={circleImages.circle1} alt="circle1" style={{ width: '20px', height: '20px' }} />
                             <Typography onClick={handleOpenToken} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
@@ -143,7 +143,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                         </Box>
                     </Box>
 
-                    <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
+                    <Box className="inputBox" sx={{ width: 'calc(50% - 30px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                             <img src={circleImages.circle2} alt="circle2" style={{ width: '20px', height: '20px' }} />
                             <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center' }}>

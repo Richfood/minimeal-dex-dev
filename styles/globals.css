@@ -188,7 +188,7 @@ body.dark-mode .white_box {
 }
 
 .swap_graph_sec {
-  padding-top: 50px;
+  padding: 50px 0;
 }
 
 .white_box {
@@ -663,7 +663,7 @@ body.dark-mode .widgetList ul svg {
 
 .Slippage_input input:focus {
   outline: none;
-  box-shadow: 0px 0px 7px #F6B41B;
+  box-shadow: 0px 0px 7px var(--secondary);
 }
 
 .lightInput {
@@ -1140,7 +1140,6 @@ body.dark-mode .tabsOuter {
     padding: 15px;
   }
 
-
   .ftCards {
     min-width: 110px;
   }
@@ -1166,7 +1165,18 @@ body.dark-mode .tabsOuter {
 
   .toolbar-button button {
     font-size: 12px;
-    
+  }
+
+  .swap_graph_sec {
+    padding: 30px 0;
+  }
+
+  .Liquidity {
+    padding: 30px 0;
+  }
+
+  .AddLiquidity {
+    padding: 30px 0;
   }
 }
 
@@ -1236,6 +1246,21 @@ body.dark-mode .tabsOuter {
     min-width: 80px;
     font-size: 12px;
   }
+
+  .al-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    padding-bottom: 10px;
+  }
+
+  .al-right>p {
+    margin-bottom: 10px;
+  }
+
+  .al-calc {
+    gap: 20px;
+  }
 }
 
 
@@ -1270,3 +1295,69 @@ body.dark-mode .tabsOuter {
 
 
 /******************  Responsive CSS  *****************/
+
+
+
+.sunRewards {
+  padding: 40px 0;
+}
+
+.customContainer {
+  max-width: 1580px;
+  width: 100%;
+  padding: 0 15px;
+  margin: 0 auto;
+}
+
+.customRow {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -15px;
+}
+
+.customCol {
+  flex: 0 1 33.33%;
+  padding: 0 15px;
+}
+
+.main-title {
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.input-box {
+  border-radius: 30px;
+}
+
+.input-box .MuiFormControl-root .MuiInputBase-root {
+  border-radius: 30px;
+  height: 30px;
+  padding: 10px;
+}
+
+
+.input-box .MuiFormControl-root .MuiInputBase-root::before,.input-box .MuiFormControl-root .MuiInputBase-root::after {
+  display: none;
+}
+
+
+
+.input-box .MuiFormControl-root .MuiInputBase-root input {
+  padding: 10px;
+  font-size: 14px;
+}
+
+.cusCheckbox label {
+  margin-right: 0;
+}
+
+
+.claimSec .input-box .MuiInputBase-root {
+  background: #EFEFEF;
+  border: 1px solid #CCCCCC;
+}
+
+.claimSec.burnSec .input-box .MuiInputBase-root {
+  background: #EFEFEF;
+  border: 1px solid #AAAAAA;
+}

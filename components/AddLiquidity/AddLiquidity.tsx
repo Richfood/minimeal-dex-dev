@@ -343,11 +343,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                       <Typography sx={{ fontWeight: '600' }}>-9MM</Typography>
                     </Box>
 
-                    <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: "15px" }}>
-                      <Box sx={{ width: '50%' }}>
+                    <Box  sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: "15px",flexWrap: 'wrap' }}>
+                      <Box sx={{ width: '50%','@media (max-width: 600px)': {width: '100%'} }}>
                         <Typography className='mainTitle' sx={{ color: 'var(--cream)',}}>SET PRICE RANGE</Typography>
                       </Box>
-                      <Box sx={{ width: '50%', display: 'flex', alignItems: 'center', gap: '10px', justifyContent: "end" }}>
+                      <Box sx={{ width: '50%', display: 'flex', alignItems: 'center', gap: '10px', justifyContent: "end",'@media (max-width: 600px)': {width: '100%',justifyContent: 'flex-start'} }}>
 
                         <Typography sx={{
                           fontSize: '14px',

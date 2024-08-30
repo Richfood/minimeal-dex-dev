@@ -1,8 +1,12 @@
-
-
 .brand_logo {
     margin-right: 50px;
 }
+
+.active {
+    background-color: var(--primary-light);
+    color: var(--cream);
+  }
+  
 
 .header_left {
     align-items: center;
@@ -12,16 +16,19 @@
 .brand_logo img {
     width: 100%;
     max-width: 160px;
+    object-fit: contain;
     vertical-align: middle;
 }
 
-.header_desktop .header_left ul ,.header_right ul{
+.header_desktop .header_left ul,
+.header_right ul {
     display: flex;
-    padding:  0;
+    padding: 0;
     gap: 10px;
 }
 
-.header_desktop .header_left ul li,.header_desktop .header_right ul li {
+.header_desktop .header_left ul li,
+.header_desktop .header_right ul li {
     width: unset;
 }
 
@@ -40,7 +47,7 @@
     justify-content: center;
 }
 
-.header_desktop .header_right ul li a svg{
+.header_desktop .header_right ul li a svg {
     width: 24px;
     height: 24px;
 }
@@ -49,10 +56,11 @@
     gap: 12px;
 }
 
-.header_desktop .header_left ul li a:hover{
+.header_desktop .header_left ul li a:hover {
     color: var(--secondary);
     transition: 0.5s all;
 }
+
 .header_wrapper {
     padding: 10px 45px;
     display: flex;
@@ -66,16 +74,20 @@
     align-items: center;
 }
 
+.header_mobile {
+    display: none;
+}
+
 
 @media screen and (max-width: 991px) {
     .header_wrapper {
         padding: 10px 15px;
     }
-    
+
     .brand_logo {
         margin-right: 15px;
     }
-    
+
     .header_desktop .header_right ul {
         gap: 15px;
     }
@@ -96,7 +108,39 @@
         padding: 5px 10px;
     }
 
-    .header_desktop .header_left ul  {
+    .header_desktop .header_left ul {
         gap: 0;
     }
+}
+
+@media screen and (max-width: 767px) {
+    .header_mobile {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        padding: 15px;
+        /* border-radius: 15px 15px 0 0; */
+        z-index: 1;
+        height: 75px;
+        background-color: #173d3d;
+        color: var(--white);
+        box-shadow: 0 -5px 10px #0000001a;
+    }
+
+    .header_mobList {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .header_mlItem {
+        flex: 33.33%;
+        text-align: center;
+    }
+
+    .header_mlItem p{
+        font-size: 12px;
+    }
+
+   
 }
