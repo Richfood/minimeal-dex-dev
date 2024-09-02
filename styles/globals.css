@@ -1336,7 +1336,8 @@ body.dark-mode .tabsOuter {
 }
 
 
-.input-box .MuiFormControl-root .MuiInputBase-root::before,.input-box .MuiFormControl-root .MuiInputBase-root::after {
+.input-box .MuiFormControl-root .MuiInputBase-root::before,
+.input-box .MuiFormControl-root .MuiInputBase-root::after {
   display: none;
 }
 
@@ -1360,4 +1361,19 @@ body.dark-mode .tabsOuter {
 .claimSec.burnSec .input-box .MuiInputBase-root {
   background: #EFEFEF;
   border: 1px solid #AAAAAA;
+}
+
+@media (max-width: 1600px) {
+  .customCol {
+    flex: 0 50%;
+    margin-bottom: 20px;
+  }
+}
+
+
+@media (max-width: 767px) {
+  .customCol {
+    flex: 0 100%;
+    margin-bottom: 20px;
+  }
 }
