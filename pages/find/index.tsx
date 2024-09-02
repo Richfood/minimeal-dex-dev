@@ -8,8 +8,8 @@ import { IoIosArrowDown } from 'react-icons/io';
 import { HiPlus } from 'react-icons/hi2';
 import { useRouter } from 'next/router';
 import { BsArrowLeft } from 'react-icons/bs';
-import Header from '../../components/header/Header';
-import Footer from '../../components/footer/Footer';
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
 
 
 
