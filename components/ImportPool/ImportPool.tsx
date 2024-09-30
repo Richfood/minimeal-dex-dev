@@ -7,6 +7,8 @@ import SelectedToken from '../SelectToken/SelectedToken';
 import { IoIosArrowDown } from 'react-icons/io';
 import { HiPlus } from 'react-icons/hi2';
 
+import { TokenDetails } from '@/interfaces';
+
 interface ImportPoolProps {
   open: boolean;
   onClose: () => void;
@@ -19,6 +21,10 @@ const ImportPool: React.FC<ImportPoolProps> = ({ open, onClose }) => {
   // Toggle token selection visibility
   const handleOpenToken = useCallback(() => setOpenToken(prev => !prev), []);
   const handleCloseToken = () => setOpenToken(false);
+
+  const [token0,setToken0] =  useState<TokenDetails | null>(null);
+  const [token1, setToken1] = useState<TokenDetails | null>(null);
+  const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
 
   const style = {
     position: 'absolute',
@@ -93,6 +99,10 @@ const ImportPool: React.FC<ImportPoolProps> = ({ open, onClose }) => {
         openToken={openToken}
         handleCloseToken={handleCloseToken}
         mode={theme} // Ensure `theme` is passed correctly
+        setToken0={setToken0}
+        setToken1={setToken1}
+        tokenNumber={tokenBeingChosen}
+        description=''
       />
     </>
   );

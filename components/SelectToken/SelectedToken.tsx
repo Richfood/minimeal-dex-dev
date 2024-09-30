@@ -9,19 +9,44 @@ import { List, ListItem } from '@mui/material';
 import ManageToken from '../ManageToken/ManageToken';
 import Image from 'next/image';
 
+import tokenList from "../../utils/tokenList.json";
+
 interface SelectedTokenProps {
     openToken: boolean;
     handleCloseToken: () => void;
     mode: 'light' | 'dark';
+    setToken0: React.Dispatch<React.SetStateAction<Token | null>>;
+    setToken1: React.Dispatch<React.SetStateAction<Token | null>>;
     title?: string;
-    description?: string;
+    description: string;
+    tokenNumber: number;
 }
 
-const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode }) => {
+interface Token {
+    name : string;
+    symbol : string;
+    address : string;
+    decimals : number;
+}
+
+const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode, setToken0, setToken1, tokenNumber }) => {
     const [openManage, setOpenManage] = useState(false);
+    const [tokenSelected, setTokenSelected] = useState<string>("");
 
     const handleOpenManage = () => setOpenManage(true);
     const handleCloseManage = () => setOpenManage(false);
+
+    const handleSelectToken = (token : Token) => {
+        if(tokenNumber === 0){
+            setToken0(token);
+        }
+        else{
+            setToken1(token);
+        }
+
+        setTokenSelected(token.address)
+        handleCloseToken()
+    }
 
     const style = {
         position: 'absolute' as 'absolute',
@@ -89,11 +114,12 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                         <Box className="common_token" sx={{ pt: '20px' }}>
                             <Typography sx={{ fontWeight: '500', fontSize: '14px' }}>Common tokens</Typography>
                             <Box className="token_Outer" sx={{ py: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                {['PLS', '9MM', 'USDC', 'DAI', 'USDT', 'WPLS'].map((token, index) => (
-                                    <Box className="token_box" key={index}>
-                                        <Image src={`/images/${token.toLowerCase()}.png`} width={20} height={20} alt={token} />
-                                        <Typography>{token}</Typography>
-                                    </Box>
+                                {tokenList.map((token, index) => (
+                                    token.address !== tokenSelected ?(
+                                        <Box className="token_box" key={index} onClick={()=>handleSelectToken(token)}>
+                                                <Typography>{token.name}</Typography>
+                                        </Box>
+                                    ) : (<></>)
                                 ))}
                             </Box>
                             <Box className="token_list">

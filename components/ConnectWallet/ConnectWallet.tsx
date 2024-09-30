@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Modal, Tabs, Tab, List, ListItem } from '@mui/material';
+import { Box, Typography, Modal, Tabs, Tab, List, ListItem, Button } from '@mui/material';
 import { TabContext, TabPanel } from '@mui/lab';
 import { IoCloseOutline } from 'react-icons/io5';
 import { BiDotsHorizontalRounded } from "react-icons/bi";
@@ -7,6 +7,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import {  Pagination } from 'swiper/modules';
+
+import { useConnect } from 'wagmi'
+import { useAccount } from 'wagmi';
 
 interface ConnectWalletProps {
     open: boolean;
@@ -17,6 +20,7 @@ interface ConnectWalletProps {
 const ConnectWallet: React.FC<ConnectWalletProps> = ({ open, onClose, mode }) => {
     const [value, setValue] = React.useState('0');
     const [showAll, setShowAll] = useState(false);
+    const { connectors, connect } = useConnect()
 
     const handleChange = (event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
@@ -42,14 +46,18 @@ const ConnectWallet: React.FC<ConnectWalletProps> = ({ open, onClose, mode }) =>
         maxHeight: '90vh',
     };
 
-    const walletListItems = Array.from({ length: 12 }, (_, index) => (
-        <ListItem key={index} disablePadding>
-            <img src="/images/metamask.png" alt="metamask" />
-            <Box>
-                <Typography sx={{ fontSize: '12px', mt: '10px' }}>Metamask</Typography>
-            </Box>
-        </ListItem>
-    ));
+    const walletListItems = connectors.map((connector, index) => (
+            <ListItem key={index} disablePadding>
+                <Button onClick={()=>connect({connector})}>
+                    <img src="/images/metamask.png" alt="metamask" />
+                    <Box>
+                        <Typography sx={{ fontSize: '12px', mt: '10px' }}>{connector.name}</Typography>
+                    </Box>
+                </Button>
+            </ListItem>
+        )
+    );
+
 
     return (
         <Modal

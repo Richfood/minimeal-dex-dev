@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import { BsArrowLeft } from 'react-icons/bs';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
+import { TokenDetails } from '@/interfaces';
 
 
 
@@ -25,6 +26,10 @@ const ImportPool: React.FC<ImportPoolProps> = ({ open, onClose }) => {
     // Toggle token selection visibility
     const handleOpenToken = useCallback(() => setOpenToken(prev => !prev), []);
     const handleCloseToken = () => setOpenToken(false);
+
+    const [token0,setToken0] =  useState<TokenDetails | null>(null);
+    const [token1, setToken1] = useState<TokenDetails | null>(null);
+    const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
 
     const style = {
         position: 'absolute',
@@ -126,6 +131,10 @@ const ImportPool: React.FC<ImportPoolProps> = ({ open, onClose }) => {
                 openToken={openToken}
                 handleCloseToken={handleCloseToken}
                 mode={theme} // Ensure `theme` is passed correctly
+                setToken0={setToken0}
+                setToken1={setToken1}
+                tokenNumber={tokenBeingChosen}
+                description=''
             />
         </>
     );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, List, ListItem, ListItemButton, Button, Typography, ListItemText, Tooltip, IconButton, Menu, MenuItem } from '@mui/material';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { IoIosArrowDown } from 'react-icons/io';
@@ -9,12 +9,19 @@ import { useRouter } from 'next/router';
 import AppSettingsModal from '../AppSettingsModal/AppSettingsModal';
 import Link from 'next/link';
 import Image from 'next/image';
+import { truncateAddress } from '@/utils/generalFunctions';
+
+import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from 'wagmi'
 
 const Header = () => {
   const [openSettingsModal, setOpenSettingsModal] = React.useState(false);
   const [openWallet, setOpenWallet] = React.useState(false);
+  const [valueToShow, setValueToShow] = React.useState("Connect Wallet")
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedNetwork, setSelectedNetwork] = React.useState('PulseChain');
+  
+  const {isConnected, address} = useAccount()
+
   const { theme } = useTheme();
   const router = useRouter();
 
@@ -23,6 +30,8 @@ const Header = () => {
 
   const handleOpenWallet = () => setOpenWallet(true);
   const handleCloseWallet = () => setOpenWallet(false);
+
+  const { disconnect } = useDisconnect()
 
   const handleClickMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -34,8 +43,11 @@ const Header = () => {
 
   const handleChangeNetwork = (network: string) => {
     setSelectedNetwork(network);
-    handleCloseMenu();
   };
+
+  // const truncateAddress = (address: string)=>{
+  //   return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  // }
 
   const openMenu = Boolean(anchorEl);
 
@@ -44,6 +56,16 @@ const Header = () => {
     PulseChain: '/images/pls.png',
     BASE: '/images/base.png',
   };
+
+  useEffect(()=>{
+    if(isConnected && address){
+      setValueToShow(truncateAddress(address));
+      handleCloseWallet()
+    }
+    else{
+      setValueToShow("Connect Wallet");
+    }
+  },[isConnected])
 
   return (
     <>
@@ -152,7 +174,7 @@ const Header = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleOpenWallet}
+                  onClick={isConnected ? ()=>{disconnect()} : handleOpenWallet}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -165,7 +187,7 @@ const Header = () => {
                     },
                   }}
                 >
-                  Connect <Typography>Wallet</Typography>
+                  <Typography>{valueToShow}</Typography>
                 </Button>
               </ListItem>
             </List>

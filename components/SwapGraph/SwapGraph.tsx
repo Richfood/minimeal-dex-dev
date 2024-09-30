@@ -136,10 +136,10 @@ const SwapGraph = ({ zoomed, onClick }: SwapGraphsProps) => {
                         </Typography>
                     </Box>
                     <Box className="toolbar-button">
-                        <Button className={timeInterval === '24Hours' ? 'active' : ''} onClick={() => handleIntervalChange('24Hours')}>24H</Button>
-                        <Button className={timeInterval === '1Week' ? 'active' : ''} onClick={() => handleIntervalChange('1Week')}>1W</Button>
-                        <Button className={timeInterval === '1Month' ? 'active' : ''} onClick={() => handleIntervalChange('1Month')}>1M</Button>
-                        <Button className={timeInterval === '1Year' ? 'active' : ''} onClick={() => handleIntervalChange('1Year')}>1Y</Button>
+                        <Button className={timeInterval === '24Hours' ? 'active' : ''} onClick={() => handleIntervalChange('24Hours')}>24h</Button>
+                        <Button className={timeInterval === '1Week' ? 'active' : ''} onClick={() => handleIntervalChange('1Week')}>1w</Button>
+                        <Button className={timeInterval === '1Month' ? 'active' : ''} onClick={() => handleIntervalChange('1Month')}>1m</Button>
+                        <Button className={timeInterval === '1Year' ? 'active' : ''} onClick={() => handleIntervalChange('1Year')}>1y</Button>
                     </Box>
                 </Box>
             </Box>
