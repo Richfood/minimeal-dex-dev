@@ -1,11 +1,19 @@
 const Q96 = 2 ** 96;
 
-export function priceToTick(p : any) {
+export function priceToTick(p : any, decimalDifference : number) {
+
+    const factor = Math.pow(10,decimalDifference);
+    p = p*factor;
+
     return Math.floor(Math.log(p) / Math.log(1.0001));
 }
 
-export function tickToPrice(tick: number) {
-    return Math.pow(1.0001, tick);
+export function tickToPrice(tick: number, decimalDifference : number) {
+    const factor = Math.pow(10, decimalDifference);
+    let price = Math.pow(1.0001, tick);
+    price = price/factor;
+
+    return price;
 }
 
 export function priceToSqrtPrice(p : any) {
@@ -31,9 +39,11 @@ export function liquidity1(amount : any, pa : any, pb : any) {
 }
 
 export function calculateAmount1WhenLiquidity0Given(liquidity0 : any, sqrtPriceCurrent : any, sqrtPriceLower : any) {
-    return ((liquidity0 * Math.abs(sqrtPriceCurrent - sqrtPriceLower)) / Q96);
+    // const decimalRatio = Math.sqrt(Math.pow(10,decimalDifference))
+    return Math.round((liquidity0 * Math.abs(sqrtPriceCurrent - sqrtPriceLower)) / (Q96 /* * decimalRatio */));
 }
 
-export function calculateAmount0WhenLiquidity1Given(liquidity1: any, sqrtPriceCurrent : any, sqrtPriceUpper : any ) {
-    return ((liquidity1 * Math.abs(sqrtPriceCurrent - sqrtPriceUpper)) * Q96 / (sqrtPriceCurrent * sqrtPriceUpper));
+export function calculateAmount0WhenLiquidity1Given(liquidity1: any, sqrtPriceCurrent : any, sqrtPriceUpper : any) {
+    // const decimalRatio = Math.sqrt(Math.pow(10,decimalDifference))
+    return Math.round(((liquidity1 * Math.abs(sqrtPriceCurrent - sqrtPriceUpper)) * Q96 /* * decimalRatio */) / (sqrtPriceCurrent * sqrtPriceUpper));
 }

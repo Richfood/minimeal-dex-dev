@@ -28,6 +28,7 @@ import { priceToTick, tickToPrice } from '@/utils/utils';
 import Default from '../CustomChart/Default';
 import { getPoolData } from '@/utils/api/getPoolData';
 import { AddLiquidityPoolData, TokenDetails } from '@/interfaces';
+import SettingsModal from '../SettingModal/SettingModal';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -84,7 +85,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
   const [amount1Desired, setAmount1Desired] = useState("");
   const [priceLower, setPriceLower] = useState("");
   const [priceUpper, setPriceUpper] = useState("");
-  const [priceCurrent, setPriceCurrent] = useState("");
+  const [priceCurrent, setPriceCurrent] = useState("2995");
   const [fee, setFee] = useState<FeeAmount | null>(null);
   const [approvalAmount0, setApprovalAmount0] = useState("");
   const [approvalAmount1, setApprovalAmount1] = useState("");
@@ -100,14 +101,17 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
   const [priceLowerEntered, setPriceLowerEntered] = useState("");
   const [priceUpperEntered, setPriceUpperEntered] = useState("");
+  const [priceCurrentEntered, setPriceCurrentEntered] = useState("");
 
   const [currentPoolData, setCurrentPoolData] = useState<AddLiquidityPoolData | null>(null);
 
+  const [decimalDifference, setDecimalDifference] = useState(0);
+
   const handlePriceLower = ()=>{
-    if(fee && priceLowerEntered){
-      const tick = priceToTick(priceLowerEntered);
+    if(fee && priceLowerEntered && token0 && token1){
+      const tick = priceToTick(priceLowerEntered, decimalDifference);
       const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
-      const newPrice = tickToPrice(nearestTick);
+      const newPrice = tickToPrice(nearestTick, decimalDifference);
 
       setPriceLower(newPrice.toString());
     }
@@ -117,15 +121,28 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
   }
 
   const handlePriceUpper = ()=>{
-    if(fee && priceUpperEntered){
-      const tick = priceToTick(priceUpperEntered);
+    if(fee && priceUpperEntered && token0 && token1){
+      const tick = priceToTick(priceUpperEntered, decimalDifference);
       const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
-      const newPrice = tickToPrice(nearestTick);
+      const newPrice = tickToPrice(nearestTick, decimalDifference);
 
       setPriceUpper(newPrice.toString());
     }
     else{
       setPriceUpper("");
+    }
+  }
+
+  const handlePriceCurrent = ()=>{
+    if(fee && priceCurrentEntered && token0 && token1){
+      const tick = priceToTick(priceCurrentEntered, decimalDifference);
+      const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
+      const newPrice = tickToPrice(nearestTick, decimalDifference);
+
+      setPriceCurrent(newPrice.toString());
+    }
+    else{
+      setPriceCurrent("");
     }
   }
 
@@ -148,6 +165,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
     setPriceLowerEntered("");
     setPriceUpperEntered("");
+    setPriceCurrentEntered("");
   }
 
   const sortTokens = ()=>{
@@ -235,8 +253,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
   const handleAddLiquidity = async ()=>{
     if(!token0 || !token1) return;
     try{
-      await getTokenApproval(token0.address, NFPMAddress, approvalAmount0);
-      await getTokenApproval(token1.address, NFPMAddress, approvalAmount1);
+      await getTokenApproval(token0, NFPMAddress, approvalAmount0);
+      await getTokenApproval(token1, NFPMAddress, approvalAmount1);
 
       alert("Tokens Approved!");
     }
@@ -265,14 +283,14 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
         const addLiquidityTxHash = await addLiquidity(
           NFPMAddress,
-          token0.address,
-          token1.address,
+          token0,
+          token1,
           tickLower,
           tickUpper,
           amount0Desired,
           amount1Desired,
-          amount0Desired < amount0Min ? amount0Desired : amount0Min,
-          amount1Desired < amount1Min ? amount1Desired : amount0Min,
+          amount0Min,
+          amount1Min,
           deadline,
           sqrtPriceX96,
           fee
@@ -291,7 +309,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
   const calculate = ()=>{
     console.log("calculate run")
-    if(!priceLower || !priceUpper || !priceCurrent || !fee || (!amount0ToEmulate && !amount1ToEmulate)) {
+    if(!priceLower || !priceUpper || !priceCurrent || !fee || (!amount0ToEmulate && !amount1ToEmulate) || !token1 || !token0) {
       // console.log("lower = ", priceLower, "upper = ",priceUpper, "current = ",priceCurrent, "fee = ",fee, "-- ",amount0ToEmulate, amount1ToEmulate)
       if((!amount0ToEmulate && !amount1ToEmulate)) {
         setAmount0Desired("");
@@ -300,14 +318,19 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
       return;
     }
 
+    console.log("Running emulate");
     const result = emulate(
       priceLower, 
       priceUpper,
       priceCurrent,
       fee,
-      amount0ToEmulate,
-      amount1ToEmulate
+      amount0ToEmulate.toString(),
+      amount1ToEmulate.toString(),
+      token0,
+      token1
     );
+
+    console.log('HEllo - ,', result);
 
     if(result){
       setEmulateError(false);
@@ -330,8 +353,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
       setAmount1Min(amount1MinEmulate || "");
       setDeadline(deadlineEmulate);
       setSqrtPriceX96(sqrtPriceX96Emulate);
-      setApprovalAmount0(amount0MinEmulate);
-      setApprovalAmount1(amount1MinEmulate);
+      setApprovalAmount0(amount0DesiredEmulate || "");
+      setApprovalAmount1(amount1DesiredEmulate || "");
     }
     else{
       setAmount0Desired("");
@@ -375,7 +398,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
       let priceCurrentToSet : number;
 
       if(poolDataFromSubgraph){
-        priceCurrentToSet = tickToPrice(Number(poolDataFromSubgraph.tick));
+        priceCurrentToSet = tickToPrice(Number(poolDataFromSubgraph.tick), decimalDifference);
       }
       else{
         priceCurrentToSet = 0;
@@ -395,9 +418,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
   },[priceLower,priceUpper, priceCurrent, amount0ToEmulate, amount1ToEmulate])
 
   useEffect(()=>{
-    console.log("hello", token0?.address, token1?.address);
     reset();
     sortTokens();
+    if(token0 && token1) setDecimalDifference(token1.decimals - token0.decimals);
   },[token0, token1])
 
   useEffect(()=>{
@@ -411,6 +434,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
       setPriceUpper("");
 
   },[priceUpperEntered])
+
+  useEffect(()=>{
+    if(priceCurrentEntered)
+      setPriceCurrent("");
+  },[priceCurrentEntered])
 
   return (
     <Box className="AddLiquiditySec">
@@ -449,14 +477,14 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
               <Box>
                 <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>0%</Typography>
               </Box>
-              <Box onClick={handleOpen} sx={{ cursor: "pointer" }}>
+              {/* <Box onClick={handleOpen} sx={{ cursor: "pointer" }}>
                 <Typography><CiCalculator2 size={20} style={{ color: palette.text.secondary }} /></Typography>
               </Box>
               <Box sx={{ cursor: "pointer" }}>
                 <Typography><BsQuestionCircle size={20} style={{ color: palette.text.secondary }} /></Typography>
-              </Box>
-              <Box sx={{ cursor: "pointer" }}>
-                <Typography><IoSettingsOutline size={20} style={{ color: palette.text.secondary }} /></Typography>
+              </Box> */}
+              <Box onClick={handleOpen} sx={{ cursor: "pointer" }}>
+                <IoSettingsOutline size={20} style={{ color: palette.text.secondary }} />
               </Box>
             </Box>
 
@@ -725,7 +753,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                         
                     <Box sx={{ textAlign: 'center', minHeight: '200px', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center', }}>
                       <SlGraph size={50} />
-                      <Default/>
+                      {/* <Default/> */}
                       <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>There is no liquidity data.</Typography>
                     </Box>
 
@@ -744,7 +772,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
                         {token0 && token1 ? (
                           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                            <Typography sx={{ fontWeight: '600' }}>{token0.symbol}</Typography>
+                            <Typography sx={{ fontWeight: '600' }}>{token1.symbol}</Typography>
                             <Typography sx={{ fontWeight: '600' }}>Per</Typography>
                             <Typography sx={{ fontWeight: '600' }}>{token0.symbol}</Typography>
                           </Box>
@@ -883,7 +911,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                       <Box className="SwapWidgetInner" sx={{ mb: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
                         <Box className="inputBox" sx={{ width: '100%' }}>
                           <Box className="inputField">
-                            <input type="number" placeholder='0.0' style={{ textAlign: 'end' }} onChange={(e)=>setPriceCurrent(e.target.value)} value={priceCurrent}/>
+                            <input type="number" placeholder='0.0' style={{ textAlign: 'end' }} onBlur={handlePriceCurrent} onChange={(e)=>setPriceCurrentEntered(e.target.value)} value={!priceCurrent ? priceCurrentEntered : priceCurrent}/>
                           </Box>
                         </Box>
                       </Box>
@@ -950,9 +978,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
                         {token0 && token1 ? (
                           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                            <Typography sx={{ fontWeight: '600' }}>{token0.symbol}</Typography>
-                            <Typography sx={{ fontWeight: '600' }}>Per</Typography>
                             <Typography sx={{ fontWeight: '600' }}>{token1.symbol}</Typography>
+                            <Typography sx={{ fontWeight: '600' }}>Per</Typography>
+                            <Typography sx={{ fontWeight: '600' }}>{token0.symbol}</Typography>
                           </Box>
                         ) : (
                           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
@@ -1078,7 +1106,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
         description=''
       />
 
-      <RoiCalculator open={open} handleClose={handleClose} />
+      {/* <RoiCalculator open={open} handleClose={handleClose} /> */}
+      <SettingsModal isOpen={open} handleClose={handleClose} theme={theme} />
       <style jsx>{`
         .greyed-out {
           opacity: 0.5;           /* Greyed out effect */

@@ -1,5 +1,7 @@
-import { FeeAmount, nearestUsableTick, Pool, Position, TICK_SPACINGS, TickMath } from "@uniswap/v3-sdk";
-import { Token } from "@uniswap/sdk-core";
+import { FeeAmount, nearestUsableTick, Pool, Position, TICK_SPACINGS, TickMath, priceToClosestTick } from "@uniswap/v3-sdk";
+import { Price, Token } from "@uniswap/sdk-core";
+import { BigNumber } from "ethers";
+
 import addresses from "./address.json";
 import { 
     priceToTick, 
@@ -11,70 +13,123 @@ import {
     sqrtPriceToTick 
 } from "./utils";
 import { ethers } from "ethers";
+import { TokenDetails } from "@/interfaces";
 
+// Helper function for rounding amounts
+function roundToPrecision(value: string, decimals:number) {
+    const factor = Math.pow(10, decimals);
+    const roundedValue = (Math.round(parseFloat(value) * factor) / factor).toFixed(0);
+    return roundedValue;
+}
+function adjustForSlippage(amount: string, slippageTolerance: number): number {
+    // Convert slippage tolerance percentage into a decimal (e.g., 1% becomes 0.01)
+    const slippageFactor = slippageTolerance / 100;
+
+    // Adjust the amount by reducing it based on the slippage tolerance
+    return Number(amount) * slippageFactor;
+}    
 function emulate(
     priceLower: string, 
     priceUpper: string, 
     priceCurrent: string, 
     fee: FeeAmount, 
-    amount0Entered = 0, 
-    amount1Entered = 0
+    amount0Entered = "0", 
+    amount1Entered = "0",
+    token0Details: TokenDetails,
+    token1Details: TokenDetails
 ) {
-    const tokenDAddress = addresses.TokenDAddress;
-    const tokenBAddress = addresses.TokenBAddress;
+    console.log('Inside emulate - -----------------------------------------------------------------')
+    const token0Address = token0Details.address;
+    const token1Address = token1Details.address;
 
-    const tokenD = new Token(31337, tokenDAddress, 6);
-    const tokenB = new Token(31337, tokenBAddress, 6);
+    const token0 = new Token(31337, token0Address, token0Details.decimals);
+    const token1 = new Token(31337, token1Address, token1Details.decimals);
 
     const tickSpacing = TICK_SPACINGS[fee];
 
+    amount0Entered = ethers.utils.parseUnits(amount0Entered.toString(), token0.decimals).toString();
+    amount1Entered = ethers.utils.parseUnits(amount1Entered.toString(), token1.decimals).toString();
+
+    console.log(`
+        Before - 
+        Lower price : ${priceLower},
+        Upper price : ${priceUpper},
+        Curr  price : ${priceCurrent}
+    `)
+
+    const decimalDifference = token1.decimals - token0.decimals;
+
+    // priceLower = ethers.utils.parseUnits(priceLowe)
+
     // Required constants
-    const tickLower = nearestUsableTick(priceToTick(priceLower), tickSpacing);
-    const tickUpper = nearestUsableTick(priceToTick(priceUpper), tickSpacing);
+    const tickLower = nearestUsableTick(priceToTick(priceLower, decimalDifference), tickSpacing); //priceToClosestTick(newPriceLower)//
+    const tickUpper = nearestUsableTick(priceToTick(priceUpper, decimalDifference), tickSpacing);
+    const currentTick = nearestUsableTick(priceToTick(priceCurrent, decimalDifference), tickSpacing);
+    // console.log("tick upper = ", tickUpper);
+
     const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 minutes
 
-    const currentTick = priceToTick(priceCurrent);
-    const sqrtPriceX96 = TickMath.getSqrtRatioAtTick(currentTick);
+    let amount0Desired: string | undefined;
+    let amount1Desired: string | undefined;
+    let amount0Min: string | undefined;
+    let amount1Min: string | undefined;
 
-    let amount0Desired: number | undefined;
-    let amount1Desired: number | undefined;
-    let amount0Min: number | undefined;
-    let amount1Min: number | undefined;
+    console.log(`
+        After - 
+        Lower Tick : ${tickLower},
+        Upper tick : ${tickUpper},
+        Curr  tick : ${currentTick}
+    `)
 
     // Price calculations
-    const currentSqrtPrice = priceToSqrtPrice(priceCurrent).toString();
-    const upperSqrtPrice = priceToSqrtPrice(priceUpper).toString();
-    const lowerSqrtPrice = priceToSqrtPrice(priceLower).toString();
+    const currentSqrtPrice = TickMath.getSqrtRatioAtTick(currentTick).toString();
+    const upperSqrtPrice = TickMath.getSqrtRatioAtTick(tickUpper).toString();
+    const lowerSqrtPrice = TickMath.getSqrtRatioAtTick(tickLower).toString();
     let liquidity: string = "";
 
     // Calculate liquidity based on amount0Entered or amount1Entered
-    if (amount0Entered) {
-        amount0Desired = amount0Entered;
+    if (amount0Entered !== "0") {
+        console.log("amount 0 entered")
+        const amount0DesiredForCalculation = amount0Entered//ethers.utils.parseUnits(amount0Entered.toString(), token0.decimals).toString();
 
-        const liquidityFor0 = Math.round(liquidity0(amount0Entered, currentSqrtPrice, upperSqrtPrice));
-        amount1Desired = calculateAmount1WhenLiquidity0Given(liquidityFor0, currentSqrtPrice, lowerSqrtPrice);
+        const liquidityFor0 = Math.round(liquidity0(amount0DesiredForCalculation, currentSqrtPrice, upperSqrtPrice));
+        amount1Desired =  calculateAmount1WhenLiquidity0Given(liquidityFor0, currentSqrtPrice, lowerSqrtPrice).toString();
         liquidity = liquidityFor0.toString();
 
-    } else if (amount1Entered) {
-        amount1Desired = amount1Entered;
+        amount0Desired = amount0Entered.toString();
 
-        const liquidityFor1 = Math.round(liquidity1(amount1Entered, currentSqrtPrice, lowerSqrtPrice));
-        amount0Desired = calculateAmount0WhenLiquidity1Given(liquidityFor1, currentSqrtPrice, upperSqrtPrice);
+        console.log(amount1Desired, amount0Desired);
+        amount0Desired = ethers.utils.formatUnits(amount0Desired, token0.decimals);
+        amount1Desired = ethers.utils.formatUnits(amount1Desired, token1.decimals);
+
+    } else if (amount1Entered !== "0") {
+        console.log("amount 1 entered")
+        const amount1DesiredForCalculation = amount1Entered//ethers.utils.parseUnits(amount1Entered.toString(), token1.decimals).toString();
+
+        const liquidityFor1 = Math.round(liquidity1(amount1DesiredForCalculation, currentSqrtPrice, lowerSqrtPrice));
+        amount0Desired = calculateAmount0WhenLiquidity1Given(liquidityFor1, currentSqrtPrice, upperSqrtPrice).toString();
         liquidity = liquidityFor1.toString();
+
+        amount1Desired = ethers.utils.formatUnits(amount1Entered.toString(),token1.decimals);
+        amount0Desired = ethers.utils.formatUnits(amount0Desired.toString(),token0.decimals);
     }
 
-    // console.log(amount0Desired, amount1Desired);
-
-    // Convert sqrtPrice to tick
-    // const currentTick = sqrtPriceToTick(currentSqrtPrice);
+    console.log("Inside Emulate - ");
+    console.log("lower, current, upper ticks : ", tickLower, currentTick, tickUpper)
+    console.log("Supposed to be     : ", TickMath.getSqrtRatioAtTick(currentTick).toString());
+    console.log("current sqrt price : ", currentSqrtPrice);
+    console.log("lower Sqrt price   : ", lowerSqrtPrice)
+    console.log("upper Sqrt price   : ", upperSqrtPrice)
+    console.log("liquidity : ", liquidity);
+    console.log("--------------------------------------------------------------------------");
 
     try {
         // Create Pool instance
         const pool = new Pool(
-            tokenD,
-            tokenB,
+            token0,
+            token1,
             fee,
-            sqrtPriceX96.toString(),
+            currentSqrtPrice.toString(),
             liquidity,
             currentTick
         );
@@ -83,18 +138,25 @@ function emulate(
         const position = new Position({
             pool,
             liquidity: pool.liquidity.toString(),
-            tickLower: Number(tickLower),
-            tickUpper: Number(tickUpper)
+            tickLower: tickLower,
+            tickUpper: tickUpper
         });
 
         // Calculate mint amounts
         const { amount0: amount0DesiredFromPosition, amount1: amount1DesiredFromPosition } = position.mintAmounts;
 
-        // console.log(amount0DesiredFromPosition.toString(), amount1DesiredFromPosition.toString());
+        console.log(amount0DesiredFromPosition.toString(), amount1DesiredFromPosition.toString());
 
         // Set the minimum amounts
-        amount0Min = parseFloat(amount0DesiredFromPosition.toString());
-        amount1Min = parseFloat(amount1DesiredFromPosition.toString());
+        amount0Min = parseFloat(amount0DesiredFromPosition.toString()).toString();
+        amount1Min = parseFloat(amount1DesiredFromPosition.toString()).toString();
+
+        const slippageTolerance = 10;
+        amount0Min = roundToPrecision((Number(amount0Min) - adjustForSlippage(amount0Min, slippageTolerance)).toString() , token0.decimals).toString()//(roundToPrecision(amount0Min,6) - roundToPrecision("0.000001",6)).toString(); // Math.pow(10,-token0.decimals+4)
+        amount1Min = roundToPrecision((Number(amount1Min) - adjustForSlippage(amount1Min, slippageTolerance)).toString() , token1.decimals).toString()//(roundToPrecision(amount1Min,6) - roundToPrecision("0.000001",6)).toString();
+
+        amount0Min = ethers.utils.formatUnits(amount0Min,token0.decimals);
+        amount1Min = ethers.utils.formatUnits(amount1Min,token1.decimals);
 
         console.log(amount0Desired, amount1Desired);
         console.log(amount0Min, amount1Min);
@@ -108,7 +170,7 @@ function emulate(
             amount0Min: amount0Min?.toString(),//ethers.utils.parseUnits(amount0Min?.toString() || "0", 6).toString(),
             amount1Min: amount1Min?.toString(),//ethers.utils.parseUnits(amount1Min?.toString() || "0", 6).toString(),
             deadline: deadline.toString(),
-            sqrtPriceX96: sqrtPriceX96.toString()
+            sqrtPriceX96: currentSqrtPrice.toString()
         };
     } catch (error) {
         console.error(error);
@@ -117,3 +179,22 @@ function emulate(
 }
 
 export default emulate;
+
+/*
+79244113692861321940131
+79228162514264337593543950336
+79216384492398872785077
+79228162514264337593543950336
+32376253762310902672622909795905527
+1350174849792634181862360983626536
+
+79196269788941351634505330538670869360004
+
+79228162514264337593543950336
+3881371428364983642911928221696
+3881371428364983642911928221696
+
+
+998976618347425408
+5000000000000000000000
+*/

@@ -29,6 +29,18 @@
     "symbol": "TKE",
     "decimals": 6,
     "address": "0xCe487FFe58d1AF5f9E27c7F8535657096aab5511"
+  },
+  {
+    "name": "MOCK_USDC",
+    "symbol": "MUSDC",
+    "decimals": 6,
+    "address": "0x4b117ca040efE7758522b1E2BdF3bFC915C1aEDc"
+  },
+  {
+    "name": "Wrapped Pulse",
+    "symbol": "WPLS",
+    "decimals": 18,
+    "address": "0x70499adEBB11Efd915E3b69E700c331778628707"
   }
 ]
   
