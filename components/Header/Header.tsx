@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Box, List, ListItem, ListItemButton, Button, Typography, ListItemText, Tooltip, IconButton, Menu, MenuItem } from '@mui/material';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { IoIosArrowDown } from 'react-icons/io';
@@ -10,8 +10,10 @@ import AppSettingsModal from '../AppSettingsModal/AppSettingsModal';
 import Link from 'next/link';
 import Image from 'next/image';
 import { truncateAddress } from '@/utils/generalFunctions';
+import { getAddChainParameters } from '.././ConnectWallet/chains'
 
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from 'wagmi'
+import { metaMask } from ".././ConnectWallet/connector";
 
 const Header = () => {
   const [openSettingsModal, setOpenSettingsModal] = React.useState(false);
@@ -19,8 +21,8 @@ const Header = () => {
   const [valueToShow, setValueToShow] = React.useState("Connect Wallet")
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedNetwork, setSelectedNetwork] = React.useState('PulseChain');
-  
-  const {isConnected, address} = useAccount()
+
+  const { isConnected, address } = useAccount()
 
   const { theme } = useTheme();
   const router = useRouter();
@@ -41,13 +43,19 @@ const Header = () => {
     setAnchorEl(null);
   };
 
-  const handleChangeNetwork = (network: string) => {
-    setSelectedNetwork(network);
-  };
-
-  // const truncateAddress = (address: string)=>{
-  //   return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  // }
+  const handleChangeNetworkAndSwitchChain = useCallback(
+    async (network: string, desiredChainId: number) => {
+      try {
+        // Update the selected network
+        setSelectedNetwork(network);
+        await metaMask.activate(getAddChainParameters(desiredChainId));
+      }
+      catch (error) {
+        console.error('Error switching network and chain:', error); // Better error handling and logging
+      }
+    },
+    [metaMask]
+  );
 
   const openMenu = Boolean(anchorEl);
 
@@ -57,15 +65,15 @@ const Header = () => {
     BASE: '/images/base.png',
   };
 
-  useEffect(()=>{
-    if(isConnected && address){
+  useEffect(() => {
+    if (isConnected && address) {
       setValueToShow(truncateAddress(address));
       handleCloseWallet()
     }
-    else{
+    else {
       setValueToShow("Connect Wallet");
     }
-  },[isConnected])
+  }, [isConnected])
 
   return (
     <>
@@ -162,11 +170,11 @@ const Header = () => {
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
-                <MenuItem onClick={() => handleChangeNetwork('PulseChain')}>
-                  <Image src={networkImages.PulseChain} width={24} height={24} alt="PulseChain" /> PulseChain
+                <MenuItem onClick={() => handleChangeNetworkAndSwitchChain('PulseChain Mainnet', 369)}>
+                  <Image src={networkImages.PulseChain} width={24} height={24} alt="Mainnet" /> Mainnet
                 </MenuItem>
-                <MenuItem onClick={() => handleChangeNetwork('BASE')}>
-                  <Image src={networkImages.BASE} width={24} height={24} alt="BASE" /> BASE
+                <MenuItem onClick={() => handleChangeNetworkAndSwitchChain('PulseChain Testnet', 943)}>
+                  <Image src={networkImages.PulseChain} width={24} height={24} alt="Testnet" /> Testnet
                 </MenuItem>
               </Menu>
 
@@ -174,7 +182,7 @@ const Header = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={isConnected ? ()=>{disconnect()} : handleOpenWallet}
+                  onClick={isConnected ? () => { disconnect() } : handleOpenWallet}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',

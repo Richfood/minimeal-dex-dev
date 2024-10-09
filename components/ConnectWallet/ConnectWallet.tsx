@@ -6,10 +6,10 @@ import { BiDotsHorizontalRounded } from "react-icons/bi";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import {  Pagination } from 'swiper/modules';
-
+import { Pagination } from 'swiper/modules';
+import { metaMask, hooks } from '../ConnectWallet/connector';
+const { useChainId } = hooks;
 import { useConnect } from 'wagmi'
-import { useAccount } from 'wagmi';
 
 interface ConnectWalletProps {
     open: boolean;
@@ -21,6 +21,7 @@ const ConnectWallet: React.FC<ConnectWalletProps> = ({ open, onClose, mode }) =>
     const [value, setValue] = React.useState('0');
     const [showAll, setShowAll] = useState(false);
     const { connectors, connect } = useConnect()
+    const chainId = useChainId();
 
     const handleChange = (event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
@@ -47,15 +48,15 @@ const ConnectWallet: React.FC<ConnectWalletProps> = ({ open, onClose, mode }) =>
     };
 
     const walletListItems = connectors.map((connector, index) => (
-            <ListItem key={index} disablePadding>
-                <Button onClick={()=>connect({connector})}>
-                    <img src="/images/metamask.png" alt="metamask" />
-                    <Box>
-                        <Typography sx={{ fontSize: '12px', mt: '10px' }}>{connector.name}</Typography>
-                    </Box>
-                </Button>
-            </ListItem>
-        )
+        <ListItem key={index} disablePadding>
+            <Button onClick={() => metaMask.activate(chainId)}>
+                <img src="/images/metamask.png" alt="metamask" />
+                <Box>
+                    <Typography sx={{ fontSize: '12px', mt: '10px' }}>{connector.name}</Typography>
+                </Box>
+            </Button>
+        </ListItem>
+    )
     );
 
 
@@ -90,12 +91,12 @@ const ConnectWallet: React.FC<ConnectWalletProps> = ({ open, onClose, mode }) =>
                                     </Box>
                                     <Box>
                                         <List className={`${showAll ? 'active connectWalletList' : 'connectWalletList'}`}>
-                                            {walletListItems.slice(0, showAll ? walletListItems.length : 5)}
+                                            {walletListItems.slice(0, 1)}
                                             {!showAll && (
                                                 <ListItem className='more-btn' onClick={toggleClass} disablePadding>
                                                     <Box className="w-50">
                                                         <BiDotsHorizontalRounded />
-                                                    </Box>
+                                                    </Box>---
                                                     <Box>
                                                         <Typography sx={{ fontSize: '12px', mt: '10px' }}>More</Typography>
                                                     </Box>
@@ -112,7 +113,7 @@ const ConnectWallet: React.FC<ConnectWalletProps> = ({ open, onClose, mode }) =>
                         <TabPanel value="1">
                             <Box className="Web3Wallet" >
                                 <Swiper
-                                    modules={[ Pagination]}
+                                    modules={[Pagination]}
                                     pagination={{ clickable: true }}
                                     className="mySwiper"
                                 >

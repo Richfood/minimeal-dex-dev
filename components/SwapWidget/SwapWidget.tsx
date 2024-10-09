@@ -23,10 +23,13 @@ import { TradeType } from '@uniswap/sdk-core';
 import CircularProgress from '@mui/material/CircularProgress';
 
 interface Token {
-    name : string;
-    symbol : string;
-    address : string;
-    decimals : number;
+    name: string;
+    symbol: string;
+    address: {
+        contract_address: string;
+        decimals: number;
+    };
+    image: string; // URL to the token's image
 }
 
 interface SwapWidgetProps {
@@ -51,17 +54,20 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [selectedGraph, setSelectedGraph] = useState<'graph1' | 'graph2'>('graph1');
     const [activeCurrency, setActiveCurrency] = useState<'PLS/9MM' | '9MM/PLS'>('PLS/9MM');
     const [series, setSeries] = useState<{ name: string; data: { x: number; y: number; }[] }[]>([]);
-    const [circleImages, setCircleImages] = useState<{ circle1: string; circle2: string }>({
-        circle1: '/images/circle1.svg',
-        circle2: '/images/circle2.svg',
+    const [circleImages, setCircleImages] = useState<{ circle1: string | undefined; circle2: string | undefined; }>({
+        circle1: '/images/pls.png',
+        circle2: '/images/9mm.png',
     });
     // const [activeNewCurrency, setActiveNewCurrency] = useState<{ active1: string; active2: string }>({
+    console.log("🚀 ~ circleImages:", circleImages)
     //     active1: 'PLS',
     //     active2: '9MM'
     // });
 
     const [token0, setToken0] = useState<Token | null>(null);
+    console.log("🚀 ~ token0:", token0)
     const [token1, setToken1] = useState<Token | null>(null);
+    console.log("🚀 ~ token1:", token1)
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
 
     const [amountIn, setAmountIn] = useState("");
@@ -72,7 +78,23 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
     const { theme } = useTheme();
 
-    const handleOpenToken = useCallback((tokenNumber : number) => {
+    // Load token data from local storage and set it to state
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const savedToken0 = localStorage.getItem('token0');
+            const savedToken1 = localStorage.getItem('token1');
+
+            // Initialize token0 and token1 from local storage if available
+            if (savedToken0) {
+                setToken0(JSON.parse(savedToken0));
+            }
+            if (savedToken1) {
+                setToken1(JSON.parse(savedToken1));
+            }
+        }
+    }, []);
+
+    const handleOpenToken = useCallback((tokenNumber: number) => {
         setTokenBeingChosen(tokenNumber)
         setOpenToken(prev => !prev)
     }, []);
@@ -95,14 +117,14 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
         onToggle();
     };
 
-    const handleAmountIn = async ()=>{
+    const handleAmountIn = async () => {
         setAmountOut("");
         setAmountOutLoading(true);
         await fetchSmartOrderRoute();
         setAmountOutLoading(false);
     }
 
-    const handleAmountOut = async ()=>{
+    const handleAmountOut = async () => {
         setAmountIn("");
         setAmountInLoading(true);
         await fetchSmartOrderRoute();
@@ -112,8 +134,10 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
     const toggleGraph = () => {
         setSelectedGraph(prevGraph => (prevGraph === 'graph1' ? 'graph2' : 'graph1'));
-
+        console.log("🚀 ~ toggleGraph ~ activeCurrency:", activeCurrency);
+    
         if (activeCurrency === 'PLS/9MM') {
+            // Set new series data for the graph
             setSeries([
                 {
                     name: 'Graph 1',
@@ -123,16 +147,24 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                     ]
                 }
             ]);
+    
             setActiveCurrency('9MM/PLS');
-            setCircleImages({
-                circle1: '/images/circle2.svg',
-                circle2: '/images/circle1.svg',
+    
+          
+    
+            // Proper token swapping using a temporary variable
+            const tempToken = token0;   // Save current token0
+            setToken0(token1);          // Set token0 to token1
+            setToken1(tempToken);       // Set token1 to the saved token0
+
+              // Update circle images for this condition
+              setCircleImages({
+                circle1: '/images/9mm.png',
+                circle2: '/images/pls.png',
             });
-            // setActiveNewCurrency({
-            //     active1: 'PLS',
-            //     active2: '9MM'
-            // });
+    
         } else {
+            // Set new series data for the other graph condition
             setSeries([
                 {
                     name: 'Graph 1',
@@ -142,27 +174,33 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                     ]
                 }
             ]);
+    
             setActiveCurrency('PLS/9MM');
+    
             setCircleImages({
-                circle1: '/images/circle1.svg',
-                circle2: '/images/circle2.svg',
+                circle1: '/images/pls.png',
+                circle2: '/images/9mm.png',
             });
-            // setActiveNewCurrency({
-            //     active1: '9MM',
-            //     active2: 'PLS'
-            // });
+    
+            // Proper token swapping using a temporary variable
+            const tempToken = token0;   // Save current token0
+            setToken0(token1);          // Set token0 to token1
+            setToken1(tempToken);       // Set token1 to the saved token0
         }
     };
+    
+    
+    
 
-    const fetchSmartOrderRoute = async ()=>{
+    const fetchSmartOrderRoute = async () => {
 
-        if(!token0 || !token1) return;
+        if (!token0 || !token1) return;
 
         console.log("Fetch Run");
 
         let protocol = Protocol.V3;
-        let tradeType : TradeType;
-        if(amountIn) {
+        let tradeType: TradeType;
+        if (amountIn) {
             tradeType = TradeType.EXACT_INPUT;
             const amountOutAmountFromRoute = await getSmartOrderRoute(token0, token1, amountIn, [protocol], tradeType);
             setAmountOut(amountOutAmountFromRoute?.toString() || "");
@@ -174,6 +212,36 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
         }
     }
 
+    const copyToClipboard = (text: string | undefined) => {
+        console.log("🚀 ~ copyToClipboard ~ text:", text)
+        if (!text || text.trim() === "") {
+            alert("Empty address");
+        }
+        else {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert("Address copied to clipboard!");
+                }).catch(err => {
+                    console.error("Failed to copy text to clipboard", err);
+                });
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand("copy");
+                    alert("Address copied to clipboard!");
+                } catch (err) {
+                    console.error("Failed to copy text to clipboard", err);
+                }
+                document.body.removeChild(textArea);
+            }
+
+        }
+
+    };
+
     return (
         <>
             <Box className="SwapWidgetSec">
@@ -181,29 +249,36 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                     <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                             <img src={circleImages.circle1} alt="circle1" style={{ width: '20px', height: '20px' }} />
-                            <Typography onClick={()=>handleOpenToken(0)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                {token0 ? token0.symbol : "Select a Currency"} <IoIosArrowDown />
+                            <Typography onClick={() => handleOpenToken(0)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                {token0 && token0.symbol} <IoIosArrowDown />
+                            </Typography>
+                            <Typography
+                                onClick={() => copyToClipboard(token0?.address?.contract_address)}
+                                component="span"
+                                sx={{ ml: '5px', cursor: 'pointer' }}
+                            >
+                                {token0?.symbol !== "PLS" && <PiCopy />}
                             </Typography>
                         </Box>
                         <Box className="inputField">
                             {amountInLoading ? (
-                                <CircularProgress size={30}/>
+                                <CircularProgress size={30} />
                             ) : (
-                            <Box>
-                                <input
-                                    type="number"
-                                    placeholder="0.0"
-                                    onChange={(e) => {
-                                        if (token0) {
-                                            setAmountIn(e.target.value);
-                                            setAmountOut("");
-                                        }
-                                    }}
-                                    onBlur={handleAmountIn}
-                                    value={amountIn}
-                                />
-                                <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}>~195,194.61 USD</Typography>
-                            </Box>
+                                <Box>
+                                    <input
+                                        type="number"
+                                        placeholder="0.0"
+                                        onChange={(e) => {
+                                            if (token0) {
+                                                setAmountIn(e.target.value);
+                                                setAmountOut("");
+                                            }
+                                        }}
+                                        onBlur={handleAmountIn}
+                                        value={amountIn}
+                                    />
+                                    <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}>~195,194.61 USD</Typography>
+                                </Box>
                             )}
                         </Box>
 
@@ -213,7 +288,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
                             </Box>
                             <Box sx={{ mt: '25px' }}>
-                                <Button variant="contained" color="secondary">Connect Wallet</Button>
+                                <Button variant="contained" color="secondary">Swap</Button>
                             </Box>
                         </Box>
 
@@ -229,35 +304,39 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                     <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                             <img src={circleImages.circle2} alt="circle2" style={{ width: '20px', height: '20px' }} />
-                            <Typography onClick={()=>handleOpenToken(1)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center' }}>
-                                {token1 ? token1.symbol : "Select a Currency"} <IoIosArrowDown /> <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
+                            <Typography onClick={() => handleOpenToken(1)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: "pointer" }}>
+                                {token1 && token1.symbol}
+                                <IoIosArrowDown />
+                            </Typography>
+                            <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }} onClick={() => copyToClipboard(token0?.address?.contract_address)}>
+                                {token1?.symbol !== "PLS" && <PiCopy />}
                             </Typography>
                         </Box>
                         <Box className="inputField">
                             {amountOutLoading ? (
-                                <CircularProgress size={30}/>
-                                ) : (
+                                <CircularProgress size={30} />
+                            ) : (
                                 <Box>
-                                    <input 
-                                        type="number" 
-                                        placeholder='0.0' 
-                                        onChange={(e)=>{
-                                            if(token1){
+                                    <input
+                                        type="number"
+                                        placeholder='0.0'
+                                        onChange={(e) => {
+                                            if (token1) {
                                                 setAmountOut(e.target.value);
                                                 setAmountIn("");
                                             }
-                                        }} 
-                                        onBlur={handleAmountOut} 
+                                        }}
+                                        onBlur={handleAmountOut}
                                         value={amountOut}
                                     />
                                     <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}>~195,194.61 USD</Typography>
                                 </Box>
-                                )}
+                            )}
                         </Box>
                     </Box>
 
 
-                    <Box className="slippageSec msls" sx={{display: "none"}}>
+                    <Box className="slippageSec msls" sx={{ display: "none" }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                             <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>Slippage Tolerance <PiPencilSimpleBold /></Typography>
                             <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
@@ -266,13 +345,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                             <Button variant="contained" color="secondary">Connect Wallet</Button>
                         </Box>
                     </Box>
-
-
-
                 </Box>
-
-
-
                 <Box className="SwapWidgetBox">
                     <Box className="SwapWidgetBoxTitle">
                         <Typography variant="h4" className='sec_title'>Swap</Typography>
@@ -313,12 +386,14 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
                 <SettingsModal isOpen={isOpen} handleClose={handleClose} theme={theme} />
                 <RecentTransactions open={isOpenRecent} onClose={handleCloseRecent} />
-                <SelectedToken 
-                    openToken={openToken} 
-                    handleCloseToken={handleCloseToken} 
-                    mode={theme} setToken0={setToken0} 
-                    setToken1={setToken1} 
-                    tokenNumber={tokenBeingChosen} 
+                <SelectedToken
+                    openToken={openToken}
+                    handleCloseToken={handleCloseToken}
+                    mode={theme} 
+                    setToken0={setToken0}
+                    setToken1={setToken1}
+                    tokenNumber={tokenBeingChosen}
+                    // setCircleImages={setCircleImages}
                     description=''
                 />
             </Box>
