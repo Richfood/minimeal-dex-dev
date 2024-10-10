@@ -1,46 +1,58 @@
-
 [
   {
     "name": "TokenA",
     "symbol": "TKA",
-    "decimals": 18,
-    "address": "0x8B0b8FDed3f3A572eaFAd9468572646b908B567b"
+    "address": {
+      "contract_address": "0x8B0b8FDed3f3A572eaFAd9468572646b908B567b",
+      "decimals": 18
+    }
   },
   {
     "name": "TokenB",
     "symbol": "TKB",
-    "decimals": 18,
-    "address": "0x8c7A15d7f758e7770cE0bdEA578710B445Aacf95"
+    "address": {
+      "contract_address": "0x8c7A15d7f758e7770cE0bdEA578710B445Aacf95",
+      "decimals": 18
+    }
   },
   {
     "name": "TokenC",
     "symbol": "TKC",
-    "decimals": 6,
-    "address": "0xFbE79fE82C559CB62FEF61aa5195f519c2426ec1"
+    "address": {
+      "contract_address": "0xFbE79fE82C559CB62FEF61aa5195f519c2426ec1",
+      "decimals": 6
+    }
   },
   {
     "name": "TokenD",
     "symbol": "TKD",
-    "decimals": 6,
-    "address": "0x794D6e757b4FE78Fd3e088eebd1A121deB3BFAf6"
+    "address": {
+      "contract_address": "0x794D6e757b4FE78Fd3e088eebd1A121deB3BFAf6",
+      "decimals": 6
+    }
   },
   {
     "name": "TokenE",
     "symbol": "TKE",
-    "decimals": 6,
-    "address": "0xCe487FFe58d1AF5f9E27c7F8535657096aab5511"
+    "address": {
+      "contract_address": "0xCe487FFe58d1AF5f9E27c7F8535657096aab5511",
+      "decimals": 6
+    }
   },
   {
     "name": "MOCK_USDC",
     "symbol": "MUSDC",
-    "decimals": 6,
-    "address": "0x4b117ca040efE7758522b1E2BdF3bFC915C1aEDc"
+    "address": {
+      "contract_address": "0x4b117ca040efE7758522b1E2BdF3bFC915C1aEDc",
+      "decimals": 6
+    }
   },
   {
     "name": "Wrapped Pulse",
     "symbol": "WPLS",
-    "decimals": 18,
-    "address": "0x70499adEBB11Efd915E3b69E700c331778628707"
+    "address": {
+      "contract_address": "0x70499adEBB11Efd915E3b69E700c331778628707",
+      "decimals": 18
+    }
   }
 ]
-  

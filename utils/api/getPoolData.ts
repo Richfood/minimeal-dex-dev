@@ -11,8 +11,8 @@ export async function getPoolData(token0 : TokenDetails, token1 : TokenDetails, 
       query {
         pools(
           where: {
-            token0: "${token0.address.toLowerCase()}", 
-            token1: "${token1.address.toLowerCase()}", 
+            token0: "${token0.address.contract_address.toLowerCase()}", 
+            token1: "${token1.address.contract_address.toLowerCase()}", 
             feeTier: "${fee}"
           }
         ) {

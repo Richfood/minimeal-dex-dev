@@ -17,7 +17,7 @@ import { BsFire } from "react-icons/bs";
 import { BigNumber } from 'ethers';
 import { Pool } from '@uniswap/v3-sdk';
 import { getPoolData } from '@/utils/api/getPoolData';
-import { Protocol, SwapPoolData } from '@/interfaces';
+import { Protocol, SwapPoolData, TokenDetails } from '@/interfaces';
 import { getSmartOrderRoute } from '@/utils/api/getSmartOrderRoute';
 import { TradeType } from '@uniswap/sdk-core';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -64,9 +64,9 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     //     active2: '9MM'
     // });
 
-    const [token0, setToken0] = useState<Token | null>(null);
+    const [token0, setToken0] = useState<TokenDetails | null>(null);
     console.log("🚀 ~ token0:", token0)
-    const [token1, setToken1] = useState<Token | null>(null);
+    const [token1, setToken1] = useState<TokenDetails | null>(null);
     console.log("🚀 ~ token1:", token1)
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
 

@@ -30,6 +30,8 @@ import { getPoolData } from '@/utils/api/getPoolData';
 import { AddLiquidityPoolData, TokenDetails } from '@/interfaces';
 import SettingsModal from '../SettingModal/SettingModal';
 
+import tokenList from "../../utils/tokenList.json";
+
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
 }
@@ -72,6 +74,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
   const handleClose = () => setOpen(false);
 
   const NFPMAddress = addresses.PancakePositionManagerAddress;
+
   const [token0,setToken0] =  useState<TokenDetails | null>(null);
   const [token1, setToken1] = useState<TokenDetails | null>(null);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
@@ -170,7 +173,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
   const sortTokens = ()=>{
     if(token0 && token1){
-      if(token0.address > token1.address){
+      if(token0.address.contract_address > token1.address.contract_address){
         const temp = token0;
         setToken0(token1);
         setToken1(temp);
@@ -420,7 +423,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
   useEffect(()=>{
     reset();
     sortTokens();
-    if(token0 && token1) setDecimalDifference(token1.decimals - token0.decimals);
+    if(token0 && token1) setDecimalDifference(token1.address.decimals - token0.address.decimals);
   },[token0, token1])
 
   useEffect(()=>{
@@ -502,7 +505,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                   <Box className="token-pair" onClick={()=>{handleOpenToken(0)}} sx={{ cursor: 'pointer', color: palette.mode === 'light' ? 'var(--black)' : 'var(--white)', bgcolor: palette.mode === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)' }}>
                     <Box >
                       {token0 ? (
-                        <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>{token0.name} {`(${truncateAddress(token0.address)})`}</Typography>
+                        <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>{token0.name} {`(${truncateAddress(token0.address.contract_address)})`}</Typography>
                       ):(
                         <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>Select Token</Typography>
                       )
@@ -518,7 +521,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                   <Box onClick={()=>{handleOpenToken(1)}} className="token-pair" sx={{ color: palette.mode === 'light' ? 'var(--black)' : 'var(--white)', bgcolor: palette.mode === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)' }}>
                     <Box >
                       {token1 ? (
-                        <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>{token1.name} {`(${truncateAddress(token1.address)})`}</Typography>
+                        <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>{token1.name} {`(${truncateAddress(token1.address.contract_address)})`}</Typography>
                       ):(
                         <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>Select Token</Typography>
                       )
@@ -742,7 +745,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                     {token0 && token1 ? (
                       <Box sx={{ display: 'flex', gap: '5px', justifyContent: 'center', mb: '15px' }}>
                       <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>Current Price:</Typography>
-                      <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{Number(currentPoolData.token1Price) / Number(currentPoolData.token0Price) || 0}</Typography>
+                      <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{Number(currentPoolData.token1Price) || 0}</Typography>
                       <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{token0.name} Per {token1.name}</Typography>
                     </Box>
                     ) : (
@@ -772,9 +775,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
                         {token0 && token1 ? (
                           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                            <Typography sx={{ fontWeight: '600' }}>{token1.symbol}</Typography>
-                            <Typography sx={{ fontWeight: '600' }}>Per</Typography>
                             <Typography sx={{ fontWeight: '600' }}>{token0.symbol}</Typography>
+                            <Typography sx={{ fontWeight: '600' }}>Per</Typography>
+                            <Typography sx={{ fontWeight: '600' }}>{token1.symbol}</Typography>
                           </Box>
                         ) : (
                           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
@@ -956,7 +959,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                               color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
                             }}>
                             <LiaExchangeAltSolid size={20} />
-                            {truncateAddress(token0?.address || "0")}
+                            {truncateAddress(token0?.address.contract_address || "0")}
                           </Typography>
                           </Box>
                       </Box>
@@ -978,9 +981,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
                         {token0 && token1 ? (
                           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                            <Typography sx={{ fontWeight: '600' }}>{token1.symbol}</Typography>
-                            <Typography sx={{ fontWeight: '600' }}>Per</Typography>
                             <Typography sx={{ fontWeight: '600' }}>{token0.symbol}</Typography>
+                            <Typography sx={{ fontWeight: '600' }}>Per</Typography>
+                            <Typography sx={{ fontWeight: '600' }}>{token1.symbol}</Typography>
                           </Box>
                         ) : (
                           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>

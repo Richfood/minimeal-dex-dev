@@ -10,28 +10,29 @@ import ManageToken from '../ManageToken/ManageToken';
 import Image from 'next/image';
 
 import tokenList from "../../utils/tokenList.json";
+import { TokenDetails } from '@/interfaces';
 
 interface SelectedTokenProps {
     openToken: boolean;
     handleCloseToken: () => void;
     mode: 'light' | 'dark';
-    setToken0: React.Dispatch<React.SetStateAction<Token | null>>;
-    setToken1: React.Dispatch<React.SetStateAction<Token | null>>;
+    setToken0: React.Dispatch<React.SetStateAction<TokenDetails | null>>;
+    setToken1: React.Dispatch<React.SetStateAction<TokenDetails | null>>;
     title?: string;
     description: string;
     tokenNumber: number;
-    setCircleImages?: React.Dispatch<React.SetStateAction<Token | null>>;
+    setCircleImages?: React.Dispatch<React.SetStateAction<TokenDetails | null>>;
 }
 
-interface Token {
-    name: string;
-    symbol: string;
-    address: {
-        contract_address: string;
-        decimals: number;
-    };
-    image: string; // URL to the token's image
-}
+// interface Token {
+//     name: string;
+//     symbol: string;
+//     address: {
+//         contract_address: string;
+//         decimals: number;
+//     };
+//     image: string; // URL to the token's image
+// }
 
 
 const fetchStablecoins = async (): Promise<any> => {
@@ -92,13 +93,13 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
     const [openManage, setOpenManage] = useState(false);
     const [tokenSelected, setTokenSelected] = useState<string>("");
     const [coinData, setCoinData] = useState<any[]>([]);
-    const [tokenA, setTokenA] = useState<Token | null>(null);
-    const [tokenB, setTokenB] = useState<Token | null>(null);
+    const [tokenA, setTokenA] = useState<TokenDetails | null>(null);
+    const [tokenB, setTokenB] = useState<TokenDetails | null>(null);
 
     const handleOpenManage = () => setOpenManage(true);
     const handleCloseManage = () => setOpenManage(false);
 
-    const handleSelectToken = (token: Token) => {
+    const handleSelectToken = (token: TokenDetails) => {
 
         if (tokenNumber === 0) {
             setToken0(token);
@@ -228,7 +229,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                     <Typography>{tokenB?.symbol}</Typography>
                                 </Box>
                                 <Box className="token_Outer" sx={{ py: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                    {coinData.map((token, index) => (
+                                    {coinData?.map((token, index) => (
                                         token.address !== tokenSelected ? (
                                             <Box className="token_box" key={index} onClick={() => handleSelectToken(token)}>
                                                 <img
@@ -244,7 +245,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                             </Box>
                             <Box className="token_list">
                                 <List>
-                                    {coinData.map(asset => (
+                                    {coinData?.map(asset => (
                                         <ListItem
                                             key={asset.symbol}
                                             sx={{

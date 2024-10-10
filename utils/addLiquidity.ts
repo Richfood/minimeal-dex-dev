@@ -84,10 +84,10 @@ const addLiquidity = async (
     // console.log("------------------");
     // console.log(amount0Desired, amount1Desired, amount0Min, amount1Min);
 
-    amount0Desired = ethers.utils.parseUnits(amount0Desired,token0.decimals).toString();
-    amount1Desired = ethers.utils.parseUnits(amount1Desired,token1.decimals).toString();
-    amount0Min = ethers.utils.parseUnits(amount0Min,token0.decimals).toString();
-    amount1Min = ethers.utils.parseUnits(amount1Min,token1.decimals).toString();
+    amount0Desired = ethers.utils.parseUnits(amount0Desired,token0.address.decimals).toString();
+    amount1Desired = ethers.utils.parseUnits(amount1Desired,token1.address.decimals).toString();
+    amount0Min = ethers.utils.parseUnits(amount0Min,token0.address.decimals).toString();
+    amount1Min = ethers.utils.parseUnits(amount1Min,token1.address.decimals).toString();
 
     console.log(`Amounts Desired and Minimum for Liquidity Provision:
         - Token 0 Desired: ${amount0Desired}

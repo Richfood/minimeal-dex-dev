@@ -3,6 +3,19 @@ import { TradeType } from "@uniswap/sdk-core";
 import axios from "axios";
 import { ethers } from "ethers";
 
+function convertQuoteToReadable(numerator: number[], denominator: number[], decimalScale: number[]): number {
+    // Combine the numerator values into a single large number
+    let bigNumerator = numerator[1] * 1e9 + numerator[0];  // Assuming base 1e9 for large number
+
+    // Convert the fraction
+    let fractionValue = bigNumerator / denominator[0]; // Since denominator is [1], this won't change much
+
+    // Adjust for the token's decimal scale
+    let readableValue = fractionValue / decimalScale[0];
+
+    return readableValue;
+}
+
 export async function getSmartOrderRoute(
     inputToken : TokenDetails, 
     outputToken : TokenDetails,
@@ -38,8 +51,11 @@ export async function getSmartOrderRoute(
         })
 
         console.log(response.data.finalRoute);
-        const quote = response.data.finalRoute.quote;
-        const value = quote.numerator[0] / (quote.denominator[0] * quote.decimalScale[0])
+        const quoteAdjustedForGas = response.data.finalRoute.quoteAdjustedForGas;
+        const numerator = quoteAdjustedForGas.numerator;
+        const denominator = quoteAdjustedForGas.denominator;
+        const decimalScale = quoteAdjustedForGas.decimalScale
+        const value = convertQuoteToReadable(numerator, denominator, decimalScale);
 
         console.log(value);
 

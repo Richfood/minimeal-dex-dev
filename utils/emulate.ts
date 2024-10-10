@@ -39,11 +39,11 @@ function emulate(
     token1Details: TokenDetails
 ) {
     console.log('Inside emulate - -----------------------------------------------------------------')
-    const token0Address = token0Details.address;
-    const token1Address = token1Details.address;
+    const token0Address = token0Details.address.contract_address;
+    const token1Address = token1Details.address.contract_address;
 
-    const token0 = new Token(31337, token0Address, token0Details.decimals);
-    const token1 = new Token(31337, token1Address, token1Details.decimals);
+    const token0 = new Token(31337, token0Address, token0Details.address.decimals);
+    const token1 = new Token(31337, token1Address, token1Details.address.decimals);
 
     const tickSpacing = TICK_SPACINGS[fee];
 
