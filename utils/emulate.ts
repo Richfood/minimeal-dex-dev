@@ -14,20 +14,8 @@ import {
 } from "./utils";
 import { ethers } from "ethers";
 import { TokenDetails } from "@/interfaces";
-
-// Helper function for rounding amounts
-function roundToPrecision(value: string, decimals:number) {
-    const factor = Math.pow(10, decimals);
-    const roundedValue = (Math.round(parseFloat(value) * factor) / factor).toFixed(0);
-    return roundedValue;
-}
-function adjustForSlippage(amount: string, slippageTolerance: number): number {
-    // Convert slippage tolerance percentage into a decimal (e.g., 1% becomes 0.01)
-    const slippageFactor = slippageTolerance / 100;
-
-    // Adjust the amount by reducing it based on the slippage tolerance
-    return Number(amount) * slippageFactor;
-}    
+import { adjustForSlippage, roundToPrecision } from "./generalFunctions";
+ 
 function emulate(
     priceLower: string, 
     priceUpper: string, 
