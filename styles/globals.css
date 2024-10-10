@@ -446,7 +446,7 @@ body.dark-mode .widgetList ul svg {
   padding: 5px;
   border-radius: 10px;
   border: 1px solid #91a1a1;
-
+  cursor: "pointer"
 }
 
 .token_Outer p {
@@ -1166,7 +1166,7 @@ body.dark-mode .tabsOuter {
 
   .toolbar-button button {
     font-size: 12px;
-    
+
   }
 }
 

@@ -231,6 +231,11 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                     {coinData.map((token, index) => (
                                         token.address !== tokenSelected ? (
                                             <Box className="token_box" key={index} onClick={() => handleSelectToken(token)}>
+                                                <img
+                                                      src={token.image}
+                                                      alt={`${token.symbol} logo`}
+                                                    style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
+                                                />
                                                 <Typography>{token.name}</Typography>
                                             </Box>
                                         ) : (<></>)
