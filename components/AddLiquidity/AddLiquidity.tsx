@@ -19,7 +19,7 @@ import { useRouter } from 'next/router';
 import RoiCalculator from '../RoiCalculator/RoiCalculator'
 import { toast, ToastContainer } from 'react-toastify';
 import getTokenApproval from "../../utils/getTokenApproval";
-import { addLiquidityV3, addLiquidityV2 } from '@/utils/addLiquidity';
+import { addLiquidityV3, addLiquidityV2, addLiquidityETH } from '@/utils/addLiquidity';
 import emulate from '@/utils/emulate';
 import { FeeAmount, nearestUsableTick, TICK_SPACINGS } from '@uniswap/v3-sdk';
 import addresses from "../../utils/address.json";
@@ -77,8 +77,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
   const NFPMAddress = addresses.PancakePositionManagerAddress;
   const v2RouterAddress = addresses.PancakeV2RouterAddress;
-  const tempToken0 = tokenList[tokenList.length-1];
-  const tempToken1 = tokenList[tokenList.length-2];
+  const tempToken0 = tokenList[tokenList.length-1]; // tokenList-1 is PLS. tokenList-2 is WPLS
+  const tempToken1 = tokenList[tokenList.length-3];
   const [token0,setToken0] =  useState<TokenDetails | null>(tempToken0);
   const [token1, setToken1] = useState<TokenDetails | null>(tempToken1);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
@@ -267,8 +267,10 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
       const addressToApprove = activeProtocol === Protocol.V3 ? NFPMAddress : v2RouterAddress;
 
-      await getTokenApproval(token0, addressToApprove, approvalAmount0);
-      await getTokenApproval(token1, addressToApprove, approvalAmount1);
+      if(token0.symbol !== "PLS")
+        await getTokenApproval(token0, addressToApprove, approvalAmount0);
+      if(token1.symbol !== "PLS")
+        await getTokenApproval(token1, addressToApprove, approvalAmount1);
 
       alert("Tokens Approved!");
     }
@@ -281,12 +283,42 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
     if(activeProtocol === Protocol.V2){
       try{
         if(token0 && token1 && amount0Desired && amount1Desired){
-          const addLiquidityTxHash = await addLiquidityV2(
-            token0,
-            token1,
-            amount0Desired,
-            amount1Desired
-          )
+
+          let addLiquidityTxHash : any;
+
+          if(token0.symbol === "PLS" || token1.symbol === "PLS"){
+            let amountTokenDesired : string;
+            let amountETHDesired : string;
+            let PLS : TokenDetails;
+            let Token : TokenDetails;
+
+            if(token0.symbol === "PLS"){
+              PLS = token0;
+              Token = token1;
+              amountETHDesired = amount0Desired;
+              amountTokenDesired = amount1Desired;
+            }
+            else{
+              PLS = token1;
+              Token = token0;
+              amountETHDesired = amount1Desired;
+              amountTokenDesired = amount0Desired;
+            }
+
+            addLiquidityTxHash = await addLiquidityETH(
+              Token,
+              amountETHDesired,
+              amountTokenDesired
+            )
+          }
+          else{
+            addLiquidityTxHash = await addLiquidityV2(
+              token0,
+              token1,
+              amount0Desired,
+              amount1Desired
+            )
+          }
 
           alert(`Liquidity added. tx hash : ${addLiquidityTxHash}`);
         }

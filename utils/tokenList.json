@@ -54,5 +54,13 @@
       "contract_address": "0x70499adEBB11Efd915E3b69E700c331778628707",
       "decimals": 18
     }
+  },
+  {
+    "name": "Pulse",
+    "symbol": "PLS",
+    "address": {
+      "contract_address": "0x70499adEBB11Efd915E3b69E700c331778628707",
+      "decimals": 18
+    }
   }
 ]

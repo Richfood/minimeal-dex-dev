@@ -11,6 +11,52 @@ import mintAbi from "../abis/NonfungiblePositionManager.sol/MintAbi.json";
 const nfpmAbi = nfpmArtifact.abi;
 const V2_ROUTER_ABI = v2RouterArtifact.abi;
 
+// function addLiquidityETH(
+//     address token,
+//     uint amountTokenDesired,
+//     uint amountTokenMin,
+//     uint amountETHMin,
+//     address to,
+//     uint deadline
+export async function addLiquidityETH(
+    token : TokenDetails,
+    amountETHDesired : string,
+    amountTokenDesired : string
+) {
+    const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+    const newSigner = newProvider.getSigner();
+    const newSignerAddress = await newSigner.getAddress()
+
+    const slippageTolerance = 10;
+    
+    amountTokenDesired = ethers.utils.parseUnits(amountTokenDesired, token.address.decimals).toString();
+
+    let amountTokenMin = amountTokenDesired;
+    let amountETHMin = ethers.utils.parseUnits(amountETHDesired, "18").toString();
+    amountTokenMin = adjustForSlippage(amountTokenMin, slippageTolerance).toString();
+    amountETHMin = adjustForSlippage(amountETHMin, slippageTolerance).toString();
+
+    const pancakeV2RouterAddress = addresses.PancakeV2RouterAddress;
+    const pancakeV2RouterContract = new ethers.Contract(pancakeV2RouterAddress, V2_ROUTER_ABI, newSigner);
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
+
+    const addLiquidityEthTx = await pancakeV2RouterContract.addLiquidityETH(
+        token.address.contract_address,
+        amountTokenDesired,
+        amountTokenMin,
+        amountETHMin,
+        newSignerAddress,
+        deadline,
+        {
+            value : ethers.utils.parseEther(amountETHDesired)
+        }
+    )
+
+    await addLiquidityEthTx.wait();
+    
+    return addLiquidityEthTx.hash;
+}
+
 export async function addLiquidityV2(
     token0: TokenDetails,
     token1: TokenDetails,
@@ -28,8 +74,8 @@ export async function addLiquidityV2(
     let amount0Min = ethers.utils.parseUnits(amount0Desired, token0.address.decimals).toString();
     let amount1Min = ethers.utils.parseUnits(amount1Desired, token1.address.decimals).toString();
 
-    amount0Min = adjustForSlippage(amount0Desired, slippageTolerance).toString();
-    amount1Min = adjustForSlippage(amount1Desired, slippageTolerance).toString();
+    amount0Min = adjustForSlippage(amount0Min, slippageTolerance).toString();
+    amount1Min = adjustForSlippage(amount1Min, slippageTolerance).toString();
 
     const pancakeV2RouterAddress = addresses.PancakeV2RouterAddress;
     const pancakeV2RouterContract = new ethers.Contract(pancakeV2RouterAddress, V2_ROUTER_ABI, newSigner);
