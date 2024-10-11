@@ -67,6 +67,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [token0, setToken0] = useState<TokenDetails | null>(null);
     console.log("🚀 ~ token0:", token0)
     const [token1, setToken1] = useState<TokenDetails | null>(null);
+    console.log("🚀 ~ token1:", token1)
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
 
     const [amountIn, setAmountIn] = useState("");
@@ -131,53 +132,22 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     }
 
 
-    const toggleGraph = () => {
-        setSelectedGraph(prevGraph => (prevGraph === 'graph1' ? 'graph2' : 'graph1'));
-    
-        const isPLS9MM = token0?.name === "PLS" && token1?.name === "9MM";
-        const is9MMPLS = token0?.name === "9MM" && token1?.name === "PLS";
-    
-        if (isPLS9MM || is9MMPLS) {
-            console.log("🚀 ~ toggleGraph ~ is9MMPLS1:", is9MMPLS)
-            console.log("🚀 ~ toggleGraph ~ isPLS9MM1:", isPLS9MM)
-            console.log(`🚀 ~ toggleGraph ~ token01: ${token0}`);
-    
-            // Set new series data for the graph
-            setSeries([
-                {
-                    name: 'Graph 1',
-                    data: [
-                        { x: new Date().getTime() - 1000, y: isPLS9MM ? 45 : 50 },
-                        { x: new Date().getTime(), y: isPLS9MM ? 50 : 45 }
-                    ]
-                }
-            ]);
-    
-            // Update active currency and circle images
-            setActiveCurrency(isPLS9MM ? '9MM/PLS' : 'PLS/9MM');
-            setCircleImages({
-                circle1: isPLS9MM ? '/images/9mm.png' : '/images/pls.png',
-                circle2: isPLS9MM ? '/images/pls.png' : '/images/9mm.png',
-            });
-        } else {
-            console.log("🚀 ~ toggleGraph ~ is9MMPLS2:", is9MMPLS)
-            console.log("🚀 ~ toggleGraph ~ isPLS9MM2:", isPLS9MM)
-            console.log(`🚀 ~ toggleGraph ~ token02: ${token0}`);
-            // Default case for other token pairs
-            setCircleImages({
-                circle1: token0?.image,
-                circle2: token1?.image,
-            });
+    const toggleGraph = async() => {
+
+
+        if (activeCurrency === "PLS/9MM") {
+            setActiveCurrency("9MM/PLS");  // Assume you want to toggle back
+
+        } else if (activeCurrency === "9MM/PLS") {
+            setActiveCurrency("PLS/9MM");  // Assume you want to toggle back
+
         }
-    
-        // Swap token0 and token1
+
+        // Swap token0 and token1 regardless of currency
         const tempToken = token0;
         setToken0(token1);
         setToken1(tempToken);
     };
-    
-
-
 
 
     const fetchSmartOrderRoute = async () => {
@@ -229,7 +199,6 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
     };
 
-
     const getImageSource = (token: TokenDetails | null) => {
         if (token?.symbol === 'PLS') {
             return circleImages.circle1; // Use state value for 'pls'
@@ -247,7 +216,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                             <img src={getImageSource(token0)} alt="circle1" style={{ width: '20px', height: '20px' }} />
                             <Typography onClick={() => handleOpenToken(0)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                {token0 && token0.symbol} <IoIosArrowDown />
+                                {token0 && token0.symbol.toUpperCase()} <IoIosArrowDown />
                             </Typography>
                             <Typography
                                 onClick={() => copyToClipboard(token0?.address?.contract_address)}
@@ -302,10 +271,10 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                             <img src={getImageSource(token1)} alt="circle2" style={{ width: '20px', height: '20px' }} />
                             <Typography onClick={() => handleOpenToken(1)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: "pointer" }}>
-                                {token1 && token1.symbol}
+                                {token1 && token1.symbol.toUpperCase()}
                                 <IoIosArrowDown />
                             </Typography>
-                            <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }} onClick={() => copyToClipboard(token0?.address?.contract_address)}>
+                            <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }} onClick={() => copyToClipboard(token1?.address?.contract_address)}>
                                 {token1?.symbol !== "PLS" && <PiCopy />}
                             </Typography>
                         </Box>
@@ -391,6 +360,8 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                     setToken1={setToken1}
                     tokenNumber={tokenBeingChosen}
                     description=''
+                    token0={token0}
+                    token1={token1}
                 />
             </Box>
         </>

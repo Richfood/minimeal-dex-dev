@@ -59,7 +59,7 @@ const AppSettingsModal: React.FC<AppSettingsModalProps> = ({ open, onClose }) =>
             <ThemeModeSwitch />
           </Box>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography sx={{ fontSize: '16px', fontWeight: '600', display: 'flex', gap: '5px', alignItems: 'center' }}>
               Subgraph Health Indicator
               <CustomTooltip
@@ -76,7 +76,7 @@ const AppSettingsModal: React.FC<AppSettingsModalProps> = ({ open, onClose }) =>
               control={<IOSSwitch sx={{ m: 1 }} defaultChecked />}
               label=""
             />
-          </Box>
+          </Box> */}
         </Box>
       </Box>
     </Modal>

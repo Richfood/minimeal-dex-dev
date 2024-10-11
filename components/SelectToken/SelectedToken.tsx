@@ -21,6 +21,9 @@ interface SelectedTokenProps {
     title?: string;
     description: string;
     tokenNumber: number;
+    token0: TokenDetails | null
+    token1: TokenDetails | null
+
 }
 
 // interface Token {
@@ -86,9 +89,13 @@ const fetchCoinStablecoins = async () => {
     }
 };
 
-const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode, setToken0, setToken1, tokenNumber
+const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode, setToken0, setToken1, tokenNumber, token0, token1
 
 }) => {
+    console.log("🚀 ~ token0:", token0)
+    console.log("🚀 ~ tokenNumber:", tokenNumber === 0)
+    console.log("🚀 ~ token1:", token1)
+
     const [openManage, setOpenManage] = useState(false);
     const [tokenSelected, setTokenSelected] = useState<string>("");
     const [coinData, setCoinData] = useState<any[]>([]);
@@ -182,8 +189,6 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
         }
     }, []);
 
-
-
     return (
         <>
             <Modal
@@ -210,92 +215,127 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                             <Typography sx={{ fontWeight: '500', fontSize: '14px' }}>Common tokens</Typography>
                             <Box className="token_Outer" sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
 
-                                <Box className="token_box" sx={{ cursor: tokenA?.address?.contract_address !== tokenSelected ? "pointer" : "default", opacity: tokenA?.address?.contract_address !== tokenSelected ? 1 : 0.4 }}
-                                    onClick={tokenA?.address?.contract_address !== tokenSelected ? () => handleSelectToken(tokenA) : undefined}>
+                                <Box
+                                    className="token_box"
+                                    sx={{
+                                        cursor: (tokenNumber === 0 && token0?.address?.contract_address === tokenA?.address?.contract_address) ? "default" : "pointer",
+                                        opacity: (tokenNumber === 0 && token0?.address?.contract_address === tokenA?.address?.contract_address) ? 0.4 : 1,
+                                    }}
+                                    onClick={(tokenNumber === 0 && token0?.address?.contract_address === tokenA?.address?.contract_address) ? undefined : () => handleSelectToken(tokenA)}
+                                >
                                     <img
                                         src="/images/pls.png"
                                         alt={tokenA?.symbol}
                                         style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
                                     />
-                                    <Typography>{tokenA?.symbol}</Typography>
+                                    <Typography>{tokenA?.symbol.toUpperCase()}</Typography>
                                 </Box>
+
 
                                 <Box
                                     className="token_box"
-                                    sx={{ cursor: tokenB?.address?.contract_address !== tokenSelected ? "pointer" : "default", opacity: tokenB?.address?.contract_address !== tokenSelected ? 1 : 0.4 }}
-                                    onClick={tokenB?.address?.contract_address !== tokenSelected ? () => handleSelectToken(tokenB) : undefined}
+                                    sx={{
+                                        cursor: (tokenNumber === 1 && token1?.address?.contract_address === tokenB?.address?.contract_address) ? "default" : "pointer",
+                                        opacity: (tokenNumber === 1 && token1?.address?.contract_address === tokenB?.address?.contract_address) ? 0.4 : 1,
+                                    }}
+                                    onClick={(tokenNumber === 1 && token1?.address?.contract_address === tokenB?.address?.contract_address) ? undefined : () => handleSelectToken(tokenB)}
                                 >
                                     <img
                                         src="/images/9mm.png"
                                         alt={tokenB?.symbol}
                                         style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
                                     />
-                                    <Typography>{tokenB?.symbol}</Typography>
+                                    <Typography>{tokenB?.symbol.toUpperCase()}</Typography>
                                 </Box>
 
+
                                 <Box className="token_Outer" sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                    {coinData?.map((token, index) => (
-                                        <Box className="token_box" key={index} sx={{ cursor: token?.address?.contract_address !== tokenSelected ? "pointer" : "default", opacity: token?.address?.contract_address !== tokenSelected ? 1 : 0.4 }}
-                                            onClick={token?.address?.contract_address !== tokenSelected ? () => handleSelectToken(token) : undefined}>
-                                            <img
-                                                src={token.image}
-                                                alt={`${token.symbol} logo`}
-                                                style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
-                                            />
-                                            <Typography>{token.symbol}</Typography>
-                                        </Box>
-                                    ))}
+                                    {coinData?.map((token, index) => {
+                                        // Determine the current token based on tokenNumber
+                                        const selectedToken = tokenNumber === 0 ? token0 : token1;
+
+                                        // Check if the current token from the list is the selected token
+                                        const isTokenDisabled = token.address?.contract_address === selectedToken?.address?.contract_address;
+
+                                        return (
+                                            <Box
+                                                key={index}
+                                                className="token_box"
+                                                sx={{
+                                                    cursor: isTokenDisabled ? "default" : "pointer",
+                                                    opacity: isTokenDisabled ? 0.4 : 1,
+                                                }}
+                                                onClick={!isTokenDisabled ? () => handleSelectToken(token) : undefined} // Allow click only if token is not disabled
+                                            >
+                                                <img
+                                                    src={token.image}
+                                                    alt={`${token.symbol} logo`}
+                                                    style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
+                                                />
+                                                <Typography>{token.symbol.toUpperCase()}</Typography>
+                                            </Box>
+                                        );
+                                    })}
+
                                 </Box>
                             </Box>
                             <Box className="token_list">
                                 <List>
-                                    {coinData?.map(asset => (
-                                        <ListItem
-                                            key={asset.symbol}
-                                            sx={{
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                alignItems: "flex-start",
-                                                justifyContent: "flex-start",
-                                                transition: "background-color 0.3s", // Smooth transition for background color
-                                                '&:hover': {
-                                                    backgroundColor: 'rgb(248 250 252)', // Change to your desired hover background color
-                                                },
-                                                padding: 1, // Optional: add padding for better spacing
-                                            }}
-                                            onClick={() => handleSelectToken(asset)}
-                                        >
-                                            {/* Image, Symbol, and Name in a row */}
-                                            <Box
+                                    {coinData?.map(asset => {
+                                        // Determine the current token based on tokenNumber
+                                        const selectedToken = tokenNumber === 0 ? token0 : token1;
+
+                                        // Check if the current token from the list is the selected token
+                                        const isTokenDisabled = asset.address?.contract_address === selectedToken?.address?.contract_address;
+
+                                        return (
+                                            <ListItem
+                                                key={asset.symbol}
                                                 sx={{
-                                                    cursor: asset?.address?.contract_address !== tokenSelected ? "pointer" : "default",
-                                                    opacity: asset?.address?.contract_address !== tokenSelected ? 1 : 0.4,
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    alignItems: "flex-start",
+                                                    justifyContent: "flex-start",
+                                                    transition: "background-color 0.3s",
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgb(248 250 252)', // Hover background color
+                                                    },
+                                                    padding: 1, // Optional: add padding for better spacing
                                                 }}
-                                                onClick={asset?.address?.contract_address !== tokenSelected ? () => handleSelectToken(asset) : undefined}
+                                                onClick={!isTokenDisabled ? () => handleSelectToken(asset) : undefined} // Allow click only if token is not disabled
                                             >
-                                                {/* Flexbox layout for image and text */}
-                                                <Box sx={{ display: "flex", alignItems: "center" }}>
-                                                    <img
-                                                        src={asset.image}
-                                                        alt={`${asset.symbol} logo`}
-                                                        style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
-                                                    />
-                                                    {/* Symbol and Name in a column */}
-                                                    <Box sx={{ display: "flex", flexDirection: "column" }}>
-                                                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                            {asset.symbol}
-                                                        </Typography>
-                                                        <Typography color="text.secondary" variant="body2">
-                                                            {asset.name}
-                                                        </Typography>
+                                                {/* Image, Symbol, and Name in a row */}
+                                                <Box
+                                                    sx={{
+                                                        cursor: isTokenDisabled ? "default" : "pointer",
+                                                        opacity: isTokenDisabled ? 0.4 : 1,
+                                                    }}
+                                                    onClick={isTokenDisabled ? undefined : () => handleSelectToken(asset)}
+                                                >
+                                                    {/* Flexbox layout for image and text */}
+                                                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                                                        <img
+                                                            src={asset.image}
+                                                            alt={`${asset.symbol} logo`}
+                                                            style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
+                                                        />
+                                                        {/* Symbol and Name in a column */}
+                                                        <Box sx={{ display: "flex", flexDirection: "column" }}>
+                                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                                {asset.symbol.toUpperCase()}
+                                                            </Typography>
+                                                            <Typography color="text.secondary" variant="body2">
+                                                                {asset.name}
+                                                            </Typography>
+                                                        </Box>
                                                     </Box>
                                                 </Box>
-                                            </Box>
-
-                                        </ListItem>
-                                    ))}
+                                            </ListItem>
+                                        );
+                                    })}
                                 </List>
                             </Box>
+
                             <Box sx={{ textAlign: 'center', mt: '20px' }}>
                                 <Typography
                                     variant="h6"
