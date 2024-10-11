@@ -102,7 +102,9 @@ const ImportPool: React.FC<ImportPoolProps> = ({ open, onClose }) => {
         setToken0={setToken0}
         setToken1={setToken1}
         tokenNumber={tokenBeingChosen}
-        description=''
+        description='' 
+        token0={token0} 
+        token1={token1}      
       />
     </>
   );
