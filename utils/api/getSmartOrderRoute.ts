@@ -2,18 +2,35 @@ import { Protocol, TokenDetails } from "@/interfaces";
 import { TradeType } from "@uniswap/sdk-core";
 import axios from "axios";
 import { ethers } from "ethers";
+import JSBI from 'jsbi';
 
-function convertQuoteToReadable(numerator: number[], denominator: number[], decimalScale: number[]): number {
-    // Combine the numerator values into a single large number
-    let bigNumerator = numerator[1] * 1e9 + numerator[0];  // Assuming base 1e9 for large number
+function arrayToJSBI(numbers: number[]): JSBI {
+    let result = JSBI.BigInt(0);
+    for (let i = numbers.length - 1; i >= 0; i--) {
+        if(numbers[i]!=0)
+            result = JSBI.add(JSBI.multiply(result, JSBI.BigInt(10)), JSBI.BigInt(numbers[i]));
+    }
+    return result;
+  }
 
-    // Convert the fraction
-    let fractionValue = bigNumerator / denominator[0]; // Since denominator is [1], this won't change much
+function convertUniswapV3Amount(numeratorArray: Array<number>, denominatorArray: Array<number>, decimalScale: Array<number>) {
 
-    // Adjust for the token's decimal scale
-    let readableValue = fractionValue / decimalScale[0];
+    const numerator = arrayToJSBI(numeratorArray);
+    const denominator = arrayToJSBI(denominatorArray);
+    const decimals = arrayToJSBI(decimalScale);
 
-    return readableValue;
+    console.log("Converted string to big number");
+  
+    // Calculate the fraction using BigNumber division
+    const fraction = JSBI.divide(numerator, denominator);
+
+    console.log("division done");
+  
+    const result = JSBI.toNumber(fraction) / JSBI.toNumber(decimals);
+  
+    console.log("heloo = ", result);
+
+    return result.toString();
 }
 
 export async function getSmartOrderRoute(
@@ -52,10 +69,11 @@ export async function getSmartOrderRoute(
 
         console.log(response.data.finalRoute);
         const quoteAdjustedForGas = response.data.finalRoute.quoteAdjustedForGas;
-        const numerator = quoteAdjustedForGas.numerator;
-        const denominator = quoteAdjustedForGas.denominator;
-        const decimalScale = quoteAdjustedForGas.decimalScale
-        const value = convertQuoteToReadable(numerator, denominator, decimalScale);
+        const quote = response.data.finalRoute.quote;
+        const numerator = quote.numerator;
+        const denominator = quote.denominator;
+        const decimalScale = quote.decimalScale;
+        const value = convertUniswapV3Amount(numerator, denominator, decimalScale);
 
         console.log(value);
 

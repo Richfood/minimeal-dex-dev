@@ -1,5 +1,5 @@
-[
-  {
+{
+  "TokenA": {
     "name": "TokenA",
     "symbol": "TKA",
     "address": {
@@ -7,7 +7,7 @@
       "decimals": 18
     }
   },
-  {
+  "TokenB": {
     "name": "TokenB",
     "symbol": "TKB",
     "address": {
@@ -15,7 +15,7 @@
       "decimals": 18
     }
   },
-  {
+  "TokenC": {
     "name": "TokenC",
     "symbol": "TKC",
     "address": {
@@ -23,7 +23,7 @@
       "decimals": 6
     }
   },
-  {
+  "TokenD": {
     "name": "TokenD",
     "symbol": "TKD",
     "address": {
@@ -31,7 +31,7 @@
       "decimals": 6
     }
   },
-  {
+  "TokenE": {
     "name": "TokenE",
     "symbol": "TKE",
     "address": {
@@ -39,7 +39,7 @@
       "decimals": 6
     }
   },
-  {
+  "MOCK_USDC": {
     "name": "MOCK_USDC",
     "symbol": "MUSDC",
     "address": {
@@ -47,7 +47,7 @@
       "decimals": 6
     }
   },
-  {
+  "Wrapped Pulse": {
     "name": "Wrapped Pulse",
     "symbol": "WPLS",
     "address": {
@@ -55,7 +55,7 @@
       "decimals": 18
     }
   },
-  {
+  "Pulse": {
     "name": "Pulse",
     "symbol": "PLS",
     "address": {
@@ -63,4 +63,4 @@
       "decimals": 18
     }
   }
-]
+}
