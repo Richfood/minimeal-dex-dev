@@ -29,7 +29,7 @@ interface Token {
         contract_address: string;
         decimals: number;
     };
-    image: string; // URL to the token's image
+    image?: string; // URL to the token's image
 }
 
 interface SwapWidgetProps {
@@ -47,7 +47,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(0);
     const [isActive, setIsActive] = useState(false);
     const [activeItem, setActiveItem] = useState<string | null>(null);
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(true);
     const [openToken, setOpenToken] = useState(false);
     const [isOpenRecent, setIsOpenRecent] = useState(false);
     const [isOpenExpert, setIsOpenExpert] = useState(false);
@@ -67,7 +67,6 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [token0, setToken0] = useState<TokenDetails | null>(null);
     console.log("🚀 ~ token0:", token0)
     const [token1, setToken1] = useState<TokenDetails | null>(null);
-    console.log("🚀 ~ token1:", token1)
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
 
     const [amountIn, setAmountIn] = useState("");
@@ -134,63 +133,52 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
     const toggleGraph = () => {
         setSelectedGraph(prevGraph => (prevGraph === 'graph1' ? 'graph2' : 'graph1'));
-        console.log("🚀 ~ toggleGraph ~ activeCurrency:", activeCurrency);
     
-        if (activeCurrency === 'PLS/9MM') {
+        const isPLS9MM = token0?.name === "PLS" && token1?.name === "9MM";
+        const is9MMPLS = token0?.name === "9MM" && token1?.name === "PLS";
+    
+        if (isPLS9MM || is9MMPLS) {
+            console.log("🚀 ~ toggleGraph ~ is9MMPLS1:", is9MMPLS)
+            console.log("🚀 ~ toggleGraph ~ isPLS9MM1:", isPLS9MM)
+            console.log(`🚀 ~ toggleGraph ~ token01: ${token0}`);
+    
             // Set new series data for the graph
             setSeries([
                 {
                     name: 'Graph 1',
                     data: [
-                        { x: new Date().getTime() - 1000, y: 45 },
-                        { x: new Date().getTime(), y: 50 }
+                        { x: new Date().getTime() - 1000, y: isPLS9MM ? 45 : 50 },
+                        { x: new Date().getTime(), y: isPLS9MM ? 50 : 45 }
                     ]
                 }
             ]);
     
-            setActiveCurrency('9MM/PLS');
-    
-          
-    
-            // Proper token swapping using a temporary variable
-            const tempToken = token0;   // Save current token0
-            setToken0(token1);          // Set token0 to token1
-            setToken1(tempToken);       // Set token1 to the saved token0
-
-              // Update circle images for this condition
-              setCircleImages({
-                circle1: '/images/9mm.png',
-                circle2: '/images/pls.png',
-            });
-    
-        } else {
-            // Set new series data for the other graph condition
-            setSeries([
-                {
-                    name: 'Graph 1',
-                    data: [
-                        { x: new Date().getTime() - 1000, y: 50 },
-                        { x: new Date().getTime(), y: 45 }
-                    ]
-                }
-            ]);
-    
-            setActiveCurrency('PLS/9MM');
-    
+            // Update active currency and circle images
+            setActiveCurrency(isPLS9MM ? '9MM/PLS' : 'PLS/9MM');
             setCircleImages({
-                circle1: '/images/pls.png',
-                circle2: '/images/9mm.png',
+                circle1: isPLS9MM ? '/images/9mm.png' : '/images/pls.png',
+                circle2: isPLS9MM ? '/images/pls.png' : '/images/9mm.png',
             });
-    
-            // Proper token swapping using a temporary variable
-            const tempToken = token0;   // Save current token0
-            setToken0(token1);          // Set token0 to token1
-            setToken1(tempToken);       // Set token1 to the saved token0
+        } else {
+            console.log("🚀 ~ toggleGraph ~ is9MMPLS2:", is9MMPLS)
+            console.log("🚀 ~ toggleGraph ~ isPLS9MM2:", isPLS9MM)
+            console.log(`🚀 ~ toggleGraph ~ token02: ${token0}`);
+            // Default case for other token pairs
+            setCircleImages({
+                circle1: token0?.image,
+                circle2: token1?.image,
+            });
         }
+    
+        // Swap token0 and token1
+        const tempToken = token0;
+        setToken0(token1);
+        setToken1(tempToken);
     };
     
-    
-    
+
+
+
 
     const fetchSmartOrderRoute = async () => {
 
@@ -237,18 +225,27 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                 }
                 document.body.removeChild(textArea);
             }
-
         }
 
     };
 
+
+    const getImageSource = (token: TokenDetails | null) => {
+        if (token?.symbol === 'PLS') {
+            return circleImages.circle1; // Use state value for 'pls'
+        } else if (token?.symbol === '9MM') {
+            return circleImages.circle2; // Use state value for '9mm'
+        } else {
+            return token?.image; // Fallback to the token's image
+        }
+    };
     return (
         <>
             <Box className="SwapWidgetSec">
                 <Box className="SwapWidgetInner">
                     <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                            <img src={circleImages.circle1} alt="circle1" style={{ width: '20px', height: '20px' }} />
+                            <img src={getImageSource(token0)} alt="circle1" style={{ width: '20px', height: '20px' }} />
                             <Typography onClick={() => handleOpenToken(0)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                                 {token0 && token0.symbol} <IoIosArrowDown />
                             </Typography>
@@ -283,10 +280,10 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                         </Box>
 
                         <Box className="slippageSec dsls">
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                            {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                                 <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>Slippage Tolerance <PiPencilSimpleBold /></Typography>
                                 <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
-                            </Box>
+                            </Box> */}
                             <Box sx={{ mt: '25px' }}>
                                 <Button variant="contained" color="secondary">Swap</Button>
                             </Box>
@@ -303,7 +300,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
                     <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                            <img src={circleImages.circle2} alt="circle2" style={{ width: '20px', height: '20px' }} />
+                            <img src={getImageSource(token1)} alt="circle2" style={{ width: '20px', height: '20px' }} />
                             <Typography onClick={() => handleOpenToken(1)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: "pointer" }}>
                                 {token1 && token1.symbol}
                                 <IoIosArrowDown />
@@ -346,7 +343,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                         </Box>
                     </Box>
                 </Box>
-                <Box className="SwapWidgetBox">
+                {/* <Box className="SwapWidgetBox">
                     <Box className="SwapWidgetBoxTitle">
                         <Typography variant="h4" className='sec_title'>Swap</Typography>
                         <Typography sx={{ fontSize: '12px', mb: '20px' }}>Trade Token in an instant</Typography>
@@ -358,11 +355,11 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                     <PiChartBar />
                                 </ListItemButton>
                             </ListItem>
-                            {/* <ListItem className="widgetItem" disablePadding>
+                            <ListItem className="widgetItem" disablePadding>
                                 <ListItemButton onClick={handleOpen}>
                                     <BsFire />
                                 </ListItemButton>
-                            </ListItem> */}
+                            </ListItem>
                             <ListItem className="widgetItem" disablePadding>
                                 <ListItemButton onClick={handleOpen}>
                                     <Badge color="secondary" variant="dot">
@@ -382,18 +379,17 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                             </ListItem>
                         </List>
                     </Box>
-                </Box>
+                </Box> */}
 
-                <SettingsModal isOpen={isOpen} handleClose={handleClose} theme={theme} />
-                <RecentTransactions open={isOpenRecent} onClose={handleCloseRecent} />
+                {/* <SettingsModal isOpen={isOpen} handleClose={handleClose} theme={theme} /> */}
+                {/* <RecentTransactions open={isOpenRecent} onClose={handleCloseRecent} /> */}
                 <SelectedToken
                     openToken={openToken}
                     handleCloseToken={handleCloseToken}
-                    mode={theme} 
+                    mode={theme}
                     setToken0={setToken0}
                     setToken1={setToken1}
                     tokenNumber={tokenBeingChosen}
-                    // setCircleImages={setCircleImages}
                     description=''
                 />
             </Box>

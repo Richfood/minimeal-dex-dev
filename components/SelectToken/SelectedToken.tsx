@@ -21,7 +21,6 @@ interface SelectedTokenProps {
     title?: string;
     description: string;
     tokenNumber: number;
-    setCircleImages?: React.Dispatch<React.SetStateAction<TokenDetails | null>>;
 }
 
 // interface Token {
@@ -93,8 +92,8 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
     const [openManage, setOpenManage] = useState(false);
     const [tokenSelected, setTokenSelected] = useState<string>("");
     const [coinData, setCoinData] = useState<any[]>([]);
-    const [tokenA, setTokenA] = useState<TokenDetails | null>(null);
-    const [tokenB, setTokenB] = useState<TokenDetails | null>(null);
+    const [tokenA, setTokenA] = useState<TokenDetails | any>(null);
+    const [tokenB, setTokenB] = useState<TokenDetails | any>(null);
 
     const handleOpenManage = () => setOpenManage(true);
     const handleCloseManage = () => setOpenManage(false);
@@ -108,7 +107,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
             setToken1(token);
         }
 
-        setTokenSelected(token.address?.contract_address)
+        setTokenSelected(token?.address?.contract_address)
         handleCloseToken()
     }
 
@@ -170,18 +169,16 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
         const savedTokenA = localStorage.getItem('token0');
         const savedTokenB = localStorage.getItem('token1');
 
-        // Check if savedTokenA exists before parsing
         if (savedTokenA) {
             setTokenA(JSON.parse(savedTokenA));
         } else {
-            setTokenA(null); // Or set a default value if needed
+            setTokenA(null);
         }
 
-        // Check if savedTokenB exists before parsing
         if (savedTokenB) {
             setTokenB(JSON.parse(savedTokenB));
         } else {
-            setTokenB(null); // Or set a default value if needed
+            setTokenB(null);
         }
     }, []);
 
@@ -211,8 +208,10 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                         </Box>
                         <Box className="common_token" sx={{ pt: '20px' }}>
                             <Typography sx={{ fontWeight: '500', fontSize: '14px' }}>Common tokens</Typography>
-                            <Box className="token_Outer" sx={{ py: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                <Box className="token_box">
+                            <Box className="token_Outer" sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+
+                                <Box className="token_box" sx={{ cursor: tokenA?.address?.contract_address !== tokenSelected ? "pointer" : "default", opacity: tokenA?.address?.contract_address !== tokenSelected ? 1 : 0.4 }}
+                                    onClick={tokenA?.address?.contract_address !== tokenSelected ? () => handleSelectToken(tokenA) : undefined}>
                                     <img
                                         src="/images/pls.png"
                                         alt={tokenA?.symbol}
@@ -220,7 +219,12 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                     />
                                     <Typography>{tokenA?.symbol}</Typography>
                                 </Box>
-                                <Box className="token_box">
+
+                                <Box
+                                    className="token_box"
+                                    sx={{ cursor: tokenB?.address?.contract_address !== tokenSelected ? "pointer" : "default", opacity: tokenB?.address?.contract_address !== tokenSelected ? 1 : 0.4 }}
+                                    onClick={tokenB?.address?.contract_address !== tokenSelected ? () => handleSelectToken(tokenB) : undefined}
+                                >
                                     <img
                                         src="/images/9mm.png"
                                         alt={tokenB?.symbol}
@@ -228,18 +232,18 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                     />
                                     <Typography>{tokenB?.symbol}</Typography>
                                 </Box>
-                                <Box className="token_Outer" sx={{ py: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+
+                                <Box className="token_Outer" sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                                     {coinData?.map((token, index) => (
-                                        token.address !== tokenSelected ? (
-                                            <Box className="token_box" key={index} onClick={() => handleSelectToken(token)}>
-                                                <img
-                                                      src={token.image}
-                                                      alt={`${token.symbol} logo`}
-                                                    style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
-                                                />
-                                                <Typography>{token.name}</Typography>
-                                            </Box>
-                                        ) : (<></>)
+                                        <Box className="token_box" key={index} sx={{ cursor: token?.address?.contract_address !== tokenSelected ? "pointer" : "default", opacity: token?.address?.contract_address !== tokenSelected ? 1 : 0.4 }}
+                                            onClick={token?.address?.contract_address !== tokenSelected ? () => handleSelectToken(token) : undefined}>
+                                            <img
+                                                src={token.image}
+                                                alt={`${token.symbol} logo`}
+                                                style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
+                                            />
+                                            <Typography>{token.symbol}</Typography>
+                                        </Box>
                                     ))}
                                 </Box>
                             </Box>
@@ -262,26 +266,34 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                             onClick={() => handleSelectToken(asset)}
                                         >
                                             {/* Image, Symbol, and Name in a row */}
-                                            <Box sx={{ display: "flex", alignItems: "center", mb: 1, cursor: "pointer" }}>
-                                                <img
-                                                    src={asset.image}
-                                                    alt={`${asset.symbol} logo`}
-                                                    style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
-                                                />
-                                                {/* Symbol and Name in a column */}
-                                                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                        {asset.symbol}
-                                                    </Typography>
-                                                    <Typography color="text.secondary" variant="body2">
-                                                        {asset.name}
-                                                    </Typography>
+                                            <Box
+                                                sx={{
+                                                    cursor: asset?.address?.contract_address !== tokenSelected ? "pointer" : "default",
+                                                    opacity: asset?.address?.contract_address !== tokenSelected ? 1 : 0.4,
+                                                }}
+                                                onClick={asset?.address?.contract_address !== tokenSelected ? () => handleSelectToken(asset) : undefined}
+                                            >
+                                                {/* Flexbox layout for image and text */}
+                                                <Box sx={{ display: "flex", alignItems: "center" }}>
+                                                    <img
+                                                        src={asset.image}
+                                                        alt={`${asset.symbol} logo`}
+                                                        style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
+                                                    />
+                                                    {/* Symbol and Name in a column */}
+                                                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                                                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                            {asset.symbol}
+                                                        </Typography>
+                                                        <Typography color="text.secondary" variant="body2">
+                                                            {asset.name}
+                                                        </Typography>
+                                                    </Box>
                                                 </Box>
                                             </Box>
+
                                         </ListItem>
                                     ))}
-
-
                                 </List>
                             </Box>
                             <Box sx={{ textAlign: 'center', mt: '20px' }}>

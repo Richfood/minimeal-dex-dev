@@ -22,12 +22,12 @@ const IndexPage = () => {
         toggleTheme();
     };
 
-    const [show, setShow] = useState(true);
-    const [isWidgetListActive, setIsWidgetListActive] = useState(false); // State to manage class
+    const [show, setShow] = useState(false);
+    const [isWidgetListActive, setIsWidgetListActive] = useState(true); // State to manage class
 
     const handleToggle = useCallback(() => {
-        setShow(prevShow => !prevShow);
-        setIsWidgetListActive(prevState => !prevState); // Toggle the class state
+        // setShow(prevShow => !prevShow);
+        // setIsWidgetListActive(prevState => !prevState);
     }, []);
 
 
@@ -44,6 +44,8 @@ const IndexPage = () => {
         const exampleToken0: Token = {
             name: 'PLS',
             symbol: 'PLS',
+            address: { contract_address: '0xA1077a294dDE1B09bB078844df40758a5D0f9a27', decimals: 18 },
+
         };
 
         const exampleToken1: Token = {

@@ -27,6 +27,8 @@ export interface TokenDetails {
     contract_address: string;
     decimals: number;
   };
+  image?: string; // URL to the token's image
+
 }
 
 export interface PoolDetails {
