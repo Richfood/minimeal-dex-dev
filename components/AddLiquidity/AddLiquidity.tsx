@@ -27,10 +27,12 @@ import { truncateAddress } from '@/utils/generalFunctions';
 import { priceToTick, tickToPrice } from '@/utils/utils';
 import Default from '../CustomChart/Default';
 import { getPoolData } from '@/utils/api/getPoolData';
+import { getV2Pair } from '@/utils/api/getV2Pair';
 import { AddLiquidityPoolData, TokenDetails, Protocol } from '@/interfaces';
 import SettingsModal from '../SettingModal/SettingModal';
 
 import tokenList from "../../utils/tokenList.json";
+import { calculateV2Amounts } from '@/utils/calculateV2TokenAmounts';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -77,8 +79,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
 
   const NFPMAddress = addresses.PancakePositionManagerAddress;
   const v2RouterAddress = addresses.PancakeV2RouterAddress;
-  const tempToken0 = tokenList[tokenList.length-1]; // tokenList-1 is PLS. tokenList-2 is WPLS
-  const tempToken1 = tokenList[tokenList.length-3];
+  const tempToken0 = tokenList.MOCK_USDC; // tokenList-1 is PLS. tokenList-2 is WPLS
+  const tempToken1 = tokenList.Pulse;
   const [token0,setToken0] =  useState<TokenDetails | null>(tempToken0);
   const [token1, setToken1] = useState<TokenDetails | null>(tempToken1);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
@@ -94,7 +96,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
   const [amount1Desired, setAmount1Desired] = useState("");
   const [priceLower, setPriceLower] = useState("");
   const [priceUpper, setPriceUpper] = useState("");
-  const [priceCurrent, setPriceCurrent] = useState("2995");
+  const [priceCurrent, setPriceCurrent] = useState("");
   const [fee, setFee] = useState<FeeAmount | null>(null);
   const [approvalAmount0, setApprovalAmount0] = useState("");
   const [approvalAmount1, setApprovalAmount1] = useState("");
@@ -113,6 +115,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
   const [priceCurrentEntered, setPriceCurrentEntered] = useState("");
 
   const [currentPoolData, setCurrentPoolData] = useState<AddLiquidityPoolData | null>(null);
+  const [currentV2PoolRatio, setCurrentV2PoolRatio] = useState<number | null>(null);
 
   const [decimalDifference, setDecimalDifference] = useState(0);
 
@@ -356,17 +359,49 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
     }
   }
 
-  const calculate = ()=>{
+  const handleGettingPoolData = async ()=>{
+    if(activeProtocol === Protocol.V2){
+      await getPoolRatio();
+    }
+    else{
+      await fetchPoolData();
+    }
+  }
+
+  const calculate = async ()=>{
     console.log("calculate run")
 
     if(activeProtocol === Protocol.V2 ){
+
+      if(currentV2PoolRatio){
+        await getPoolRatio();
+      } 
+
       if(amount0ToEmulate){
         setAmount0Desired(amount0ToEmulate.toString())
-        setApprovalAmount0(amount0ToEmulate.toString())
+
+        let amount1DesiredFromFunction = amount1ToEmulate;
+        if(currentV2PoolRatio){
+          amount1DesiredFromFunction = calculateV2Amounts(amount0ToEmulate, 0, currentV2PoolRatio);
+          setAmount1Desired(amount1DesiredFromFunction.toString())
+          setApprovalAmount1(amount1DesiredFromFunction.toString());
+        }
+
+        setApprovalAmount0(amount0ToEmulate.toString());
+
       }
       if(amount1ToEmulate){
         setAmount1Desired(amount1ToEmulate.toString())
-        setApprovalAmount1(amount1ToEmulate.toString())
+
+        let amount0DesiredFromFunction = amount0ToEmulate;
+
+        if(currentV2PoolRatio){
+          amount0DesiredFromFunction = calculateV2Amounts(0, amount1ToEmulate, currentV2PoolRatio);
+          setAmount0Desired(amount0DesiredFromFunction.toString())
+          setApprovalAmount0(amount0DesiredFromFunction.toString());
+        }
+
+        setApprovalAmount1(amount1ToEmulate.toString());
       }
 
       if((!amount0ToEmulate && !amount1ToEmulate)) {
@@ -474,8 +509,17 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
     }
   };
 
+  const getPoolRatio = async ()=>{
+    let pairRatio : number | null = null;
+      if(token0 && token1){
+        pairRatio = await getV2Pair(token0, token1) || null;
+      }
+    
+      setCurrentV2PoolRatio(pairRatio);
+  }
+
   useEffect(() => {
-    fetchPoolData(); // Call the async function inside useEffect
+    handleGettingPoolData() // Call the async function inside useEffect
     calculate();
   }, [token0, token1, fee]);
   
@@ -506,6 +550,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
     if(priceCurrentEntered)
       setPriceCurrent("");
   },[priceCurrentEntered])
+
+  useEffect(()=>{
+    reset();
+    handleGettingPoolData();
+  },[activeProtocol])
 
   return (
     <Box className="AddLiquiditySec">
@@ -776,7 +825,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
                       variant="contained" 
                       color="secondary" 
                       sx={{ width: '100%' }}
-                      disabled={!amount0Desired || !amount1Desired}
+                      disabled={!amount0Desired || !amount1Desired || !token0 || !token1}
                     >
                       Create Liquidity
                     </Button>
@@ -1176,14 +1225,15 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
         </Box>
       </Box>
       <SelectedToken
-        openToken={openToken}
-        handleCloseToken={handleCloseToken}
-        mode={theme} // Ensure `theme` is passed correctly
-        setToken0={setToken0}
-        setToken1={setToken1}
-        tokenNumber={tokenBeingChosen}
-        description=''
-      />
+          openToken={openToken}
+          handleCloseToken={handleCloseToken}
+          mode={theme} // Ensure `theme` is passed correctly
+          setToken0={setToken0}
+          setToken1={setToken1}
+          tokenNumber={tokenBeingChosen}
+          description='' 
+          token0={token0} 
+          token1={token1}      />
 
       {/* <RoiCalculator open={open} handleClose={handleClose} /> */}
       <SettingsModal isOpen={open} handleClose={handleClose} theme={theme} />
