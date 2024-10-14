@@ -4,8 +4,6 @@ import React from 'react';
 import { Box, Typography, Button, Modal } from '@mui/material';
 import { IoCloseOutline } from 'react-icons/io5';
 import { useTheme } from '../ThemeContext';
-import { metaMask, hooks } from '../ConnectWallet/connector';
-const { useChainId, useIsActive } = hooks;
 
 interface RecentTransactionsProps {
     open: boolean;
@@ -14,8 +12,6 @@ interface RecentTransactionsProps {
 
 const RecentTransactions: React.FC<RecentTransactionsProps> = ({ open, onClose }) => {
     const { theme } = useTheme();
-    const chainId = useChainId();
-    const isActive = useIsActive();
 
     const style = {
         position: 'absolute',
@@ -41,7 +37,7 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ open, onClose }
         >
             <Box sx={style}>
                 <Box className="modal_head">
-                    <Typography variant="h6">
+                    <Typography  variant="h6">
                         Recent Transactions
                     </Typography>
                     <Typography sx={{ position: 'absolute', right: '10px', top: '5px', lineHeight: 'normal', cursor: 'pointer' }}>
@@ -49,29 +45,10 @@ const RecentTransactions: React.FC<RecentTransactionsProps> = ({ open, onClose }
                     </Typography>
                 </Box>
                 <Box className="modal_body" sx={{ textAlign: 'center' }}>
-                    {isActive === false ? (<Button
-                        variant="contained"
-                        color="secondary"
-                        disabled={true}
-                        onClick={async () => {
-                            await metaMask.activate(chainId);
-                        }}
-                    >
-                        Connect Wallet
-                    </Button>) : (
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            onClick={async () => {
-                                await metaMask.activate(chainId);
-                            }}
-                        >
-                            Connect Wallet
-                        </Button>
-                    )}
+                    <Button variant="contained" color="secondary">Connect Wallet</Button>
                 </Box>
             </Box>
-        </Modal >
+        </Modal>
     );
 };
 

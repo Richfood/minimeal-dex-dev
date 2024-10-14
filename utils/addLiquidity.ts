@@ -23,6 +23,9 @@ export async function addLiquidityETH(
     amountETHDesired : string,
     amountTokenDesired : string
 ) {
+
+    if(!window.ethereum) return;
+
     const newProvider = new ethers.providers.Web3Provider(window.ethereum);
     const newSigner = newProvider.getSigner();
     const newSignerAddress = await newSigner.getAddress()
@@ -63,6 +66,8 @@ export async function addLiquidityV2(
     amount0Desired: string,
     amount1Desired: string,
 ) {
+    if(!window.ethereum) return;
+
     const newProvider = new ethers.providers.Web3Provider(window.ethereum);
     const newSigner = newProvider.getSigner();
     const newSignerAddress = await newSigner.getAddress()
@@ -103,6 +108,8 @@ export async function addLiquidityV3(
     sqrtPriceX96: string,
     fee: FeeAmount,
 ) {
+    if(!window.ethereum) return;
+    
     const newProvider = new ethers.providers.Web3Provider(window.ethereum);
     const newSigner = newProvider.getSigner();
     const nfpmContract = new ethers.Contract(contractAddress, nfpmAbi, newSigner);
