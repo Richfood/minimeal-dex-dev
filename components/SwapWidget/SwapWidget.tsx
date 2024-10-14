@@ -21,6 +21,7 @@ import { Protocol, SwapPoolData, TokenDetails } from '@/interfaces';
 import { getSmartOrderRoute } from '@/utils/api/getSmartOrderRoute';
 import { TradeType } from '@uniswap/sdk-core';
 import CircularProgress from '@mui/material/CircularProgress';
+import { getTokenUsdPrice } from '@/utils/api/getTokenUsdPrice';
 
 interface Token {
     name: string;
@@ -42,32 +43,6 @@ interface PoolDetails {
     tick: number;
     fee: number;
 }
-
-const fetchUSDPriceForSelectedToken = async (address: string | undefined, id: string | undefined): Promise<any> => {
-    // Construct the URL dynamically using the address and id arguments
-    const url = `https://api.coingecko.com/api/v3/coins/${id}/contract/${address}`;
-    console.log("🚀 ~ fetchUSDPriceForSelectedToken ~ url:", url)
-    const options = {
-        method: 'GET',
-        headers: {
-            accept: 'application/json',
-            'x-cg-api-key': 'CG-FKLVTYvNVHpiLV7WntH31dPF'
-        }
-    };
-
-    try {
-        const res = await fetch(url, options);
-        if (!res.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const json = await res.json();
-        return json;
-    } catch (err) {
-        console.error('Error:', err);
-        return null;
-    }
-};
-
 
 const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(0);
@@ -125,9 +100,11 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
     useEffect(() => {
         const fetchPrices = async () => {
-            const price0 = await fetchUSDPriceForSelectedToken(token0?.address?.contract_address, token0?.symbol);
-            const price1 = await fetchUSDPriceForSelectedToken(token1?.address?.contract_address, token1?.symbol);
 
+            if(!token0 || !token1) return;
+
+            const price0 = await getTokenUsdPrice(token0?.address?.contract_address);
+            const price1 = await getTokenUsdPrice(token1?.address?.contract_address);
 
             setToken0Price(price0);
             setToken1Price(price1);
