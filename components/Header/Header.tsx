@@ -9,6 +9,7 @@ import AppSettingsModal from '../AppSettingsModal/AppSettingsModal';
 import Link from 'next/link';
 import Image from 'next/image';
 import { metaMask, hooks } from '../ConnectWallet/connector';
+import NetworkMenu from './account';
 const { useChainId, useAccounts, useIsActive, useProvider } = hooks;
 
 const Header = () => {
@@ -18,7 +19,7 @@ const Header = () => {
   const [selectedNetwork, setSelectedNetwork] = React.useState('PulseChain');
   const [address, setAddress] = React.useState<string | null>("Connect Wallet");
   const accounts = useAccounts();
-
+  const chainId = useChainId();
   const { theme } = useTheme();
   const router = useRouter();
 
@@ -45,6 +46,14 @@ const Header = () => {
       setAddress(null); // Reset if disconnected
     }
   }, [accounts]);
+
+  const [selectedChainId, setSelectedChainId] = React.useState<number | null>(null);
+
+  const handleNetworkSelect = (chainId: number) => {
+    metaMask.activate(chainId);
+    setSelectedChainId(chainId);
+    handleCloseMenu(); // Close the menu after selection
+  };
 
 
   const openMenu = Boolean(anchorEl);
@@ -113,56 +122,21 @@ const Header = () => {
                 </Tooltip>
               </ListItem>
 
-              <Menu
+              <NetworkMenu
                 anchorEl={anchorEl}
-                id="network-menu"
-                open={openMenu}
-                onClose={handleCloseMenu}
-                PaperProps={{
-                  elevation: 0,
-                  sx: {
-                    overflow: 'visible',
-                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                    mt: 1.5,
-                    bgcolor: theme === 'light' ? 'var(--white)' : 'var(--secondary-dark)',
-                    color: theme === 'light' ? 'var(--black)' : 'var(--white)',
-                    borderRadius: '8px',
-                    '& .MuiMenuItem-root': {
-                      fontSize: '12px',
-                      fontWeight: '700',
-                      gap: '10px',
-                      color: theme === 'light' ? 'var(--black)' : 'var(--white)',
-                    },
-                    '&::before': {
-                      content: '""',
-                      display: 'block',
-                      position: 'absolute',
-                      top: 0,
-                      right: 14,
-                      width: 10,
-                      height: 10,
-                      bgcolor: theme === 'light' ? 'var(--white)' : 'var(--secondary-dark)',
-                      transform: 'translateY(-50%) rotate(45deg)',
-                      zIndex: 0,
-                    },
-                  },
-                }}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-              >
-                <MenuItem>
-                  <Image src={networkImages.PulseChain} width={24} height={24} alt="Mainnet" /> Mainnet
-                </MenuItem>
-                <MenuItem>
-                  <Image src={networkImages.PulseChain} width={24} height={24} alt="Testnet" /> Testnet
-                </MenuItem>
-              </Menu>
+                openMenu={openMenu}
+                handleCloseMenu={handleCloseMenu}
+                metaMask={metaMask}
+                networkImages={networkImages}
+                theme={theme}
+                chainId={chainId}
+              />
 
               <ListItem disablePadding>
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={() => metaMask.activate()} // Ensure activation logic is correct
+                  onClick={() => metaMask.activate()}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
