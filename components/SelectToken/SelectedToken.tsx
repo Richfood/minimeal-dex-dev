@@ -106,33 +106,24 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
     const handleCloseManage = () => setOpenManage(false);
 
     const handleSelectToken = (token: TokenDetails) => {
-        console.log("🚀 ~ handleSelectToken ~ token:", token)
         if (tokenNumber === 0) {
-            console.log("🚀 ~ handleSelectToken ~ tokenNumber:0", tokenNumber)
-            // Check if the selected token is already token0
-            console.log("🚀 ~ handleSelectToken ~ token?.address?.contract_address === token1?.address?.contract_address:", token?.address?.contract_address === token1?.address?.contract_address)
             if (token?.address?.contract_address === token1?.address?.contract_address) {
-                console.log("🚀 ~ handleSelectToken ~ token?.address?.contract_address:0", token?.address?.contract_address)
                 // If the selected token is token0, swap with token1
                 setToken0(token);
                 setToken1(token0);
             } else {
-                console.log("🚀 ~ handleSelectToken ~ token?.address?.contract_address:0 else", token?.address?.contract_address)
 
                 // Set token0 to the selected token
                 setToken0(token);
             }
         } else {
-            console.log("🚀 ~ handleSelectToken ~ tokenNumber:1", tokenNumber)
 
             // Check if the selected token is already token1
             if (token?.address?.contract_address === token0?.address?.contract_address) {
-                console.log("🚀 ~ handleSelectToken ~ token?.address?.contract_address:", token?.address?.contract_address)
                 // If the selected token is token1, swap with token0
                 setToken1(token);
                 setToken0(token1);
             } else {
-                console.log("🚀 ~ handleSelectToken ~ token?.address?.contract_address:else", token?.address?.contract_address)
 
                 // Set token1 to the selected token
                 setToken1(token);
