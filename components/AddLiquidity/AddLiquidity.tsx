@@ -38,12 +38,12 @@ interface AddLiquidityProps {
   defaultActiveProtocol : Protocol;
 }
 
-const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol }) => {
+const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol : activeProtocol }) => {
   const { palette } = useTheme();
   const [isActive, setIsActive] = useState(true);
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [pickData, setPickData] = useState<string>('Not created');
-  const [vTwo, setVTwo] = useState(defaultActiveProtocol === Protocol.V2 ? true : false);
+  const [vTwo, setVTwo] = useState(activeProtocol === Protocol.V2 ? true : false);
   const [circleImages, setCircleImages] = useState<{ circle1: string; circle2: string }>({
     circle1: '/images/circle1.svg',
     circle2: '/images/circle2.svg',
@@ -70,7 +70,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   // const [tokenAtPosition1, setTokenAtPosition1] = useState(token1Address);
   const [tokenToggleOccured , setTokenToggleOccured] = useState(false);
 
-  const [activeProtocol, setActiveProtocol] = useState(defaultActiveProtocol); 
+  // const [activeProtocol, setActiveProtocol] = useState(defaultActiveProtocol); 
 
   const [amount0Desired, setAmount0Desired] = useState("");
   const [amount1Desired, setAmount1Desired] = useState("");
@@ -228,7 +228,17 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     setVTwo(!vTwo);
     setIsActive(!isActive);
 
-    setActiveProtocol(activeProtocol === Protocol.V3 ? Protocol.V2 : Protocol.V3);
+    const currentPath = router.asPath;
+    if(activeProtocol === Protocol.V3){
+      router.replace("/add/V2/token/token");
+      // router.push("/add/V2/token/token");
+    }
+    else{
+      router.replace("/add/V3/token/token");
+      // router.push("/add/V3/token/token");
+    }
+
+    // setActiveProtocol(activeProtocol === Protocol.V3 ? Protocol.V2 : Protocol.V3);
   }
 
   const handleOpenToken = useCallback((tokenNumber : number) => {
@@ -241,6 +251,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const router = useRouter();
 
   const handleGoBack = () => {
+    router.replace("/liquidity");
     router.back();
   };
 
@@ -552,7 +563,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                 cursor: 'pointer'
               }}
             >
-              <BsArrowLeft size={20} /> Add V3 Liquidity
+              <BsArrowLeft size={20} /> Your Positions
             </Typography>
           </Box>
           <Box className="al-right">
@@ -996,11 +1007,12 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                           </Box>
                         </Box>
     
-                        {/* <Box>
-                          <Button variant="contained" color="secondary" sx={{ width: '100%' }} disabled={true}>
-                            Enter an amount
+                        {/* <Box> */}
+                          <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired}>
+                            Create Liquidity{/* {Enter an amount} */}
                           </Button>
-                        </Box> */}
+                        {/* </Box> */}
+
                       </Box>
                     ) : (
                       <Box>

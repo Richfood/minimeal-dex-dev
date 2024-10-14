@@ -144,10 +144,10 @@ export async function addLiquidityV3(
     const createAndInitializePoolIfNecessary = new ethers.utils.Interface([
         "function createAndInitializePoolIfNecessary(address token0, address token1, uint24 fee, uint160 sqrtPriceX96) public returns (address)"
     ]);
-    const createAndInitializePoolIfNecessaryData = createAndInitializePoolIfNecessary.encodeFunctionData("createAndInitializePoolIfNecessary", [token0.address, token1.address, fee, sqrtPriceX96]);
+    const createAndInitializePoolIfNecessaryData = createAndInitializePoolIfNecessary.encodeFunctionData("createAndInitializePoolIfNecessary", [token0.address.contract_address, token1.address.contract_address, fee, sqrtPriceX96]);
 
     const mint = new ethers.utils.Interface(mintAbi);
-    const mintData = mint.encodeFunctionData("mint", [[token0.address, token1.address, fee, tickLower, tickUpper, amount0Desired, amount1Desired, amount0Min, amount1Min, recepientAddress, deadline]]);
+    const mintData = mint.encodeFunctionData("mint", [[token0.address.contract_address, token1.address.contract_address, fee, tickLower, tickUpper, amount0Desired, amount1Desired, amount0Min, amount1Min, recepientAddress, deadline]]);
 
     const refundETH = new ethers.utils.Interface([
         "function refundETH() external"
