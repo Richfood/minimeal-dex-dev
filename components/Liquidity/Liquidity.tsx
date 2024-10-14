@@ -115,7 +115,18 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
         </Box>
 
         <Box sx={{ py: '15px', textAlign: 'center' }}>
-          <Button onClick={() => router.push('/add/token/token')} variant="contained" color="secondary" sx={{ width: '100%', gap: '5px' }}>
+          <Button 
+            onClick={() => {
+              const pathVal = value === '2' ? "V2" : "V3";
+              let path = `/add/${pathVal}/token/token`;
+              
+              // path = (value === '2' ? 'V2/' : 'V3/') + path;
+              router.push(path)
+            }} 
+            variant="contained" 
+            color="secondary" 
+            sx={{ width: '100%', gap: '5px' }}
+          >
             <FiPlus style={{ width: '20px', height: '20px' }} /> Add Liquidity
           </Button>
         </Box>

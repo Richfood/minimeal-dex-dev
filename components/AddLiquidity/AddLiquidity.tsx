@@ -30,40 +30,20 @@ import { getPoolData } from '@/utils/api/getPoolData';
 import { getV2Pair } from '@/utils/api/getV2Pair';
 import { AddLiquidityPoolData, TokenDetails, Protocol } from '@/interfaces';
 import SettingsModal from '../SettingModal/SettingModal';
-
 import tokenList from "../../utils/tokenList.json";
 import { calculateV2Amounts } from '@/utils/calculateV2TokenAmounts';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
+  defaultActiveProtocol : Protocol;
 }
 
-// interface CurrentPoolData {
-//   id : String,
-//   tick : String,
-//   ticks : {
-//     price0 : String,
-//     price1 : String
-//   },
-//   token0Price : String,
-//   token1Price : String
-// }
-
-// interface Token {
-//   name : string;
-//   symbol : string;
-//   address : string;
-//   decimals : number;
-// }
-
-
-
-const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
+const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol }) => {
   const { palette } = useTheme();
   const [isActive, setIsActive] = useState(true);
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [pickData, setPickData] = useState<string>('Not created');
-  const [vTwo, setVTwo] = useState(false);
+  const [vTwo, setVTwo] = useState(defaultActiveProtocol === Protocol.V2 ? true : false);
   const [circleImages, setCircleImages] = useState<{ circle1: string; circle2: string }>({
     circle1: '/images/circle1.svg',
     circle2: '/images/circle2.svg',
@@ -90,7 +70,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme }) => {
   // const [tokenAtPosition1, setTokenAtPosition1] = useState(token1Address);
   const [tokenToggleOccured , setTokenToggleOccured] = useState(false);
 
-  const [activeProtocol, setActiveProtocol] = useState(Protocol.V3); 
+  const [activeProtocol, setActiveProtocol] = useState(defaultActiveProtocol); 
 
   const [amount0Desired, setAmount0Desired] = useState("");
   const [amount1Desired, setAmount1Desired] = useState("");
