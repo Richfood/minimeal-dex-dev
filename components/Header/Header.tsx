@@ -4,17 +4,20 @@ import { IoSettingsOutline } from 'react-icons/io5';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useTheme } from '../ThemeContext';
 import styles from './header.module.css';
-import ConnectWallet from '../ConnectWallet/ConnectWallet';
 import { useRouter } from 'next/router';
 import AppSettingsModal from '../AppSettingsModal/AppSettingsModal';
 import Link from 'next/link';
 import Image from 'next/image';
+import { metaMask, hooks } from '../ConnectWallet/connector';
+const { useChainId, useAccounts, useIsActive, useProvider } = hooks;
 
 const Header = () => {
   const [openSettingsModal, setOpenSettingsModal] = React.useState(false);
   const [openWallet, setOpenWallet] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedNetwork, setSelectedNetwork] = React.useState('PulseChain');
+  const [address, setAddress] = React.useState<string | null>("Connect Wallet");
+  const accounts = useAccounts();
 
   const { theme } = useTheme();
   const router = useRouter();
@@ -32,6 +35,17 @@ const Header = () => {
   const handleCloseMenu = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    if (accounts && accounts.length > 0) {
+      // Shorten the address for display (e.g., 0x123...789)
+      const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+      setAddress(shortenedAddress);
+    } else {
+      setAddress(null); // Reset if disconnected
+    }
+  }, [accounts]);
+
 
   const openMenu = Boolean(anchorEl);
 
@@ -148,6 +162,7 @@ const Header = () => {
                 <Button
                   variant="contained"
                   color="primary"
+                  onClick={() => metaMask.activate()} // Ensure activation logic is correct
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -160,7 +175,9 @@ const Header = () => {
                     },
                   }}
                 >
-                  <Typography>Connect Wallet</Typography>
+                  <Typography>
+                    {address}
+                  </Typography>
                 </Button>
               </ListItem>
             </List>

@@ -43,6 +43,32 @@ interface PoolDetails {
     fee: number;
 }
 
+const fetchUSDPriceForSelectedToken = async (address: string | undefined, id: string | undefined): Promise<any> => {
+    // Construct the URL dynamically using the address and id arguments
+    const url = `https://api.coingecko.com/api/v3/coins/${id}/contract/${address}`;
+    console.log("🚀 ~ fetchUSDPriceForSelectedToken ~ url:", url)
+    const options = {
+        method: 'GET',
+        headers: {
+            accept: 'application/json',
+            'x-cg-api-key': 'CG-FKLVTYvNVHpiLV7WntH31dPF'
+        }
+    };
+
+    try {
+        const res = await fetch(url, options);
+        if (!res.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const json = await res.json();
+        return json;
+    } catch (err) {
+        console.error('Error:', err);
+        return null;
+    }
+};
+
+
 const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(0);
     const [isActive, setIsActive] = useState(false);
@@ -65,9 +91,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     // });
 
     const [token0, setToken0] = useState<TokenDetails | null>(null);
-    console.log("🚀 ~ token0:", token0)
     const [token1, setToken1] = useState<TokenDetails | null>(null);
-    console.log("🚀 ~ token1:", token1)
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
 
     const [amountIn, setAmountIn] = useState("");
@@ -75,7 +99,10 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
     const [amountOutLoading, setAmountOutLoading] = useState(false);
     const [amountInLoading, setAmountInLoading] = useState(false);
-
+    const [token0Price, setToken0Price] = useState(null);
+    console.log("🚀 ~ token0Price:", token0Price)
+    const [token1Price, setToken1Price] = useState(null);
+    console.log("🚀 ~ token1Price:", token1Price)
     const { theme } = useTheme();
 
     // Load token data from local storage and set it to state
@@ -93,6 +120,21 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
             }
         }
     }, []);
+
+
+
+    useEffect(() => {
+        const fetchPrices = async () => {
+            const price0 = await fetchUSDPriceForSelectedToken(token0?.address?.contract_address, token0?.symbol);
+            const price1 = await fetchUSDPriceForSelectedToken(token1?.address?.contract_address, token1?.symbol);
+
+
+            setToken0Price(price0);
+            setToken1Price(price1);
+        };
+
+        fetchPrices();
+    }, [token0, token1]);
 
     const handleOpenToken = useCallback((tokenNumber: number) => {
         setTokenBeingChosen(tokenNumber)
@@ -132,7 +174,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     }
 
 
-    const toggleGraph = async() => {
+    const toggleGraph = async () => {
 
 
         if (activeCurrency === "PLS/9MM") {
