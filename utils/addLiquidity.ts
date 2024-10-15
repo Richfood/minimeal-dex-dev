@@ -107,6 +107,7 @@ export async function addLiquidityV3(
     deadline: string,
     sqrtPriceX96: string,
     fee: FeeAmount,
+    isFullRange : boolean
 ) {
     if(!window.ethereum) return;
     
@@ -114,6 +115,11 @@ export async function addLiquidityV3(
     const newSigner = newProvider.getSigner();
     const nfpmContract = new ethers.Contract(contractAddress, nfpmAbi, newSigner);
     const recepientAddress = await newSigner.getAddress();
+
+    if(isFullRange){
+        amount0Min = "0";
+        amount1Min = "0";
+    }
 
     console.log(`Amounts Desired and Minimum for Liquidity Provision:
         - Token 0 Desired: ${amount0Desired}

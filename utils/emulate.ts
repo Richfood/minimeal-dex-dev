@@ -80,7 +80,7 @@ function emulate(
         console.log("amount 0 entered")
         const amount0DesiredForCalculation = amount0Entered//ethers.utils.parseUnits(amount0Entered.toString(), token0.decimals).toString();
 
-        const liquidityFor0 = Math.round(liquidity0(amount0DesiredForCalculation, currentSqrtPrice, upperSqrtPrice));
+        const liquidityFor0 = liquidity0(amount0DesiredForCalculation, currentSqrtPrice, upperSqrtPrice);
         amount1Desired =  calculateAmount1WhenLiquidity0Given(liquidityFor0, currentSqrtPrice, lowerSqrtPrice).toString();
         liquidity = liquidityFor0.toString();
 
@@ -94,7 +94,7 @@ function emulate(
         console.log("amount 1 entered")
         const amount1DesiredForCalculation = amount1Entered//ethers.utils.parseUnits(amount1Entered.toString(), token1.decimals).toString();
 
-        const liquidityFor1 = Math.round(liquidity1(amount1DesiredForCalculation, currentSqrtPrice, lowerSqrtPrice));
+        const liquidityFor1 = liquidity1(amount1DesiredForCalculation, currentSqrtPrice, lowerSqrtPrice);
         amount0Desired = calculateAmount0WhenLiquidity1Given(liquidityFor1, currentSqrtPrice, upperSqrtPrice).toString();
         liquidity = liquidityFor1.toString();
 

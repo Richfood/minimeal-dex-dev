@@ -38,6 +38,9 @@ interface AddLiquidityProps {
   defaultActiveProtocol : Protocol;
 }
 
+const MIN_TICK = -887272;
+const MAX_TICK = 887272;
+
 const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol : activeProtocol }) => {
   const { palette } = useTheme();
   const [isActive, setIsActive] = useState(true);
@@ -64,6 +67,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const [token0,setToken0] =  useState<TokenDetails | null>(tempToken0);
   const [token1, setToken1] = useState<TokenDetails | null>(tempToken1);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
+
+  const [isFullRange, setIsFullRange] = useState(false);
 
   /* This is irrelevant of token0 and token1 addresses. Meaning token0 (token0 < token1) can be at position 1*/
   // const [tokenAtPosition0, setTokenAtPosition0] = useState(token0Address);
@@ -99,8 +104,12 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const [decimalDifference, setDecimalDifference] = useState(0);
 
+  const calculateRange = (price: number, percentage: number)=>{
+    return (price + ((percentage*price)/100)).toString();
+  }
+
   const handlePriceLower = ()=>{
-    if(fee && priceLowerEntered && token0 && token1){
+    if(fee && priceLowerEntered && token0 && token1 && Number(priceLowerEntered) > 0){
       const tick = priceToTick(priceLowerEntered, decimalDifference);
       const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
       const newPrice = tickToPrice(nearestTick, decimalDifference);
@@ -113,7 +122,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   }
 
   const handlePriceUpper = ()=>{
-    if(fee && priceUpperEntered && token0 && token1){
+    if(fee && priceUpperEntered && token0 && token1 && Number(priceUpperEntered) > 0){
       const tick = priceToTick(priceUpperEntered, decimalDifference);
       const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
       const newPrice = tickToPrice(nearestTick, decimalDifference);
@@ -337,7 +346,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
             amount1Min,
             deadline,
             sqrtPriceX96,
-            fee
+            fee,
+            isFullRange
           )
 
           alert(`Liquidity added. tx hash : ${addLiquidityTxHash} `)
@@ -526,14 +536,15 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   },[token0, token1])
 
   useEffect(()=>{
-    if(priceLowerEntered)
+    if(priceLowerEntered){
       setPriceLower("");
-
+    }
   },[priceLowerEntered])
   
   useEffect(()=>{
-    if(priceUpperEntered)
+    if(priceUpperEntered){
       setPriceUpper("");
+    }
 
   },[priceUpperEntered])
 
@@ -881,11 +892,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                             <Typography sx={{ fontWeight: '600' }}>Min Price</Typography>
     
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Box><FaMinus onClick={()=>{setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) - 0.0001).toString()); handlePriceLower()}}/></Box>
+                              <Box><FaMinus onClick={()=>{setIsFullRange(false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) - 0.0001).toString()); handlePriceLower()}}/></Box>
                               <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                                <input onBlur={handlePriceLower} onChange={(e)=>setPriceLowerEntered(e.target.value)} type="number" placeholder="0.0" style={{ textAlign: 'center' }} value={!priceLower ? priceLowerEntered : priceLower}/>
+                                <input onBlur={handlePriceLower} onChange={(e)=>{setIsFullRange(false);setPriceLowerEntered(e.target.value)}} type="number" placeholder="0.0" style={{ textAlign: 'center' }} value={isFullRange ? "0" : !priceLower ? priceLowerEntered : priceLower}/>
                               </Box>
-                              <Box><FaPlus onClick={()=>{setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
+                              <Box><FaPlus onClick={()=>{setIsFullRange(false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
                             </Box>
     
                             {token0 && token1 ? (
@@ -909,11 +920,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                             <Typography sx={{ fontWeight: '600' }}>Max Price</Typography>
     
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Box><FaMinus onClick={()=>{setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) - 0.0001).toString()); handlePriceUpper()}}/></Box>
+                              <Box><FaMinus onClick={()=>{setIsFullRange(false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) - 0.0001).toString()); handlePriceUpper()}}/></Box>
                               <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                                <input type="number" placeholder="0.0" style={{ textAlign: 'center' }} onBlur={handlePriceUpper} onChange={(e)=>setPriceUpperEntered(e.target.value)} value={!priceUpper ? priceUpperEntered : priceUpper}/>
+                                <input type="text" placeholder="0.0" style={{ textAlign: 'center' , fontSize: isFullRange ? '1.5em' : '1em'}} onBlur={handlePriceUpper} onChange={(e)=>{setIsFullRange(false);setPriceUpperEntered(e.target.value)}} value={isFullRange ? "∞" : !priceUpper ? priceUpperEntered : priceUpper}/>
                               </Box>
-                              <Box><FaPlus onClick={()=>{setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) + 0.0001).toString()); handlePriceUpper()}}/></Box>
+                              <Box><FaPlus onClick={()=>{setIsFullRange(false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) + 0.0001).toString()); handlePriceUpper()}}/></Box>
                             </Box>
     
                             {token0 && token1 ? (
@@ -932,65 +943,108 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                           {/* free_tier */}
                         </Box>
                         <Box className="fullRangeSec" sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', textAlign: 'center', mb: '15px' }}>
-                          <Box sx={{
-                            width: 'calc(25% - 15px)',
-                            border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            p: '5px 7px',
-                            display: 'flex',
-                            gap: '10px',
-                            borderRadius: '30px',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                          }}>
+                          <Box 
+                            onClick={()=>{
+                              if(!priceCurrent) return;
+                              setPriceLowerEntered(calculateRange(Number(priceCurrent), -10));
+                              setPriceUpperEntered(calculateRange(Number(priceCurrent), 10));
+                              setIsFullRange(false)                
+                              handlePriceLower();
+                              handlePriceUpper();                        
+                            }}
+                            sx={{
+                              width: 'calc(25% - 15px)',
+                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              p: '5px 7px',
+                              display: 'flex',
+                              gap: '10px',
+                              borderRadius: '30px',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                            }}
+                          >
                             10%
                           </Box>
     
-                          <Box sx={{
-                            width: 'calc(25% - 15px)',
-                            border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            p: '5px 7px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            borderRadius: '30px',
-                            cursor: 'pointer',
-                            color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                          }}>
+                          <Box 
+                            onClick={()=>{
+                              if(!priceCurrent) return;
+                              setPriceLowerEntered(calculateRange(Number(priceCurrent), -20));
+                              setPriceUpperEntered(calculateRange(Number(priceCurrent), 20));
+                              setIsFullRange(false)
+                              handlePriceLower();
+                              handlePriceUpper();
+                            }}
+                            sx={{
+                              width: 'calc(25% - 15px)',
+                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              p: '5px 7px',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              gap: '10px',
+                              borderRadius: '30px',
+                              cursor: 'pointer',
+                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                            }}
+                          >
                             20%
                           </Box>
-                          <Box sx={{
-                            width: 'calc(25% - 15px)',
-                            border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            p: '5px 7px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            borderRadius: '30px',
-                            cursor: 'pointer',
-                            color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                          }}>
+                          <Box 
+                            onClick={()=>{
+                              if(!priceCurrent) return;
+                              console.log("CLicked")
+                              setPriceLowerEntered(calculateRange(Number(priceCurrent), -50));
+                              setPriceUpperEntered(calculateRange(Number(priceCurrent), 50));
+                              setIsFullRange(false)
+                              handlePriceLower();
+                              handlePriceUpper();                              
+                            }}
+                            sx={{
+                              width: 'calc(25% - 15px)',
+                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              p: '5px 7px',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              gap: '10px',
+                              borderRadius: '30px',
+                              cursor: 'pointer',
+                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                            }}
+                          >
                             50%
                           </Box>
-                          <Box sx={{
-                            width: 'calc(25% - 15px)',
-                            border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            p: '5px 7px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            borderRadius: '30px',
-                            cursor: 'pointer',
-                            color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                          }}>
+                          <Box 
+                            onClick={()=>{
+                              const newPriceLower = tickToPrice(MIN_TICK, decimalDifference);
+                              setPriceLowerEntered(newPriceLower.toString());
+                              const newPriceUpper = tickToPrice(MAX_TICK, decimalDifference);
+                              setPriceUpperEntered(newPriceUpper.toString());
+
+                              setIsFullRange(true);
+                              handlePriceLower();
+                              handlePriceUpper();                              
+                            }}
+                            sx={{
+                              width: 'calc(25% - 15px)',
+                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              p: '5px 7px',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              gap: '10px',
+                              borderRadius: '30px',
+                              cursor: 'pointer',
+                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                            }}
+                          >
                             Full Range
                           </Box>
     
@@ -1088,11 +1142,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                             <Typography sx={{ fontWeight: '600' }}>Min Price</Typography>
     
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Box><FaMinus onClick={()=>{setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) - 0.0001).toString()); handlePriceLower() }}/></Box>
+                              <Box><FaMinus onClick={()=>{setIsFullRange(false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) - 0.0001).toString()); handlePriceLower() }}/></Box>
                               <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                                <input type="number" placeholder="0.0" style={{ textAlign: 'center' }} onBlur={handlePriceLower} onChange={(e)=>setPriceLowerEntered(e.target.value)} value={!priceLower ? priceLowerEntered : priceLower}/>
+                                <input type="number" placeholder="0.0" style={{ textAlign: 'center' }} onBlur={handlePriceLower} onChange={(e)=>{setIsFullRange(false);setPriceLowerEntered(e.target.value)}} value={isFullRange ? "0" : !priceLower ? priceLowerEntered : priceLower}/>
                               </Box>
-                              <Box><FaPlus onClick={()=>{setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
+                              <Box><FaPlus onClick={()=>{setIsFullRange(false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
                             </Box>
     
                             {token0 && token1 ? (
@@ -1114,11 +1168,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                             <Typography sx={{ fontWeight: '600' }}>Max Price</Typography>
     
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Box><FaMinus onClick={()=>{setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) - 0.0001).toString()); handlePriceUpper()}}/></Box>
+                              <Box><FaMinus onClick={()=>{setIsFullRange(false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) - 0.0001).toString()); handlePriceUpper()}}/></Box>
                               <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                                <input type="number" placeholder="0.0" style={{ textAlign: 'center' }} onBlur={handlePriceUpper} onChange={(e)=>setPriceUpperEntered(e.target.value)} value={!priceUpper ? priceUpperEntered : priceUpper}/>
+                              <input type="text" placeholder="0.0" style={{ textAlign: 'center' , fontSize: isFullRange ? '1.5em' : '1em'}} onBlur={handlePriceUpper} onChange={(e)=>{setIsFullRange(false);setPriceUpperEntered(e.target.value)}} value={isFullRange ? "∞" : !priceUpper ? priceUpperEntered : priceUpper}/>
                               </Box>
-                              <Box><FaPlus onClick={()=>{setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) + 0.0001).toString()); handlePriceUpper()}}/></Box>
+                              <Box><FaPlus onClick={()=>{setIsFullRange(false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) + 0.0001).toString()); handlePriceUpper()}}/></Box>
                             </Box>
     
                             {token0 && token1 ? (
@@ -1139,65 +1193,110 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     
     
                         <Box className="fullRangeSec" sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', textAlign: 'center', mb: '15px' }}>
-                          <Box sx={{
-                            width: 'calc(25% - 15px)',
-                            border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            p: '5px 7px',
-                            display: 'flex',
-                            gap: '10px',
-                            borderRadius: '30px',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                          }}>
+                        <Box 
+                            onClick={()=>{
+                              if(!priceCurrent) return;
+                              console.log("CLicked")
+                              setPriceLowerEntered(calculateRange(Number(priceCurrent), -10));
+                              setPriceUpperEntered(calculateRange(Number(priceCurrent), 10));
+                              setIsFullRange(false)
+                              handlePriceLower();
+                              handlePriceUpper();                              
+                            }}
+                            sx={{
+                              width: 'calc(25% - 15px)',
+                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              p: '5px 7px',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              gap: '10px',
+                              borderRadius: '30px',
+                              cursor: 'pointer',
+                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                            }}
+                          >
                             10%
                           </Box>
     
-                          <Box sx={{
-                            width: 'calc(25% - 15px)',
-                            border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            p: '5px 7px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            borderRadius: '30px',
-                            cursor: 'pointer',
-                            color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                          }}>
+                          <Box 
+                            onClick={()=>{
+                              if(!priceCurrent) return;
+                              console.log("CLicked")
+                              setPriceLowerEntered(calculateRange(Number(priceCurrent), -20));
+                              setPriceUpperEntered(calculateRange(Number(priceCurrent), 20));
+                              setIsFullRange(false)
+                              handlePriceLower();
+                              handlePriceUpper();                              
+                            }}
+                            sx={{
+                              width: 'calc(25% - 15px)',
+                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              p: '5px 7px',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              gap: '10px',
+                              borderRadius: '30px',
+                              cursor: 'pointer',
+                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                            }}
+                          >
                             20%
                           </Box>
-                          <Box sx={{
-                            width: 'calc(25% - 15px)',
-                            border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            p: '5px 7px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            borderRadius: '30px',
-                            cursor: 'pointer',
-                            color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                          }}>
+                          <Box 
+                            onClick={()=>{
+                              if(!priceCurrent) return;
+                              console.log("CLicked")
+                              setPriceLowerEntered(calculateRange(Number(priceCurrent), -50));
+                              setPriceUpperEntered(calculateRange(Number(priceCurrent), 50));
+                              setIsFullRange(false)
+                              handlePriceLower();
+                              handlePriceUpper();                              
+                            }}
+                            sx={{
+                              width: 'calc(25% - 15px)',
+                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              p: '5px 7px',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              gap: '10px',
+                              borderRadius: '30px',
+                              cursor: 'pointer',
+                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                            }}
+                          >
                             50%
                           </Box>
-                          <Box sx={{
-                            width: 'calc(25% - 15px)',
-                            border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            p: '5px 7px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            borderRadius: '30px',
-                            cursor: 'pointer',
-                            color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                          }}>
+                          <Box 
+                            onClick={()=>{
+                              const newPriceLower = tickToPrice(MIN_TICK, decimalDifference);
+                              setPriceLowerEntered(newPriceLower.toString());
+                              const newPriceUpper = tickToPrice(MAX_TICK, decimalDifference);
+                              setPriceUpperEntered(newPriceUpper.toString());
+
+                              setIsFullRange(true);
+                              handlePriceLower();
+                              handlePriceUpper();                              
+                            }}
+                            sx={{
+                              width: 'calc(25% - 15px)',
+                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              p: '5px 7px',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              gap: '10px',
+                              borderRadius: '30px',
+                              cursor: 'pointer',
+                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                            }}
+                          >
                             Full Range
                           </Box>
     
