@@ -540,14 +540,16 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   useEffect(()=>{
     if(priceLowerEntered){
       setPriceLower("");
-      handlePriceLower();
+      if(isFullRange)
+        handlePriceLower();
     }
   },[priceLowerEntered])
   
   useEffect(()=>{
     if(priceUpperEntered){
       setPriceUpper("");
-      handlePriceUpper();
+      if(isFullRange)
+        handlePriceUpper();
     }
 
   },[priceUpperEntered])
@@ -875,7 +877,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                         {token0 && token1 ? (
                           <Box sx={{ display: 'flex', gap: '5px', justifyContent: 'center', mb: '15px' }}>
                           <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>Current Price:</Typography>
-                          <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{Number(currentPoolData.token1Price) || 0}</Typography>
+                          <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{Number(currentPoolData.token0Price) || 0}</Typography>
                           <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{token0.name} Per {token1.name}</Typography>
                         </Box>
                         ) : (
