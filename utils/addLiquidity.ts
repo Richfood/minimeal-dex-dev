@@ -129,19 +129,6 @@ export async function addLiquidityV3(
         - sqrtPriceX96: ${sqrtPriceX96}
       `);
 
-    function roundToPrecision(value: string, decimals: number): number {
-        const factor = Math.pow(10, decimals);
-        const roundedValue = (Math.round(parseFloat(value) * factor) / factor).toFixed(decimals);
-        return Number(roundedValue);
-    }
-    function adjustForSlippage(amount: string, slippageTolerance: number): number {
-        // Convert slippage tolerance percentage into a decimal (e.g., 1% becomes 0.01)
-        const slippageFactor = slippageTolerance / 100;
-
-        // Adjust the amount by reducing it based on the slippage tolerance
-        return Number(amount) * slippageFactor;
-    }
-
     amount0Desired = ethers.utils.parseUnits(amount0Desired, token0.address.decimals).toString();
     amount1Desired = ethers.utils.parseUnits(amount1Desired, token1.address.decimals).toString();
     amount0Min = ethers.utils.parseUnits(amount0Min, token0.address.decimals).toString();

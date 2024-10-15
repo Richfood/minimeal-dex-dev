@@ -167,6 +167,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     setPriceLowerEntered("");
     setPriceUpperEntered("");
     setPriceCurrentEntered("");
+
+    setIsFullRange(false);
   }
 
   const sortTokens = ()=>{
@@ -538,12 +540,14 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   useEffect(()=>{
     if(priceLowerEntered){
       setPriceLower("");
+      handlePriceLower();
     }
   },[priceLowerEntered])
   
   useEffect(()=>{
     if(priceUpperEntered){
       setPriceUpper("");
+      handlePriceUpper();
     }
 
   },[priceUpperEntered])
@@ -948,9 +952,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                               if(!priceCurrent) return;
                               setPriceLowerEntered(calculateRange(Number(priceCurrent), -10));
                               setPriceUpperEntered(calculateRange(Number(priceCurrent), 10));
-                              setIsFullRange(false)                
-                              handlePriceLower();
-                              handlePriceUpper();                        
+                              setIsFullRange(false)                                    
                             }}
                             sx={{
                               width: 'calc(25% - 15px)',
@@ -975,8 +977,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                               setPriceLowerEntered(calculateRange(Number(priceCurrent), -20));
                               setPriceUpperEntered(calculateRange(Number(priceCurrent), 20));
                               setIsFullRange(false)
-                              handlePriceLower();
-                              handlePriceUpper();
                             }}
                             sx={{
                               width: 'calc(25% - 15px)',
@@ -1000,9 +1000,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                               console.log("CLicked")
                               setPriceLowerEntered(calculateRange(Number(priceCurrent), -50));
                               setPriceUpperEntered(calculateRange(Number(priceCurrent), 50));
-                              setIsFullRange(false)
-                              handlePriceLower();
-                              handlePriceUpper();                              
+                              setIsFullRange(false)                           
                             }}
                             sx={{
                               width: 'calc(25% - 15px)',
@@ -1027,9 +1025,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                               const newPriceUpper = tickToPrice(MAX_TICK, decimalDifference);
                               setPriceUpperEntered(newPriceUpper.toString());
 
-                              setIsFullRange(true);
-                              handlePriceLower();
-                              handlePriceUpper();                              
+                              setIsFullRange(true);                           
                             }}
                             sx={{
                               width: 'calc(25% - 15px)',
@@ -1199,9 +1195,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                               console.log("CLicked")
                               setPriceLowerEntered(calculateRange(Number(priceCurrent), -10));
                               setPriceUpperEntered(calculateRange(Number(priceCurrent), 10));
-                              setIsFullRange(false)
-                              handlePriceLower();
-                              handlePriceUpper();                              
+                              setIsFullRange(false)                 
                             }}
                             sx={{
                               width: 'calc(25% - 15px)',
@@ -1227,8 +1221,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                               setPriceLowerEntered(calculateRange(Number(priceCurrent), -20));
                               setPriceUpperEntered(calculateRange(Number(priceCurrent), 20));
                               setIsFullRange(false)
-                              handlePriceLower();
-                              handlePriceUpper();                              
                             }}
                             sx={{
                               width: 'calc(25% - 15px)',
@@ -1252,9 +1244,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                               console.log("CLicked")
                               setPriceLowerEntered(calculateRange(Number(priceCurrent), -50));
                               setPriceUpperEntered(calculateRange(Number(priceCurrent), 50));
-                              setIsFullRange(false)
-                              handlePriceLower();
-                              handlePriceUpper();                              
+                              setIsFullRange(false)                              
                             }}
                             sx={{
                               width: 'calc(25% - 15px)',
@@ -1279,9 +1269,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                               const newPriceUpper = tickToPrice(MAX_TICK, decimalDifference);
                               setPriceUpperEntered(newPriceUpper.toString());
 
-                              setIsFullRange(true);
-                              handlePriceLower();
-                              handlePriceUpper();                              
+                              setIsFullRange(true);                             
                             }}
                             sx={{
                               width: 'calc(25% - 15px)',
