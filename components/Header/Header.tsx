@@ -10,24 +10,27 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { metaMask, hooks } from '../ConnectWallet/connector';
 import NetworkMenu from './account';
-const { useChainId, useAccounts, useIsActive, useProvider } = hooks;
+const { useChainId, useAccounts, useProvider } = hooks;
 
 const Header = () => {
   const [openSettingsModal, setOpenSettingsModal] = React.useState(false);
   const [openWallet, setOpenWallet] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedNetwork, setSelectedNetwork] = React.useState('PulseChain');
-  const [address, setAddress] = React.useState<string | null>("Connect Wallet");
+  const [address, setAddress] = React.useState<string | null>(null);
+  console.log("🚀 ~ Header ~ address:", address)
   const accounts = useAccounts();
+  const isConnected = useAccounts();
   const chainId = useChainId();
   const { theme } = useTheme();
   const router = useRouter();
+  const [buttonText, setButtonText] = React.useState<string | null>(null);
 
   const handleOpenSettings = () => setOpenSettingsModal(true);
   const handleCloseSettings = () => setOpenSettingsModal(false);
 
-  const handleOpenWallet = () => setOpenWallet(true);
-  const handleCloseWallet = () => setOpenWallet(false);
+  // const handleOpenWallet = () => setOpenWallet(true);
+  // const handleCloseWallet = () => setOpenWallet(false);
 
   const handleClickMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -38,21 +41,41 @@ const Header = () => {
   };
 
   useEffect(() => {
-    if (accounts && accounts.length > 0) {
-      // Shorten the address for display (e.g., 0x123...789)
-      const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
-      setAddress(shortenedAddress);
+    const updateAddressAndButtonText = async () => {
+      if (accounts && accounts.length > 0 && isConnected) {
+        // Shorten the address for display (e.g., 0x123...789)
+        const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+        setAddress(shortenedAddress);
+      }
+      setButtonText(isConnected ? address : 'Connect Wallet');
+
+
+      // Update the button text based on connection status
+    };
+
+    updateAddressAndButtonText();
+  }, [accounts, isConnected]);
+
+
+  // const handleNetworkSelect = (chainId: number) => {
+  //   metaMask.activate(chainId);
+  //   setSelectedChainId(chainId);
+  //   handleCloseMenu(); // Close the menu after selection
+  // };
+
+  const handleClick = () => {
+    if (isConnected) {
+      console.log("🚀 ~ handleClick ~ isConnected:", isConnected);
+
+      // Check if deactivate is available before calling it
+      if (metaMask.deactivate) {
+        metaMask.deactivate?.();
+      } else {
+        console.log(metaMask.resetState());
+      }
     } else {
-      setAddress(null); // Reset if disconnected
+      metaMask.activate();
     }
-  }, [accounts]);
-
-  const [selectedChainId, setSelectedChainId] = React.useState<number | null>(null);
-
-  const handleNetworkSelect = (chainId: number) => {
-    metaMask.activate(chainId);
-    setSelectedChainId(chainId);
-    handleCloseMenu(); // Close the menu after selection
   };
 
 
@@ -136,7 +159,7 @@ const Header = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={() => metaMask.activate()}
+                  onClick={handleClick}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -149,9 +172,7 @@ const Header = () => {
                     },
                   }}
                 >
-                  <Typography>
-                    {address}
-                  </Typography>
+                  <Typography>{buttonText}</Typography>
                 </Button>
               </ListItem>
             </List>

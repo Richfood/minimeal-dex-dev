@@ -15,7 +15,6 @@ import RecentTransactions from '../../components/RecentTransactions/RecentTransa
 import { BsFire } from "react-icons/bs";
 // import { getAmountOutV3 } from '@/utils/calculateSwap';
 import { BigNumber } from 'ethers';
-import { Pool } from '@uniswap/v3-sdk';
 import { getPoolData } from '@/utils/api/getPoolData';
 import { Protocol, SwapPoolData, TokenDetails } from '@/interfaces';
 import { getSmartOrderRoute } from '@/utils/api/getSmartOrderRoute';
@@ -74,10 +73,6 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
     const [amountOutLoading, setAmountOutLoading] = useState(false);
     const [amountInLoading, setAmountInLoading] = useState(false);
-    const [token0Price, setToken0Price] = useState(null);
-    console.log("🚀 ~ token0Price:", token0Price)
-    const [token1Price, setToken1Price] = useState(null);
-    console.log("🚀 ~ token1Price:", token1Price)
     const { theme } = useTheme();
 
     // Load token data from local storage and set it to state
@@ -96,22 +91,6 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
         }
     }, []);
 
-
-
-    useEffect(() => {
-        const fetchPrices = async () => {
-
-            if(!token0 || !token1) return;
-
-            const price0 = await getTokenUsdPrice(token0?.address?.contract_address);
-            const price1 = await getTokenUsdPrice(token1?.address?.contract_address);
-
-            setToken0Price(price0);
-            setToken1Price(price1);
-        };
-
-        fetchPrices();
-    }, [token0, token1]);
 
     const handleOpenToken = useCallback((tokenNumber: number) => {
         setTokenBeingChosen(tokenNumber)

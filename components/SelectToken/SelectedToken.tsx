@@ -8,8 +8,13 @@ import { IoCloseOutline } from 'react-icons/io5';
 import { List, ListItem } from '@mui/material';
 import ManageToken from '../ManageToken/ManageToken';
 import Image from 'next/image';
+import { metaMask, hooks } from '../ConnectWallet/connector';
 
-import tokenList from "../../utils/tokenList.json";
+const { useChainId, useAccounts } = hooks;
+
+import famousToken from "../../utils/famousToken.json";
+import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
+
 import { TokenDetails } from '@/interfaces';
 
 interface SelectedTokenProps {
@@ -63,8 +68,8 @@ const fetchStablecoins = async (): Promise<any> => {
 const fetchCoinStablecoins = async () => {
     try {
 
-        const idsArray = ["tether", "usd-coin-pulsechain", "pulsecoin", "pulsebitcoin-pulsechain", "dai-on-pulsechain",
-            "hex-pulsechain", "doge-on-pulsechain", "wrapped-bitcoin-pulsechain", "bitcoin", "xen-crypto-pulsechain"]
+        const idsArray = ["0xaiswap", "1000bonk", "16dao", "1ex", "2080",
+            "2fai", "doge-on-pulsechain", "5g-cash", "404ver", "xen-crypto-pulsechain"]
         const response = await fetch('api/coins', {
             method: 'POST',
             headers: {
@@ -74,7 +79,7 @@ const fetchCoinStablecoins = async () => {
         });
 
         if (!response.ok) {
-            console.error('Failed to fetch data from API:', response);
+            console.log('Failed to fetch data from API:', response);
             return null;
         }
 
@@ -83,7 +88,7 @@ const fetchCoinStablecoins = async () => {
 
         return data;
     } catch (error) {
-        console.error('Error fetching data from API:', error);
+        console.log('Error fetching data from API:', error);
         return null;
 
     }
@@ -92,18 +97,49 @@ const fetchCoinStablecoins = async () => {
 const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode, setToken0, setToken1, tokenNumber, token0, token1
 
 }) => {
-    console.log("🚀 ~ token0:", token0)
-    console.log("🚀 ~ tokenNumber:", tokenNumber === 0)
-    console.log("🚀 ~ token1:", token1)
-
     const [openManage, setOpenManage] = useState(false);
     const [tokenSelected, setTokenSelected] = useState<string>("");
     const [coinData, setCoinData] = useState<any[]>([]);
     const [tokenA, setTokenA] = useState<TokenDetails | any>(null);
     const [tokenB, setTokenB] = useState<TokenDetails | any>(null);
+    const [tokens, setTokens] = useState<any[]>([]);
+    console.log("🚀 ~ tokens:", tokens)
+    const isConnected = useAccounts();
+    const chainId = useChainId();
 
     const handleOpenManage = () => setOpenManage(true);
     const handleCloseManage = () => setOpenManage(false);
+
+    useEffect(() => {
+        const initializeData = async () => {
+            // Fetch and set stablecoins data
+            const data = await fetchStablecoins();
+            console.log("🚀 ~ initializeData ~ stablecoins data:", data);
+
+            const usableCoinData = await fetchCoinStablecoins();
+            console.log("🚀 ~ initializeData ~ usableCoinData:", usableCoinData);
+            setCoinData(usableCoinData);
+
+            // Fetch and set token data based on network
+            const isTestnet = chainId === 943;
+            console.log("🚀 ~ initializeData ~ isTestnet:", isTestnet);
+
+            const tokenData = isTestnet ? famousTokenTestnet : famousToken;
+            console.log("🚀 ~ initializeData ~ tokenData:", tokenData);
+            setTokens(tokenData);
+
+            // Restore saved tokens from local storage
+            const savedTokenA = localStorage.getItem('token0');
+            const savedTokenB = localStorage.getItem('token1');
+
+            setTokenA(savedTokenA ? JSON.parse(savedTokenA) : null);
+            setTokenB(savedTokenB ? JSON.parse(savedTokenB) : null);
+        };
+
+        if (isConnected) {
+            initializeData();
+        }
+    }, []);
 
     const handleSelectToken = (token: TokenDetails) => {
         if (tokenNumber === 0) {
@@ -131,7 +167,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
         }
 
         setTokenSelected(token?.address?.contract_address);
-        handleCloseToken(); 
+        handleCloseToken();
     };
 
 
@@ -177,34 +213,6 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
         },
     }));
 
-    useEffect(() => {
-        const getStablecoins = async () => {
-            const data = await fetchStablecoins();
-            console.log("🚀 ~ getStablecoins ~ data:", data)
-            const usableCoinData = await fetchCoinStablecoins(); // Pass the array of IDs to the function
-            console.log("🚀 ~ getStablecoins ~ usableCoinData:", usableCoinData);
-            setCoinData(usableCoinData)
-        }
-
-        getStablecoins();
-    }, []);
-
-    useEffect(() => {
-        const savedTokenA = localStorage.getItem('token0');
-        const savedTokenB = localStorage.getItem('token1');
-
-        if (savedTokenA) {
-            setTokenA(JSON.parse(savedTokenA));
-        } else {
-            setTokenA(null);
-        }
-
-        if (savedTokenB) {
-            setTokenB(JSON.parse(savedTokenB));
-        } else {
-            setTokenB(null);
-        }
-    }, []);
 
     return (
         <>
@@ -267,7 +275,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
 
 
                                 <Box className="token_Outer" sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                    {coinData?.map((token, index) => {
+                                    {tokens?.map((token, index) => {
                                         // Determine the current token based on tokenNumber
                                         const selectedToken = tokenNumber === 0 ? token0 : token1;
 
