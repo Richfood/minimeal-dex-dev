@@ -24,7 +24,7 @@ import famousToken from "../../utils/famousToken.json";
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import { hooks } from '../ConnectWallet/connector';
 
-const { useChainId, useAccounts } = hooks;
+const { useChainId, useIsActive } = hooks;
 interface Token {
     name: string;
     symbol: string;
@@ -48,7 +48,6 @@ interface PoolDetails {
 
 const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(0);
-    const [isActive, setIsActive] = useState(false);
     const [activeItem, setActiveItem] = useState<string | null>(null);
     const [isOpen, setIsOpen] = useState(true);
     const [openToken, setOpenToken] = useState(false);
@@ -80,6 +79,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [amountOutLoading, setAmountOutLoading] = useState(false);
     const [amountInLoading, setAmountInLoading] = useState(false);
     const { theme } = useTheme();
+    const isActive = useIsActive()
 
     // Load token data from local storage and set it to state
     useEffect(() => {
@@ -212,7 +212,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 {token0 && token0.symbol.toUpperCase()} <IoIosArrowDown />
                             </Typography>
                             <Typography
-                                onClick={() => copyToClipboard(token0?.address)}
+                                onClick={() => copyToClipboard(token0?.address.contract_address)}
                                 component="span"
                                 sx={{ ml: '5px', cursor: 'pointer' }}
                             >
@@ -247,7 +247,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
                             </Box> */}
                             <Box sx={{ mt: '25px' }}>
-                                <Button variant="contained" color="secondary">Swap</Button>
+                                <Button variant="contained" color="secondary">{isActive ? "Swap" : "Connect Wallet"}</Button>
                             </Box>
                         </Box>
 
@@ -267,7 +267,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 {token1 && token1.symbol.toUpperCase()}
                                 <IoIosArrowDown />
                             </Typography>
-                            <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }} onClick={() => copyToClipboard(token1?.address)}>
+                            <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }} onClick={() => copyToClipboard(token1?.address.contract_address)}>
                                 {token1?.symbol !== "PLS" && <PiCopy />}
                             </Typography>
                         </Box>

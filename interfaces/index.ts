@@ -23,10 +23,13 @@ export interface SwapPoolData {
 export interface TokenDetails {
   name: string;
   symbol: string;
-  address: string;
-  decimals: number;
-  logoURI?: string; // URL to the token's image
-  chainId: number;
+  address: {
+    contract_address: string;
+    decimals: number;
+  };
+  logoURI?: string;
+  chainId?: number;
+
 }
 
 export interface PoolDetails {
