@@ -1,6 +1,22 @@
 [
     {
         "chainId": 943,
+        "name": "Pulse",
+        "address": "0x70499adEBB11Efd915E3b69E700c331778628707",
+        "symbol": "PLS",
+        "decimals": 18,
+        "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png"
+    },
+    {
+        "chainId": 943,
+        "name": "9MM",
+        "address": "0xa9970518B793A101E69635A193DE063504c2eDd5",
+        "symbol": "9MM",
+        "decimals": 18,
+        "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0x7b39712Ef45F7dcED2bBDF11F3D5046bA61dA719.png"
+    },
+    {
+        "chainId": 943,
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "name": "USD Coin from Ethereum",
         "symbol": "USDC",
@@ -25,11 +41,11 @@
     },
     {
         "chainId": 943,
-        "address": "0x70499adEBB11Efd915E3b69E700c331778628707",
-        "name": "Wrapped Pulse",
-        "symbol": "WPLS",
-        "decimals": 18,
-        "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png"
+        "name": "PulseBitcoin",
+        "address": "0x5EE84583f67D5EcEa5420dBb42b462896E7f8D06",
+        "symbol": "PLSB",
+        "decimals": 12,
+        "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0x5EE84583f67D5EcEa5420dBb42b462896E7f8D06.png"
     },
     {
         "chainId": 943,

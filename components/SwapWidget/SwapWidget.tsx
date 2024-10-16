@@ -20,8 +20,11 @@ import { Protocol, SwapPoolData, TokenDetails } from '@/interfaces';
 import { getSmartOrderRoute } from '@/utils/api/getSmartOrderRoute';
 import { TradeType } from '@uniswap/sdk-core';
 import CircularProgress from '@mui/material/CircularProgress';
-import { getTokenUsdPrice } from '@/utils/api/getTokenUsdPrice';
+import famousToken from "../../utils/famousToken.json";
+import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
+import { hooks } from '../ConnectWallet/connector';
 
+const { useChainId, useAccounts } = hooks;
 interface Token {
     name: string;
     symbol: string;
@@ -63,9 +66,12 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     //     active1: 'PLS',
     //     active2: '9MM'
     // });
+    const chainId = useChainId();
 
     const [token0, setToken0] = useState<TokenDetails | null>(null);
+    console.log("🚀 ~ token0:", token0)
     const [token1, setToken1] = useState<TokenDetails | null>(null);
+    console.log("🚀 ~ token1:", token1)
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
 
     const [amountIn, setAmountIn] = useState("");
@@ -77,19 +83,16 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
     // Load token data from local storage and set it to state
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const savedToken0 = localStorage.getItem('token0');
-            const savedToken1 = localStorage.getItem('token1');
+        const isTestnet = chainId === 943;
 
-            // Initialize token0 and token1 from local storage if available
-            if (savedToken0) {
-                setToken0(JSON.parse(savedToken0));
-            }
-            if (savedToken1) {
-                setToken1(JSON.parse(savedToken1));
-            }
+        const tokenData = isTestnet ? famousTokenTestnet : famousToken;
+
+        if (tokenData.length > 0) {
+            // Set token0 and token1 based on tokenData
+            setToken0(tokenData[0]);
+            setToken1(tokenData[1]);
         }
-    }, []);
+    }, [chainId]); // Add chainId as a dependency
 
 
     const handleOpenToken = useCallback((tokenNumber: number) => {
@@ -197,27 +200,19 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
     };
 
-    const getImageSource = (token: TokenDetails | null) => {
-        if (token?.symbol === 'PLS') {
-            return circleImages.circle1; // Use state value for 'pls'
-        } else if (token?.symbol === '9MM') {
-            return circleImages.circle2; // Use state value for '9mm'
-        } else {
-            return token?.image; // Fallback to the token's image
-        }
-    };
+
     return (
         <>
             <Box className="SwapWidgetSec">
                 <Box className="SwapWidgetInner">
                     <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                            <img src={getImageSource(token0)} alt="circle1" style={{ width: '20px', height: '20px' }} />
+                            <img src={token0?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
                             <Typography onClick={() => handleOpenToken(0)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                                 {token0 && token0.symbol.toUpperCase()} <IoIosArrowDown />
                             </Typography>
                             <Typography
-                                onClick={() => copyToClipboard(token0?.address?.contract_address)}
+                                onClick={() => copyToClipboard(token0?.address)}
                                 component="span"
                                 sx={{ ml: '5px', cursor: 'pointer' }}
                             >
@@ -267,12 +262,12 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
                     <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                            <img src={getImageSource(token1)} alt="circle2" style={{ width: '20px', height: '20px' }} />
+                            <img src={token1?.logoURI} alt="circle2" style={{ width: '20px', height: '20px' }} />
                             <Typography onClick={() => handleOpenToken(1)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: "pointer" }}>
                                 {token1 && token1.symbol.toUpperCase()}
                                 <IoIosArrowDown />
                             </Typography>
-                            <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }} onClick={() => copyToClipboard(token1?.address?.contract_address)}>
+                            <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }} onClick={() => copyToClipboard(token1?.address)}>
                                 {token1?.symbol !== "PLS" && <PiCopy />}
                             </Typography>
                         </Box>

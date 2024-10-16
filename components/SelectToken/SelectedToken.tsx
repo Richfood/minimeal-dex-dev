@@ -97,9 +97,10 @@ const fetchCoinStablecoins = async () => {
 const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode, setToken0, setToken1, tokenNumber, token0, token1
 
 }) => {
+    console.log("🚀 ~ tokenNumber:", tokenNumber)
     const [openManage, setOpenManage] = useState(false);
-    const [tokenSelected, setTokenSelected] = useState<string>("");
     const [coinData, setCoinData] = useState<any[]>([]);
+    console.log("🚀 ~ coinData:", coinData)
     const [tokenA, setTokenA] = useState<TokenDetails | any>(null);
     const [tokenB, setTokenB] = useState<TokenDetails | any>(null);
     const [tokens, setTokens] = useState<any[]>([]);
@@ -112,23 +113,16 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
 
     useEffect(() => {
         const initializeData = async () => {
-            // Fetch and set stablecoins data
             const data = await fetchStablecoins();
-            console.log("🚀 ~ initializeData ~ stablecoins data:", data);
 
             const usableCoinData = await fetchCoinStablecoins();
-            console.log("🚀 ~ initializeData ~ usableCoinData:", usableCoinData);
             setCoinData(usableCoinData);
 
-            // Fetch and set token data based on network
             const isTestnet = chainId === 943;
-            console.log("🚀 ~ initializeData ~ isTestnet:", isTestnet);
 
             const tokenData = isTestnet ? famousTokenTestnet : famousToken;
-            console.log("🚀 ~ initializeData ~ tokenData:", tokenData);
             setTokens(tokenData);
 
-            // Restore saved tokens from local storage
             const savedTokenA = localStorage.getItem('token0');
             const savedTokenB = localStorage.getItem('token1');
 
@@ -136,39 +130,35 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
             setTokenB(savedTokenB ? JSON.parse(savedTokenB) : null);
         };
 
-        if (isConnected) {
-            initializeData();
-        }
-    }, []);
+        initializeData();
+    }, [isConnected, chainId]); // Add dependencies
+
 
     const handleSelectToken = (token: TokenDetails) => {
+        console.log("🚀 ~ handleSelectToken ~ tokenNumber1:", tokenNumber);
         if (tokenNumber === 0) {
-            if (token?.address?.contract_address === token1?.address?.contract_address) {
-                // If the selected token is token0, swap with token1
+            if (token.address === token1?.address) {
+                // If the selected token is already token1, swap it with token0
                 setToken0(token);
                 setToken1(token0);
             } else {
-
-                // Set token0 to the selected token
+                // Set the selected token as token0
                 setToken0(token);
             }
         } else {
-
-            // Check if the selected token is already token1
-            if (token?.address?.contract_address === token0?.address?.contract_address) {
-                // If the selected token is token1, swap with token0
+            if (token.address === token0?.address) {
+                // If the selected token is already token0, swap it with token1
                 setToken1(token);
                 setToken0(token1);
             } else {
-
-                // Set token1 to the selected token
+                // Set the selected token as token1
                 setToken1(token);
             }
         }
 
-        setTokenSelected(token?.address?.contract_address);
         handleCloseToken();
     };
+
 
 
 
@@ -240,47 +230,14 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                             <Typography sx={{ fontWeight: '500', fontSize: '14px' }}>Common tokens</Typography>
                             <Box className="token_Outer" sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
 
-                                <Box
-                                    className="token_box"
-                                    sx={{
-                                        cursor: (tokenNumber === 0 && token0?.address?.contract_address === tokenA?.address?.contract_address) ? "default" : "pointer",
-                                        opacity: (tokenNumber === 0 && token0?.address?.contract_address === tokenA?.address?.contract_address) ? 0.4 : 1,
-                                    }}
-                                    onClick={(tokenNumber === 0 && token0?.address?.contract_address === tokenA?.address?.contract_address) ? undefined : () => handleSelectToken(tokenA)}
-                                >
-                                    <img
-                                        src="/images/pls.png"
-                                        alt={tokenA?.symbol}
-                                        style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
-                                    />
-                                    <Typography>{tokenA?.symbol.toUpperCase()}</Typography>
-                                </Box>
-
-
-                                <Box
-                                    className="token_box"
-                                    sx={{
-                                        cursor: (tokenNumber === 1 && token1?.address?.contract_address === tokenB?.address?.contract_address) ? "default" : "pointer",
-                                        opacity: (tokenNumber === 1 && token1?.address?.contract_address === tokenB?.address?.contract_address) ? 0.4 : 1,
-                                    }}
-                                    onClick={(tokenNumber === 1 && token1?.address?.contract_address === tokenB?.address?.contract_address) ? undefined : () => handleSelectToken(tokenB)}
-                                >
-                                    <img
-                                        src="/images/9mm.png"
-                                        alt={tokenB?.symbol}
-                                        style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
-                                    />
-                                    <Typography>{tokenB?.symbol.toUpperCase()}</Typography>
-                                </Box>
-
-
                                 <Box className="token_Outer" sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                                     {tokens?.map((token, index) => {
-                                        // Determine the current token based on tokenNumber
                                         const selectedToken = tokenNumber === 0 ? token0 : token1;
 
-                                        // Check if the current token from the list is the selected token
-                                        const isTokenDisabled = token.address?.contract_address === selectedToken?.address?.contract_address;
+
+                                        // Check if the token should be disabled
+                                        const isTokenDisabled = token.address === selectedToken?.address;
+
 
                                         return (
                                             <Box
@@ -293,7 +250,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                                 onClick={!isTokenDisabled ? () => handleSelectToken(token) : undefined} // Allow click only if token is not disabled
                                             >
                                                 <img
-                                                    src={token.image}
+                                                    src={token.logoURI}
                                                     alt={`${token.symbol} logo`}
                                                     style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
                                                 />
@@ -306,12 +263,60 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                             </Box>
                             <Box className="token_list">
                                 <List>
-                                    {coinData?.map(asset => {
-                                        // Determine the current token based on tokenNumber
+                                    {/* Mapping over tokens */}
+                                    {tokens?.map((token) => {
+                                        // Select the relevant token based on tokenNumber
                                         const selectedToken = tokenNumber === 0 ? token0 : token1;
 
-                                        // Check if the current token from the list is the selected token
-                                        const isTokenDisabled = asset.address?.contract_address === selectedToken?.address?.contract_address;
+
+                                        // Check if the token should be disabled
+                                        const isTokenDisabled = token.address === selectedToken?.address;
+
+                                        return (
+                                            <ListItem
+                                                key={token.symbol}
+                                                sx={{
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    alignItems: "flex-start",
+                                                    transition: "background-color 0.3s",
+                                                    '&:hover': { backgroundColor: 'rgb(248 250 252)' },
+                                                    padding: 1,
+                                                }}
+                                                onClick={!isTokenDisabled ? () => handleSelectToken(token) : undefined} // Only enable click if not disabled
+                                            >
+                                                <Box
+                                                    className="token_box"
+                                                    sx={{
+                                                        cursor: isTokenDisabled ? "default" : "pointer",
+                                                        opacity: isTokenDisabled ? 0.4 : 1,
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={token.logoURI}
+                                                        alt={`${token.symbol} logo`}
+                                                        style={{ width: 24, height: 24, marginRight: 8 }}
+                                                    />
+                                                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                                                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                            {token.symbol.toUpperCase()}
+                                                        </Typography>
+                                                        <Typography color="text.secondary" variant="body2">
+                                                            {token.name}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                            </ListItem>
+                                        );
+                                    })}
+
+                                    {/* Mapping over coinData */}
+                                    {/* {coinData?.map((asset) => {
+                                        const selectedToken = tokenNumber === 0 ? token0 : token1;
+                                        const isTokenDisabled =
+                                            asset.address?.contract_address === selectedToken?.address?.contract_address;
 
                                         return (
                                             <ListItem
@@ -320,31 +325,24 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                                     display: "flex",
                                                     flexDirection: "column",
                                                     alignItems: "flex-start",
-                                                    justifyContent: "flex-start",
                                                     transition: "background-color 0.3s",
-                                                    '&:hover': {
-                                                        backgroundColor: 'rgb(248 250 252)', // Hover background color
-                                                    },
-                                                    padding: 1, // Optional: add padding for better spacing
+                                                    '&:hover': { backgroundColor: 'rgb(248 250 252)' },
+                                                    padding: 1,
                                                 }}
-                                                onClick={!isTokenDisabled ? () => handleSelectToken(asset) : undefined} // Allow click only if token is not disabled
+                                                onClick={!isTokenDisabled ? () => handleSelectToken(asset) : undefined}
                                             >
-                                                {/* Image, Symbol, and Name in a row */}
                                                 <Box
                                                     sx={{
                                                         cursor: isTokenDisabled ? "default" : "pointer",
                                                         opacity: isTokenDisabled ? 0.4 : 1,
                                                     }}
-                                                    onClick={isTokenDisabled ? undefined : () => handleSelectToken(asset)}
                                                 >
-                                                    {/* Flexbox layout for image and text */}
                                                     <Box sx={{ display: "flex", alignItems: "center" }}>
                                                         <img
                                                             src={asset.image}
                                                             alt={`${asset.symbol} logo`}
-                                                            style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
+                                                            style={{ width: 24, height: 24, marginRight: 8 }}
                                                         />
-                                                        {/* Symbol and Name in a column */}
                                                         <Box sx={{ display: "flex", flexDirection: "column" }}>
                                                             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                                                                 {asset.symbol.toUpperCase()}
@@ -357,9 +355,10 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                                 </Box>
                                             </ListItem>
                                         );
-                                    })}
+                                    })} */}
                                 </List>
                             </Box>
+
 
                             <Box sx={{ textAlign: 'center', mt: '20px' }}>
                                 <Typography
@@ -373,7 +372,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                         </Box>
                     </Box>
                 </Box>
-            </Modal>
+            </Modal >
             <ManageToken open={openManage} handleClose={handleCloseManage} mode={mode} />
         </>
     );
