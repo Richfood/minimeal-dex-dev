@@ -6,6 +6,12 @@ export async function getPoolData(token0 : TokenDetails, token1 : TokenDetails, 
 
     if(!token0 || !token1) return;
 
+    if(token0.address.contract_address > token1.address.contract_address){
+      const tempToken = token0;
+      token0 = token1;
+      token1 = tempToken;
+    }
+
     const subgraphUrl = "http://localhost:8000/subgraphs/name/pulsetest-error";
     const query = `
       query {

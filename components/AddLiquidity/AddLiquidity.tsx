@@ -73,7 +73,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   /* This is irrelevant of token0 and token1 addresses. Meaning token0 (token0 < token1) can be at position 1*/
   // const [tokenAtPosition0, setTokenAtPosition0] = useState(token0Address);
   // const [tokenAtPosition1, setTokenAtPosition1] = useState(token1Address);
-  const [tokenToggleOccured , setTokenToggleOccured] = useState(false);
 
   // const [activeProtocol, setActiveProtocol] = useState(defaultActiveProtocol); 
 
@@ -103,9 +102,41 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const [currentV2PoolRatio, setCurrentV2PoolRatio] = useState<number | null>(null);
 
   const [decimalDifference, setDecimalDifference] = useState(0);
+  const [tokenToggleOccured, setTokenToggleOccured] = useState<boolean | null>(false);
 
   const calculateRange = (price: number, percentage: number)=>{
     return (price + ((percentage*price)/100)).toString();
+  }
+
+  const adjustPricesForTokenToggle = ()=>{
+    if(token0 && token1){
+      
+      const tempToken = token0;
+      setToken0(token1);
+      setToken1(tempToken);
+
+      if(priceLower){
+        const newPriceUpper = (1/Number(priceLower)).toString();
+        setPriceUpperEntered(newPriceUpper);
+        setPriceUpper(newPriceUpper);
+      }
+
+      if(priceUpper){
+      const newPriceLower = (1/Number(priceUpper)).toString();
+        setPriceLowerEntered(newPriceLower);
+        setPriceLower(newPriceLower);
+      }
+
+      if(priceCurrent){
+      const newPriceCurrent = (1/Number(priceCurrent)).toString();
+        setPriceCurrentEntered(newPriceCurrent);
+        setPriceCurrent(newPriceCurrent);
+      }
+
+      if(decimalDifference){
+        setDecimalDifference(-1 * decimalDifference);
+      }
+    }
   }
 
   const handlePriceLower = ()=>{
@@ -135,7 +166,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   }
 
   const handlePriceCurrent = ()=>{
-    if(fee && priceCurrentEntered && token0 && token1){
+    if(fee && priceCurrentEntered && !priceCurrent && token0 && token1){
       const tick = priceToTick(priceCurrentEntered, decimalDifference);
       const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
       const newPrice = tickToPrice(nearestTick, decimalDifference);
@@ -476,23 +507,28 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   
     const tokenInput = document.getElementById(`token${inputElementId}`) as HTMLInputElement;
 
-    if((!tokenToggleOccured && inputElementId === 0) || (tokenToggleOccured && inputElementId === 1)){
+    // if((!tokenToggleOccured && inputElementId === 0) || (tokenToggleOccured && inputElementId === 1)){
+    if(inputElementId === 0){
       amount0ToEmulateFromInput = (Number(tokenInput.value) || 0);
       amount1ToEmulateFromInput = 0;
 
-      console.log("Adding for 0", tokenToggleOccured, inputElementId);
+      console.log("Adding for 0", inputElementId);
 
     }
     else{
       amount1ToEmulateFromInput = (Number(tokenInput.value) || 0);
       amount0ToEmulateFromInput = 0;
 
-      console.log("Adding for 1", tokenToggleOccured, inputElementId);
+      console.log("Adding for 1", inputElementId);
     }
 
     setAmount0ToEmulate(amount0ToEmulateFromInput);
     setAmount1ToEmulate(amount1ToEmulateFromInput);
     
+  }
+
+  const handleTokenToggle = ()=>{
+    setTokenToggleOccured(!tokenToggleOccured);
   }
 
   const fetchPoolData = async () => {
@@ -532,8 +568,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   },[priceLower,priceUpper, priceCurrent, amount0ToEmulate, amount1ToEmulate])
 
   useEffect(()=>{
-    reset();
-    sortTokens();
+    if(!token0 || !token1)
+      reset();
+    // sortTokens();
     if(token0 && token1) setDecimalDifference(token1.address.decimals - token0.address.decimals);
   },[token0, token1])
 
@@ -563,6 +600,10 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     reset();
     handleGettingPoolData();
   },[activeProtocol])
+
+  // useEffect(()=>{
+  //   adjustPricesForTokenToggle();
+  // },[tokenToggleOccured])
 
   return (
     <Box className="AddLiquiditySec">
@@ -797,7 +838,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       </Typography>
                     </Box>
                     <Box className="inputField">
-                      <input onChange={()=>handleTokenAmountChange(0)} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} value={!tokenToggleOccured ? amount0Desired : amount1Desired}/>
+                      <input onChange={()=>handleTokenAmountChange(0)} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} value={amount0Desired}/>
                       {/* By default this input takes token amount of token 0. If token toggle has occured, then this also needs to be toggled */}
                     </Box>
                   </Box>
@@ -811,7 +852,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       </Typography>
                     </Box>
                     <Box className="inputField">
-                      <input onChange={()=>handleTokenAmountChange(1)} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} value={!tokenToggleOccured ? amount1Desired : amount0Desired}/>
+                      <input onChange={()=>handleTokenAmountChange(1)} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} value={amount1Desired}/>
                       {/* By default this input takes token amount of token 1. If token toggle has occured, then this also needs to be toggled */}
                     </Box>
                   </Box>
@@ -840,466 +881,256 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                   </Box>
               ) : (
                   <Box sx={{ display: vTwo ? 'none' : 'block' }}>
-                    {currentPoolData ? (
+                    <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: "15px" }}>
+                      <Box sx={{ width: '50%' }}>
+                        <Typography sx={{ color: 'var(--cream)', fontWeight: '600' }}>SET PRICE RANGE</Typography>
+                      </Box>
+                      <Box sx={{ width: '50%', display: 'flex', alignItems: 'center', gap: '10px', justifyContent: "end" }}>
+
+                        <Typography sx={{
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: 'var(--cream)'
+                        }}>View prices in</Typography>
+                        <Typography
+                        onClick={handleTokenToggle}
+                          className='pickData'
+                          component="span"
+                          sx={{
+                            border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            p: '5px 7px',
+                            display: 'flex',
+                            gap: '10px',
+                            borderRadius: '30px',
+                            cursor: 'pointer',
+                            color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                          }}>
+                          <LiaExchangeAltSolid size={20} />
+                          {token1 ? token1.symbol : ""}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    {!currentPoolData ? (
                       <Box>
-                        <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: "15px" }}>
-                          <Box sx={{ width: '50%' }}>
-                            <Typography sx={{ color: 'var(--cream)', fontWeight: '600' }}>SET PRICE RANGE</Typography>
+                        <Box className="warning-box" sx={{ mb: '15px' }}>
+                          <Box sx={{ color: 'var(--secondary)', fontSize: 20 }}>
+                            <GoAlertFill />
                           </Box>
-                          <Box sx={{ width: '50%', display: 'flex', alignItems: 'center', gap: '10px', justifyContent: "end" }}>
-    
-                            <Typography sx={{
-                              fontSize: '14px',
-                              fontWeight: '600',
-                              color: 'var(--cream)'
-                            }}>View prices in</Typography>
-                            <Typography
-                              className='pickData'
-                              component="span"
-                              sx={{
-                                border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                p: '5px 7px',
-                                display: 'flex',
-                                gap: '10px',
-                                borderRadius: '30px',
-                                cursor: 'pointer',
-                                color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                              }}>
-                              <LiaExchangeAltSolid size={20} />
-                              {token0 ? token0.symbol : ""}
-                            </Typography>
-    
+                        <Box sx={{ width: 'calc(100% - 30px)', color: 'var(--primary)' }}>
+                          <Typography>This pool must be initialized before you can add liquidity. To initialize, select a starting price for the pool. Then, enter your liquidity price range and deposit amount. Gas fees will be higher than usual due to the initialization transaction.</Typography>
+                          <Typography sx={{ fontWeight: '600' }}>Fee-on transfer tokens and rebasing tokens are NOT compatible with V3.</Typography>
+                        </Box>
+                      </Box>
+                      <Box className="SwapWidgetInner" sx={{ mb: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
+                        <Box className="inputBox" sx={{ width: '100%' }}>
+                          <Box className="inputField">
+                            <input type="number" placeholder='0.0' style={{ textAlign: 'end' }} onBlur={handlePriceCurrent} onChange={(e)=>setPriceCurrentEntered(e.target.value)} value={!priceCurrent ? priceCurrentEntered : priceCurrent}/>
                           </Box>
                         </Box>
-    
+                      </Box>
+                    </Box>
+                    ) : (
+                      <Box>
+        
                         {token0 && token1 ? (
                           <Box sx={{ display: 'flex', gap: '5px', justifyContent: 'center', mb: '15px' }}>
                           <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>Current Price:</Typography>
-                          <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{Number(currentPoolData.token0Price) || 0}</Typography>
-                          <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{token0.name} Per {token1.name}</Typography>
+                          <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{tokenToggleOccured ? Number(currentPoolData.token0Price) : Number(currentPoolData.token1Price)}</Typography>
+                          <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{token1.name} Per {token0.name}</Typography>
                         </Box>
                         ) : (
                           <Box sx={{ display: 'flex', gap: '5px', justifyContent: 'center', mb: '15px' }}>
                           <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>Select Currency</Typography>
                         </Box>
                         )}
-                            
+                                
                         <Box sx={{ textAlign: 'center', minHeight: '200px', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center', }}>
                           <SlGraph size={50} />
                           {/* <Default/> */}
                           <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>There is no liquidity data.</Typography>
                         </Box>
+                      </Box>
+                      )
+                    }      
     
-    
-                        <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '15px' }}>
-                          <Box className="free_tier" sx={{ bgcolor: palette.mode === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', width: '50%', textAlign: 'center' }}>
-                            <Typography sx={{ fontWeight: '600' }}>Min Price</Typography>
-    
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Box><FaMinus onClick={()=>{setIsFullRange(false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) - 0.0001).toString()); handlePriceLower()}}/></Box>
-                              <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                                <input onBlur={handlePriceLower} onChange={(e)=>{setIsFullRange(false);setPriceLowerEntered(e.target.value)}} type="number" placeholder="0.0" style={{ textAlign: 'center' }} value={isFullRange ? "0" : !priceLower ? priceLowerEntered : priceLower}/>
-                              </Box>
-                              <Box><FaPlus onClick={()=>{setIsFullRange(false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
-                            </Box>
-    
-                            {token0 && token1 ? (
-                              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                                <Typography sx={{ fontWeight: '600' }}>{token0.symbol}</Typography>
-                                <Typography sx={{ fontWeight: '600' }}>Per</Typography>
-                                <Typography sx={{ fontWeight: '600' }}>{token1.symbol}</Typography>
-                              </Box>
-                            ) : (
-                              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                                <Typography sx={{ fontWeight: '600' }}></Typography>
-                              </Box>
-                            )}
-    
-    
-    
-                          </Box>
-                          {/* free_tier */}
-    
-                          <Box className="free_tier" sx={{ bgcolor: palette.mode === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', width: '50%', textAlign: 'center' }}>
-                            <Typography sx={{ fontWeight: '600' }}>Max Price</Typography>
-    
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Box><FaMinus onClick={()=>{setIsFullRange(false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) - 0.0001).toString()); handlePriceUpper()}}/></Box>
-                              <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                                <input type="text" placeholder="0.0" style={{ textAlign: 'center' , fontSize: isFullRange ? '1.5em' : '1em'}} onBlur={handlePriceUpper} onChange={(e)=>{setIsFullRange(false);setPriceUpperEntered(e.target.value)}} value={isFullRange ? "∞" : !priceUpper ? priceUpperEntered : priceUpper}/>
-                              </Box>
-                              <Box><FaPlus onClick={()=>{setIsFullRange(false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) + 0.0001).toString()); handlePriceUpper()}}/></Box>
-                            </Box>
-    
-                            {token0 && token1 ? (
-                              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                                <Typography sx={{ fontWeight: '600' }}>{token0.symbol}</Typography>
-                                <Typography sx={{ fontWeight: '600' }}>Per</Typography>
-                                <Typography sx={{ fontWeight: '600' }}>{token1.symbol}</Typography>
-                              </Box>
-                            ) : (
-                              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                                <Typography sx={{ fontWeight: '600' }}></Typography>
-                              </Box>
-                            )}
-    
-                          </Box>
-                          {/* free_tier */}
-                        </Box>
-                        <Box className="fullRangeSec" sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', textAlign: 'center', mb: '15px' }}>
-                          <Box 
-                            onClick={()=>{
-                              if(!priceCurrent) return;
-                              setPriceLowerEntered(calculateRange(Number(priceCurrent), -10));
-                              setPriceUpperEntered(calculateRange(Number(priceCurrent), 10));
-                              setIsFullRange(false)                                    
-                            }}
-                            sx={{
-                              width: 'calc(25% - 15px)',
-                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                              fontSize: '14px',
-                              fontWeight: '600',
-                              p: '5px 7px',
-                              display: 'flex',
-                              gap: '10px',
-                              borderRadius: '30px',
-                              justifyContent: 'center',
-                              cursor: 'pointer',
-                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                            }}
-                          >
-                            10%
-                          </Box>
-    
-                          <Box 
-                            onClick={()=>{
-                              if(!priceCurrent) return;
-                              setPriceLowerEntered(calculateRange(Number(priceCurrent), -20));
-                              setPriceUpperEntered(calculateRange(Number(priceCurrent), 20));
-                              setIsFullRange(false)
-                            }}
-                            sx={{
-                              width: 'calc(25% - 15px)',
-                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                              fontSize: '14px',
-                              fontWeight: '600',
-                              p: '5px 7px',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              gap: '10px',
-                              borderRadius: '30px',
-                              cursor: 'pointer',
-                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                            }}
-                          >
-                            20%
-                          </Box>
-                          <Box 
-                            onClick={()=>{
-                              if(!priceCurrent) return;
-                              console.log("CLicked")
-                              setPriceLowerEntered(calculateRange(Number(priceCurrent), -50));
-                              setPriceUpperEntered(calculateRange(Number(priceCurrent), 50));
-                              setIsFullRange(false)                           
-                            }}
-                            sx={{
-                              width: 'calc(25% - 15px)',
-                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                              fontSize: '14px',
-                              fontWeight: '600',
-                              p: '5px 7px',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              gap: '10px',
-                              borderRadius: '30px',
-                              cursor: 'pointer',
-                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                            }}
-                          >
-                            50%
-                          </Box>
-                          <Box 
-                            onClick={()=>{
-                              const newPriceLower = tickToPrice(MIN_TICK, decimalDifference);
-                              setPriceLowerEntered(newPriceLower.toString());
-                              const newPriceUpper = tickToPrice(MAX_TICK, decimalDifference);
-                              setPriceUpperEntered(newPriceUpper.toString());
-
-                              setIsFullRange(true);                           
-                            }}
-                            sx={{
-                              width: 'calc(25% - 15px)',
-                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                              fontSize: '14px',
-                              fontWeight: '600',
-                              p: '5px 7px',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              gap: '10px',
-                              borderRadius: '30px',
-                              cursor: 'pointer',
-                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                            }}
-                          >
-                            Full Range
-                          </Box>
-    
-                        </Box>
-    
-    
-                        <Box className="warning-box" sx={{ mb: '15px' }}>
-                          <Box sx={{ color: 'var(--secondary)', fontSize: 20 }}>
-                            <GoAlertFill />
-                          </Box>
-                          <Box sx={{ width: 'calc(100% - 30px)', color: 'var(--primary)' }}>
-                            <Typography>Your position will not earn fees or be used in trades until the market price moves into your range.</Typography>
-    
-                          </Box>
-                        </Box>
-    
-                        {/* <Box> */}
-                          <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired}>
-                            Create Liquidity{/* {Enter an amount} */}
-                          </Button>
-                        {/* </Box> */}
-
+                    {token0 && token1 ? (
+                      <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '30px' }}>
+                        <Typography sx={{ fontWeight: '600' }}>Current {token0.name} Price:</Typography>
+                        <Typography sx={{ fontWeight: '600' }}>{priceCurrent || 0} {token1.name}</Typography>
                       </Box>
                     ) : (
-                      <Box>
-                        <Box>
-                          <Box className="warning-box" sx={{ mb: '15px' }}>
-                            <Box sx={{ color: 'var(--secondary)', fontSize: 20 }}>
-                              <GoAlertFill />
-                            </Box>
-                            <Box sx={{ width: 'calc(100% - 30px)', color: 'var(--primary)' }}>
-                              <Typography>This pool must be initialized before you can add liquidity. To initialize, select a starting price for the pool. Then, enter your liquidity price range and deposit amount. Gas fees will be higher than usual due to the initialization transaction.</Typography>
-                              <Typography sx={{ fontWeight: '600' }}>Fee-on transfer tokens and rebasing tokens are NOT compatible with V3.</Typography>
-                            </Box>
-                          </Box>
-    
-                          <Box className="SwapWidgetInner" sx={{ mb: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
-                            <Box className="inputBox" sx={{ width: '100%' }}>
-                              <Box className="inputField">
-                                <input type="number" placeholder='0.0' style={{ textAlign: 'end' }} onBlur={handlePriceCurrent} onChange={(e)=>setPriceCurrentEntered(e.target.value)} value={!priceCurrent ? priceCurrentEntered : priceCurrent}/>
-                              </Box>
-                            </Box>
-                          </Box>
-    
-                          {token0 && token1 ? (
-                            <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '30px' }}>
-                              <Typography sx={{ fontWeight: '600' }}>Current {token0.name} Price:</Typography>
-                              <Typography sx={{ fontWeight: '600' }}>{priceCurrent || 0} {token1.name}</Typography>
-                            </Box>
-                          ) : (
-                            <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '30px' }}>
-                              <Typography sx={{ fontWeight: '600' }}></Typography>
-                            </Box>
-                          )}
-    
-    
-    
-                          <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: "15px" }}>
-                            <Box sx={{ width: '50%' }}>
-                              <Typography className='mainTitle' sx={{ color: 'var(--cream)',}}>SET PRICE RANGE</Typography>
-                            </Box>
-                            <Box sx={{ width: '50%', display: 'flex', alignItems: 'center', gap: '10px', justifyContent: "end" }}>
-    
-                              <Typography sx={{
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                color: 'var(--cream)'
-                              }}>View prices in</Typography>
-                              <Typography
-                                // onClick={handleTokenToggle}
-                                className='pickData'
-                                component="span"
-                                sx={{
-                                  border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                                  fontSize: '14px',
-                                  fontWeight: '600',
-                                  p: '5px 7px',
-                                  display: 'flex',
-                                  gap: '10px',
-                                  borderRadius: '30px',
-                                  cursor: 'pointer',
-                                  color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                                }}>
-                                <LiaExchangeAltSolid size={20} />
-                                {truncateAddress(token0?.address.contract_address || "0")}
-                              </Typography>
-                              </Box>
-                          </Box>
-                        </Box>
-    
-    
-                        <Box className="viewPrice" sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '15px' }}>
-                          {/* free_tier */}
-                          <Box className="free_tier" sx={{ bgcolor: palette.mode === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', width: '50%', textAlign: 'center' }}>
-                            <Typography sx={{ fontWeight: '600' }}>Min Price</Typography>
-    
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Box><FaMinus onClick={()=>{setIsFullRange(false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) - 0.0001).toString()); handlePriceLower() }}/></Box>
-                              <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                                <input type="number" placeholder="0.0" style={{ textAlign: 'center' }} onBlur={handlePriceLower} onChange={(e)=>{setIsFullRange(false);setPriceLowerEntered(e.target.value)}} value={isFullRange ? "0" : !priceLower ? priceLowerEntered : priceLower}/>
-                              </Box>
-                              <Box><FaPlus onClick={()=>{setIsFullRange(false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
-                            </Box>
-    
-                            {token0 && token1 ? (
-                              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                                <Typography sx={{ fontWeight: '600' }}>{token0.symbol}</Typography>
-                                <Typography sx={{ fontWeight: '600' }}>Per</Typography>
-                                <Typography sx={{ fontWeight: '600' }}>{token1.symbol}</Typography>
-                              </Box>
-                            ) : (
-                              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                                <Typography sx={{ fontWeight: '600' }}></Typography>
-                              </Box>
-                            )}
-    
-                          </Box>
-                          {/* free_tier */}
-    
-                          <Box className="free_tier" sx={{ bgcolor: palette.mode === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', width: '50%', textAlign: 'center' }}>
-                            <Typography sx={{ fontWeight: '600' }}>Max Price</Typography>
-    
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Box><FaMinus onClick={()=>{setIsFullRange(false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) - 0.0001).toString()); handlePriceUpper()}}/></Box>
-                              <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                              <input type="text" placeholder="0.0" style={{ textAlign: 'center' , fontSize: isFullRange ? '1.5em' : '1em'}} onBlur={handlePriceUpper} onChange={(e)=>{setIsFullRange(false);setPriceUpperEntered(e.target.value)}} value={isFullRange ? "∞" : !priceUpper ? priceUpperEntered : priceUpper}/>
-                              </Box>
-                              <Box><FaPlus onClick={()=>{setIsFullRange(false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) + 0.0001).toString()); handlePriceUpper()}}/></Box>
-                            </Box>
-    
-                            {token0 && token1 ? (
-                              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                                <Typography sx={{ fontWeight: '600' }}>{token0.symbol}</Typography>
-                                <Typography sx={{ fontWeight: '600' }}>Per</Typography>
-                                <Typography sx={{ fontWeight: '600' }}>{token1.symbol}</Typography>
-                              </Box>
-                            ) : (
-                              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                                <Typography sx={{ fontWeight: '600' }}></Typography>
-                              </Box>
-                            )}
-    
-                          </Box>
-                          {/* free_tier */}
-                        </Box>
-    
-    
-                        <Box className="fullRangeSec" sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', textAlign: 'center', mb: '15px' }}>
-                        <Box 
-                            onClick={()=>{
-                              if(!priceCurrent) return;
-                              console.log("CLicked")
-                              setPriceLowerEntered(calculateRange(Number(priceCurrent), -10));
-                              setPriceUpperEntered(calculateRange(Number(priceCurrent), 10));
-                              setIsFullRange(false)                 
-                            }}
-                            sx={{
-                              width: 'calc(25% - 15px)',
-                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                              fontSize: '14px',
-                              fontWeight: '600',
-                              p: '5px 7px',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              gap: '10px',
-                              borderRadius: '30px',
-                              cursor: 'pointer',
-                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                            }}
-                          >
-                            10%
-                          </Box>
-    
-                          <Box 
-                            onClick={()=>{
-                              if(!priceCurrent) return;
-                              console.log("CLicked")
-                              setPriceLowerEntered(calculateRange(Number(priceCurrent), -20));
-                              setPriceUpperEntered(calculateRange(Number(priceCurrent), 20));
-                              setIsFullRange(false)
-                            }}
-                            sx={{
-                              width: 'calc(25% - 15px)',
-                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                              fontSize: '14px',
-                              fontWeight: '600',
-                              p: '5px 7px',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              gap: '10px',
-                              borderRadius: '30px',
-                              cursor: 'pointer',
-                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                            }}
-                          >
-                            20%
-                          </Box>
-                          <Box 
-                            onClick={()=>{
-                              if(!priceCurrent) return;
-                              console.log("CLicked")
-                              setPriceLowerEntered(calculateRange(Number(priceCurrent), -50));
-                              setPriceUpperEntered(calculateRange(Number(priceCurrent), 50));
-                              setIsFullRange(false)                              
-                            }}
-                            sx={{
-                              width: 'calc(25% - 15px)',
-                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                              fontSize: '14px',
-                              fontWeight: '600',
-                              p: '5px 7px',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              gap: '10px',
-                              borderRadius: '30px',
-                              cursor: 'pointer',
-                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                            }}
-                          >
-                            50%
-                          </Box>
-                          <Box 
-                            onClick={()=>{
-                              const newPriceLower = tickToPrice(MIN_TICK, decimalDifference);
-                              setPriceLowerEntered(newPriceLower.toString());
-                              const newPriceUpper = tickToPrice(MAX_TICK, decimalDifference);
-                              setPriceUpperEntered(newPriceUpper.toString());
-
-                              setIsFullRange(true);                             
-                            }}
-                            sx={{
-                              width: 'calc(25% - 15px)',
-                              border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                              fontSize: '14px',
-                              fontWeight: '600',
-                              p: '5px 7px',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              gap: '10px',
-                              borderRadius: '30px',
-                              cursor: 'pointer',
-                              color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
-                            }}
-                          >
-                            Full Range
-                          </Box>
-    
-                        </Box>
-    
-                        <Box>
-                          <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired}>
-                            Create Liquidity{/* {Enter an amount} */}
-                          </Button>
-                        </Box>
+                      <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '30px' }}>
+                        <Typography sx={{ fontWeight: '600' }}></Typography>
                       </Box>
-                    )
-                    }
+                    )}
+    
+    
+                    <Box className="viewPrice" sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '15px' }}>
+                      {/* free_tier */}
+                      <Box className="free_tier" sx={{ bgcolor: palette.mode === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', width: '50%', textAlign: 'center' }}>
+                        <Typography sx={{ fontWeight: '600' }}>Min Price</Typography>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Box><FaMinus onClick={()=>{setIsFullRange(false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) - 0.0001).toString()); handlePriceLower() }}/></Box>
+                          <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
+                            <input type="number" placeholder="0.0" style={{ textAlign: 'center' }} onBlur={handlePriceLower} onChange={(e)=>{setIsFullRange(false);setPriceLowerEntered(e.target.value)}} value={isFullRange ? "0" : !priceLower ? priceLowerEntered : priceLower}/>
+                          </Box>
+                          <Box><FaPlus onClick={()=>{setIsFullRange(false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
+                        </Box>
+
+                        {token0 && token1 ? (
+                          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
+                            <Typography sx={{ fontWeight: '600' }}>{token1.symbol}</Typography>
+                            <Typography sx={{ fontWeight: '600' }}>Per</Typography>
+                            <Typography sx={{ fontWeight: '600' }}>{token0.symbol}</Typography>
+                          </Box>
+                        ) : (
+                          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
+                            <Typography sx={{ fontWeight: '600' }}></Typography>
+                          </Box>
+                        )}
+
+                      </Box>
+                      {/* free_tier */}
+
+                      <Box className="free_tier" sx={{ bgcolor: palette.mode === 'light' ? 'var(--gray)' : 'var(--secondary-dark)', width: '50%', textAlign: 'center' }}>
+                        <Typography sx={{ fontWeight: '600' }}>Max Price</Typography>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Box><FaMinus onClick={()=>{setIsFullRange(false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) - 0.0001).toString()); handlePriceUpper()}}/></Box>
+                          <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
+                          <input type="text" placeholder="0.0" style={{ textAlign: 'center' , fontSize: isFullRange ? '1.5em' : '1em'}} onBlur={handlePriceUpper} onChange={(e)=>{setIsFullRange(false);setPriceUpperEntered(e.target.value)}} value={isFullRange ? "∞" : !priceUpper ? priceUpperEntered : priceUpper}/>
+                          </Box>
+                          <Box><FaPlus onClick={()=>{setIsFullRange(false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) + 0.0001).toString()); handlePriceUpper()}}/></Box>
+                        </Box>
+
+                        {token0 && token1 ? (
+                          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
+                            <Typography sx={{ fontWeight: '600' }}>{token1.symbol}</Typography>
+                            <Typography sx={{ fontWeight: '600' }}>Per</Typography>
+                            <Typography sx={{ fontWeight: '600' }}>{token0.symbol}</Typography>
+                          </Box>
+                        ) : (
+                          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
+                            <Typography sx={{ fontWeight: '600' }}></Typography>
+                          </Box>
+                        )}
+
+                      </Box>
+                      {/* free_tier */}
+                    </Box>
+
+
+                    <Box className="fullRangeSec" sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', textAlign: 'center', mb: '15px' }}>
+                    <Box 
+                        onClick={()=>{
+                          if(!priceCurrent) return;
+                          console.log("CLicked")
+                          setPriceLowerEntered(calculateRange(Number(priceCurrent), -10));
+                          setPriceUpperEntered(calculateRange(Number(priceCurrent), 10));
+                          setIsFullRange(false)                 
+                        }}
+                        sx={{
+                          width: 'calc(25% - 15px)',
+                          border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          p: '5px 7px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          gap: '10px',
+                          borderRadius: '30px',
+                          cursor: 'pointer',
+                          color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                        }}
+                      >
+                        10%
+                      </Box>
+
+                      <Box 
+                        onClick={()=>{
+                          if(!priceCurrent) return;
+                          console.log("CLicked")
+                          setPriceLowerEntered(calculateRange(Number(priceCurrent), -20));
+                          setPriceUpperEntered(calculateRange(Number(priceCurrent), 20));
+                          setIsFullRange(false)
+                        }}
+                        sx={{
+                          width: 'calc(25% - 15px)',
+                          border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          p: '5px 7px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          gap: '10px',
+                          borderRadius: '30px',
+                          cursor: 'pointer',
+                          color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                        }}
+                      >
+                        20%
+                      </Box>
+                      <Box 
+                        onClick={()=>{
+                          if(!priceCurrent) return;
+                          console.log("CLicked")
+                          setPriceLowerEntered(calculateRange(Number(priceCurrent), -50));
+                          setPriceUpperEntered(calculateRange(Number(priceCurrent), 50));
+                          setIsFullRange(false)                              
+                        }}
+                        sx={{
+                          width: 'calc(25% - 15px)',
+                          border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          p: '5px 7px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          gap: '10px',
+                          borderRadius: '30px',
+                          cursor: 'pointer',
+                          color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                        }}
+                      >
+                        50%
+                      </Box>
+                      <Box 
+                        onClick={()=>{
+                          const newPriceLower = tickToPrice(MIN_TICK, decimalDifference);
+                          setPriceLowerEntered(newPriceLower.toString());
+                          const newPriceUpper = tickToPrice(MAX_TICK, decimalDifference);
+                          setPriceUpperEntered(newPriceUpper.toString());
+
+                          setIsFullRange(true);                             
+                        }}
+                        sx={{
+                          width: 'calc(25% - 15px)',
+                          border: `1px solid ${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          p: '5px 7px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          gap: '10px',
+                          borderRadius: '30px',
+                          cursor: 'pointer',
+                          color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                        }}
+                      >
+                        Full Range
+                      </Box>
+
+                    </Box>
+
+                    <Box>
+                      <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired}>
+                        Create Liquidity{/* {Enter an amount} */}
+                      </Button>
+                    </Box>
                   </Box>
               )}
           </Box>
