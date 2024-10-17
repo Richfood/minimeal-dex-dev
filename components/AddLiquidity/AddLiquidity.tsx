@@ -103,6 +103,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const [decimalDifference, setDecimalDifference] = useState(0);
   const [tokenToggleOccured, setTokenToggleOccured] = useState<boolean | null>(false);
+  const [isSorted, setIsSorted] = useState<boolean | null>(null);
+  const [handlePricesAfterAdjust, setHandlePricesAfterAdjust] = useState<boolean>(false);
+
 
   const calculateRange = (price: number, percentage: number)=>{
     return (price + ((percentage*price)/100)).toString();
@@ -118,24 +121,26 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       if(priceLower){
         const newPriceUpper = (1/Number(priceLower)).toString();
         setPriceUpperEntered(newPriceUpper);
-        setPriceUpper(newPriceUpper);
+        // setPriceUpper(newPriceUpper);
       }
 
       if(priceUpper){
       const newPriceLower = (1/Number(priceUpper)).toString();
         setPriceLowerEntered(newPriceLower);
-        setPriceLower(newPriceLower);
+        // setPriceLower(newPriceLower);
       }
 
       if(priceCurrent){
       const newPriceCurrent = (1/Number(priceCurrent)).toString();
         setPriceCurrentEntered(newPriceCurrent);
-        setPriceCurrent(newPriceCurrent);
+        // setPriceCurrent(newPriceCurrent);
       }
 
       if(decimalDifference){
         setDecimalDifference(-1 * decimalDifference);
       }
+
+      setHandlePricesAfterAdjust(!handlePricesAfterAdjust);
     }
   }
 
@@ -146,6 +151,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       const newPrice = tickToPrice(nearestTick, decimalDifference);
 
       setPriceLower(newPrice.toString());
+
+      console.log("🚀 ~ handlePriceLower ~ newPrice:", newPrice)
     }
     else{
       setPriceLower("");
@@ -159,6 +166,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       const newPrice = tickToPrice(nearestTick, decimalDifference);
 
       setPriceUpper(newPrice.toString());
+      console.log("🚀 ~ handlePriceUpper ~ newPrice:", newPrice) 
     }
     else{
       setPriceUpper("");
@@ -166,12 +174,13 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   }
 
   const handlePriceCurrent = ()=>{
-    if(fee && priceCurrentEntered && !priceCurrent && token0 && token1){
+    if(fee && priceCurrentEntered && token0 && token1 && Number(priceCurrentEntered) > 0){
       const tick = priceToTick(priceCurrentEntered, decimalDifference);
       const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
       const newPrice = tickToPrice(nearestTick, decimalDifference);
 
       setPriceCurrent(newPrice.toString());
+      console.log("🚀 ~ handlePriceCurrent ~ newPrice:", newPrice); 
     }
     else{
       setPriceCurrent("");
@@ -507,7 +516,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   
     const tokenInput = document.getElementById(`token${inputElementId}`) as HTMLInputElement;
 
-    // if((!tokenToggleOccured && inputElementId === 0) || (tokenToggleOccured && inputElementId === 1)){
+    if((!tokenToggleOccured && inputElementId === 0) || (tokenToggleOccured && inputElementId === 1)){
     if(inputElementId === 0){
       amount0ToEmulateFromInput = (Number(tokenInput.value) || 0);
       amount1ToEmulateFromInput = 0;
@@ -524,6 +533,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
     setAmount0ToEmulate(amount0ToEmulateFromInput);
     setAmount1ToEmulate(amount1ToEmulateFromInput);
+  }
     
   }
 
@@ -532,6 +542,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   }
 
   const fetchPoolData = async () => {
+    console.log("🚀 ~ fetchPoolData ~ fetchPoolData: RUNN");
     if (token0 && token1 && fee) {
       const poolDataFromSubgraph: AddLiquidityPoolData = await getPoolData(token0, token1, fee);
       setCurrentPoolData(poolDataFromSubgraph);
@@ -558,20 +569,24 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   }
 
   useEffect(() => {
-    handleGettingPoolData() // Call the async function inside useEffect
-    calculate();
-  }, [token0, token1, fee]);
-  
+    if(token0 && token1){
+      handleGettingPoolData();
+      calculate();
+    }
+  }, [fee]);
 
   useEffect(()=>{
     calculate();
   },[priceLower,priceUpper, priceCurrent, amount0ToEmulate, amount1ToEmulate])
 
   useEffect(()=>{
-    if(!token0 || !token1)
+    if(!token0 || !token1){
       reset();
-    // sortTokens();
-    if(token0 && token1) setDecimalDifference(token1.address.decimals - token0.address.decimals);
+    }
+    else {
+      setDecimalDifference(token1.address.decimals - token0.address.decimals);
+      setIsSorted(token0.address.contract_address < token1.address.contract_address);
+    }
   },[token0, token1])
 
   useEffect(()=>{
@@ -579,6 +594,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       setPriceLower("");
       if(isFullRange)
         handlePriceLower();
+
+      console.log("🚀 ~ useEffect ~ setPriceLower:", priceLowerEntered);
     }
   },[priceLowerEntered])
   
@@ -587,13 +604,17 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       setPriceUpper("");
       if(isFullRange)
         handlePriceUpper();
+      console.log("🚀 ~ useEffect ~ priceUpperEntered:", priceUpperEntered)
     }
-
   },[priceUpperEntered])
 
   useEffect(()=>{
-    if(priceCurrentEntered)
+    if(priceCurrentEntered){
       setPriceCurrent("");
+      if(isFullRange)
+        handlePriceCurrent();
+      console.log("🚀 ~ useEffect ~ priceCurrentEntered:", priceCurrentEntered)
+    }
   },[priceCurrentEntered])
 
   useEffect(()=>{
@@ -601,9 +622,15 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     handleGettingPoolData();
   },[activeProtocol])
 
-  // useEffect(()=>{
-  //   adjustPricesForTokenToggle();
-  // },[tokenToggleOccured])
+  useEffect(()=>{
+    adjustPricesForTokenToggle();
+  },[tokenToggleOccured])
+
+  useEffect(()=>{
+    handlePriceCurrent();
+    handlePriceLower();
+    handlePriceUpper();
+  },[handlePricesAfterAdjust])
 
   return (
     <Box className="AddLiquiditySec">
@@ -938,7 +965,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                         {token0 && token1 ? (
                           <Box sx={{ display: 'flex', gap: '5px', justifyContent: 'center', mb: '15px' }}>
                           <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>Current Price:</Typography>
-                          <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{tokenToggleOccured ? Number(currentPoolData.token0Price) : Number(currentPoolData.token1Price)}</Typography>
+                          <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{priceCurrent}</Typography>
                           <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{token1.name} Per {token0.name}</Typography>
                         </Box>
                         ) : (
@@ -958,8 +985,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     
                     {token0 && token1 ? (
                       <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '30px' }}>
-                        <Typography sx={{ fontWeight: '600' }}>Current {token0.name} Price:</Typography>
-                        <Typography sx={{ fontWeight: '600' }}>{priceCurrent || 0} {token1.name}</Typography>
+                        <Typography sx={{ fontWeight: '600' }}>Current {token1.name} Price Per {token0.name}:</Typography>
+                        <Typography sx={{ fontWeight: '600' }}>{priceCurrent}</Typography>
                       </Box>
                     ) : (
                       <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '30px' }}>
