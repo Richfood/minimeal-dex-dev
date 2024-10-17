@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Box, Typography, List, ListItem, ListItemButton, FormGroup, FormControlLabel, Tab, Tabs, Button } from '@mui/material';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { RxCountdownTimer } from 'react-icons/rx';
@@ -9,6 +9,9 @@ import { TabContext } from '@mui/lab';
 import { FiPlus } from "react-icons/fi";
 import router from 'next/router';
 import ImportPool from '../ImportPool/ImportPool'; 
+import { getPositionsData } from '@/utils/api/getPositionsData';
+import { calculatePositionData } from '@/utils/calculatePositionData';
+import { PositionData } from '@/interfaces';
 
 interface LiquidityProps {
   theme: 'light' | 'dark';
@@ -20,6 +23,9 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenRecent, setIsOpenRecent] = useState(false);
   const [value, setValue] = React.useState('0');
+
+  const [positions, setPositions] = useState<PositionData[]>([]);
+  console.log("🚀 ~ positions:", positions)
 
   const handleOpen = useCallback(() => setIsOpen(true), []);
   const handleClose = () => setIsOpen(false);
@@ -33,6 +39,20 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
+
+  useEffect(()=>{
+    const runGetPositionsData = async()=>{
+      let newPositions : PositionData[] = await getPositionsData();
+
+      newPositions = newPositions.map((position : PositionData)=>{
+        return calculatePositionData(position);
+      })
+
+      setPositions(newPositions);
+    }
+
+    runGetPositionsData();
+  },[])
 
   const color = theme === 'light' ? 'var(--primary)' : 'var(--cream)';
 

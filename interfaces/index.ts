@@ -20,6 +20,40 @@ export interface SwapPoolData {
   feeTier: String,
 }
 
+export interface PositionData {
+  id: string;
+  liquidity: string;
+  feeGrowthInside0LastX128: string;
+  feeGrowthInside1LastX128: string;
+  collectedFeesToken0: string;
+  collectedFeesToken1: string;
+  depositedToken0: string;
+  depositedToken1: string;
+  withdrawnToken0: string;
+  withdrawnToken1: string;
+  pool: {
+    feeGrowthGlobal0X128: string;
+    feeGrowthGlobal1X128: string;
+  };
+  tickLower: {
+    feeGrowthOutside0X128: string;
+    feeGrowthOutside1X128: string;
+  };
+  tickUpper: {
+    feeGrowthOutside0X128: string;
+    feeGrowthOutside1X128: string;
+  };
+  token0: {
+    decimals: string;
+  };
+  token1: {
+    decimals: string;
+  };
+}
+
+
+
+
 export interface TokenDetails {
   name: string;
   symbol: string;
