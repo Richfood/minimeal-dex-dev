@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Button, Link, Typography, useTheme } from '@mui/material';
 import { BsArrowLeft } from 'react-icons/bs';
 import { CiCalculator2 } from 'react-icons/ci';
@@ -62,20 +62,12 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const NFPMAddress = addresses.PancakePositionManagerAddress;
   const v2RouterAddress = addresses.PancakeV2RouterAddress;
-  const tempToken0 = tokenList.MOCK_USDC; // tokenList-1 is PLS. tokenList-2 is WPLS
+  const tempToken0 = tokenList.MOCK_USDC;
   const tempToken1 = tokenList.Pulse;
   const [token0,setToken0] =  useState<TokenDetails | null>(tempToken0);
   const [token1, setToken1] = useState<TokenDetails | null>(tempToken1);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
-
   const [isFullRange, setIsFullRange] = useState(false);
-
-  /* This is irrelevant of token0 and token1 addresses. Meaning token0 (token0 < token1) can be at position 1*/
-  // const [tokenAtPosition0, setTokenAtPosition0] = useState(token0Address);
-  // const [tokenAtPosition1, setTokenAtPosition1] = useState(token1Address);
-
-  // const [activeProtocol, setActiveProtocol] = useState(defaultActiveProtocol); 
-
   const [amount0Desired, setAmount0Desired] = useState("");
   const [amount1Desired, setAmount1Desired] = useState("");
   const [priceLower, setPriceLower] = useState("");
@@ -106,12 +98,16 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const [isSorted, setIsSorted] = useState<boolean | null>(null);
   const [handlePricesAfterAdjust, setHandlePricesAfterAdjust] = useState<boolean>(false);
 
+  const isInitialRender = useRef(0);
 
   const calculateRange = (price: number, percentage: number)=>{
     return (price + ((percentage*price)/100)).toString();
   }
 
   const adjustPricesForTokenToggle = ()=>{
+
+    console.log("Adjust Price RUn");
+    console.log("🚀 ~ isInitialRender:", isInitialRender)
     if(token0 && token1){
       
       const tempToken = token0;
@@ -272,6 +268,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   // }
 
   const toggleClass = () => {
+    console.log("🚀 ~ toggleClass ~ isActive:", isActive)
     setIsActive(!isActive);
   };
 
@@ -569,68 +566,99 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   }
 
   useEffect(() => {
-    if(token0 && token1){
-      handleGettingPoolData();
-      calculate();
+    if(isInitialRender.current >= 2){
+      if(token0 && token1){
+        handleGettingPoolData();
+        calculate();
+      }
+      console.log("🚀 ~ [fee]:")
     }
   }, [fee]);
 
   useEffect(()=>{
-    calculate();
+    if(isInitialRender.current >= 2){
+      calculate();
+      console.log("🚀 ~ [priceLower,priceUpper, priceCurrent, amount0ToEmulate, amount1ToEmulate]:")
+    }
   },[priceLower,priceUpper, priceCurrent, amount0ToEmulate, amount1ToEmulate])
 
   useEffect(()=>{
-    if(!token0 || !token1){
-      reset();
-    }
-    else {
-      setDecimalDifference(token1.address.decimals - token0.address.decimals);
-      setIsSorted(token0.address.contract_address < token1.address.contract_address);
+    if(isInitialRender.current >= 2){
+      if(!token0 || !token1){
+        reset();
+      }
+      else{
+        setDecimalDifference(token1.address.decimals - token0.address.decimals);
+        setIsSorted(token0.address.contract_address < token1.address.contract_address);
+      }
+      console.log("🚀 ~ token0, token1:")
     }
   },[token0, token1])
 
   useEffect(()=>{
-    if(priceLowerEntered){
-      setPriceLower("");
-      if(isFullRange)
-        handlePriceLower();
+    if(isInitialRender.current >= 2){
+      if(priceLowerEntered){
+        setPriceLower("");
+        if(isFullRange)
+          handlePriceLower();
 
-      console.log("🚀 ~ useEffect ~ setPriceLower:", priceLowerEntered);
+        // console.log("🚀 ~ useEffect ~ setPriceLower:", priceLowerEntered);
+      }
+      console.log("🚀 ~ priceLowerEntered:")
     }
   },[priceLowerEntered])
   
   useEffect(()=>{
-    if(priceUpperEntered){
-      setPriceUpper("");
-      if(isFullRange)
-        handlePriceUpper();
-      console.log("🚀 ~ useEffect ~ priceUpperEntered:", priceUpperEntered)
+    if(isInitialRender.current >= 2){
+      if(priceUpperEntered){
+        setPriceUpper("");
+        if(isFullRange)
+          handlePriceUpper();
+        // console.log("🚀 ~ useEffect ~ priceUpperEntered:", priceUpperEntered)
+      }
+      console.log("🚀 ~ priceUpperEntered:")
     }
   },[priceUpperEntered])
 
   useEffect(()=>{
-    if(priceCurrentEntered){
-      setPriceCurrent("");
-      if(isFullRange)
-        handlePriceCurrent();
-      console.log("🚀 ~ useEffect ~ priceCurrentEntered:", priceCurrentEntered)
+    if(isInitialRender.current >= 2){
+      if(priceCurrentEntered){
+        setPriceCurrent("");
+        if(isFullRange)
+          handlePriceCurrent();
+        // console.log("🚀 ~ useEffect ~ priceCurrentEntered:", priceCurrentEntered)
+      }
+      console.log("🚀 ~ priceCurrentEntered:")
     }
   },[priceCurrentEntered])
 
   useEffect(()=>{
-    reset();
-    handleGettingPoolData();
+    if(isInitialRender.current >= 2){
+      reset();
+      handleGettingPoolData();
+      console.log("🚀 ~ activeProtocol:", activeProtocol)
+    }
   },[activeProtocol])
 
   useEffect(()=>{
-    adjustPricesForTokenToggle();
+    if(isInitialRender.current >= 2){
+      adjustPricesForTokenToggle();
+      console.log("🚀 ~ tokenToggleOccured:", tokenToggleOccured)
+    }
   },[tokenToggleOccured])
 
   useEffect(()=>{
-    handlePriceCurrent();
-    handlePriceLower();
-    handlePriceUpper();
+    if(isInitialRender.current >= 2){
+      handlePriceCurrent();
+      handlePriceLower();
+      handlePriceUpper();
+      console.log("🚀 ~ handlePricesAfterAdjust:", handlePricesAfterAdjust)
+    }
   },[handlePricesAfterAdjust])
+
+  useEffect(()=>{
+    isInitialRender.current++;
+  },[])
 
   return (
     <Box className="AddLiquiditySec">
@@ -1163,7 +1191,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
           </Box>
         </Box>
       </Box>
-      <SelectedToken
+      {/* <SelectedToken
           openToken={openToken}
           handleCloseToken={handleCloseToken}
           mode={theme} // Ensure `theme` is passed correctly
@@ -1172,7 +1200,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
           tokenNumber={tokenBeingChosen}
           description='' 
           token0={token0} 
-          token1={token1}      />
+          token1={token1}      /> */}
 
       {/* <RoiCalculator open={open} handleClose={handleClose} /> */}
       <SettingsModal isOpen={open} handleClose={handleClose} theme={theme} />
