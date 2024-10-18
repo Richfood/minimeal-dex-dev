@@ -64,8 +64,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const v2RouterAddress = addresses.PancakeV2RouterAddress;
   const tempToken0 = tokenList.MOCK_USDC;
   const tempToken1 = tokenList.Pulse;
-  const [token0,setToken0] =  useState<TokenDetails | null>(tempToken0);
-  const [token1, setToken1] = useState<TokenDetails | null>(tempToken1);
+  const [token0,setToken0] =  useState<TokenDetails | null>(tempToken1);
+  const [token1, setToken1] = useState<TokenDetails | null>(tempToken0);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
   const [isFullRange, setIsFullRange] = useState(false);
   const [amount0Desired, setAmount0Desired] = useState("");
@@ -547,7 +547,30 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       let priceCurrentToSet : number;
 
       if(poolDataFromSubgraph){
-        priceCurrentToSet = tickToPrice(Number(poolDataFromSubgraph.tick), decimalDifference);
+        if(isSorted){
+          priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
+        }        
+        else{
+          priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
+        }
+        // if(isSorted){
+        //   if(tokenToggleOccured){
+        //     priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
+        //   }
+        //   else{
+        //     priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
+        //   }
+        //   // console.log("🚀 ~ fetchPoolData ~ tokenToggleOccured in if:", tokenToggleOccured)
+        // }
+        // else{
+        //   if(tokenToggleOccured){
+        //     priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
+        //   }
+        //   else{
+        //     priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
+        //   }
+        // }
+
       }
       else{
         priceCurrentToSet = 0;
@@ -564,6 +587,13 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     
       setCurrentV2PoolRatio(pairRatio);
   }
+
+  useEffect(()=>{
+    if(token0 && token1){
+      setDecimalDifference(token1.address.decimals - token0.address.decimals);
+      setIsSorted(token0.address.contract_address < token1.address.contract_address);
+    }
+  },[])
 
   useEffect(() => {
     if(isInitialRender.current >= 2){
