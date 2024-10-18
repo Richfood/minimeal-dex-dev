@@ -24,8 +24,58 @@ function emulate(
     amount0Entered = "0", 
     amount1Entered = "0",
     token0Details: TokenDetails,
-    token1Details: TokenDetails
+    token1Details: TokenDetails,
+    isSorted : boolean,
+    // decimalDifference : number
 ) {
+    console.log("🚀 ~ old isSorted:", isSorted)
+    console.log("🚀 ~ old token1Details:", token1Details)
+    console.log("🚀 ~ old token0Details:", token0Details)
+    console.log("🚀 ~ old amount1Entered:", amount1Entered)
+    console.log("🚀 ~ old amount0Entered:", amount0Entered)
+    console.log("🚀 ~ old fee:", fee)
+    console.log("🚀 ~ old priceCurrent:", priceCurrent)
+    console.log("🚀 ~ old priceUpper:", priceUpper)
+    console.log("🚀 ~ old priceLower:", priceLower)
+
+
+    let oldPriceLower: string = priceLower;
+    let oldPriceUpper: string = priceUpper;
+    let oldPriceCurrent: string = priceCurrent;
+    let oldAmount0Entered: string = amount0Entered;
+    let oldAmount1Entered: string = amount1Entered;
+
+
+
+    if (!isSorted) {
+        if (Number(priceLower)) {
+            priceUpper = (1 / Number(oldPriceLower)).toString();
+        }
+
+        if (Number(priceUpper)) {
+            priceLower = (1 / Number(oldPriceUpper)).toString();
+        }
+
+        if (Number(priceCurrent)) {
+            priceCurrent = (1 / Number(oldPriceCurrent)).toString();
+        }
+
+        const tempToken = token0Details;
+        token0Details = token1Details;
+        token1Details = tempToken;
+    }
+
+    console.log("🚀 ~ new isSorted:", isSorted)
+    console.log("🚀 ~ new token1Details:", token1Details)
+    console.log("🚀 ~ new token0Details:", token0Details)
+    console.log("🚀 ~ new amount1Entered:", amount1Entered)
+    console.log("🚀 ~ new amount0Entered:", amount0Entered)
+    console.log("🚀 ~ new fee:", fee)
+    console.log("🚀 ~ new priceCurrent:", priceCurrent)
+    console.log("🚀 ~ new priceUpper:", priceUpper)
+    console.log("🚀 ~ new priceLower:", priceLower)
+
+
     console.log('Inside emulate - -----------------------------------------------------------------')
     const token0Address = token0Details.address.contract_address;
     const token1Address = token1Details.address.contract_address;
@@ -38,6 +88,8 @@ function emulate(
     amount0Entered = ethers.utils.parseUnits(amount0Entered.toString(), token0.decimals).toString();
     amount1Entered = ethers.utils.parseUnits(amount1Entered.toString(), token1.decimals).toString();
 
+    const decimalDifference = token1.decimals - token0.decimals;
+
     console.log(`
         Before - 
         Lower price : ${priceLower},
@@ -45,7 +97,7 @@ function emulate(
         Curr  price : ${priceCurrent}
     `)
 
-    const decimalDifference = token1.decimals - token0.decimals;
+    // const decimalDifference = isSorted ? token1.decimals - token0.decimals : token0.decimals - token1.decimals;
 
     // priceLower = ethers.utils.parseUnits(priceLowe)
 
@@ -77,6 +129,7 @@ function emulate(
 
     // Calculate liquidity based on amount0Entered or amount1Entered
     if (amount0Entered !== "0") {
+        console.log("🚀 ~ amount0Entered:", amount0Entered)
         console.log("amount 0 entered")
         const amount0DesiredForCalculation = amount0Entered//ethers.utils.parseUnits(amount0Entered.toString(), token0.decimals).toString();
 
@@ -91,6 +144,7 @@ function emulate(
         amount1Desired = ethers.utils.formatUnits(amount1Desired, token1.decimals);
 
     } else if (amount1Entered !== "0") {
+        console.log("🚀 ~ amount1Entered:", amount1Entered)
         console.log("amount 1 entered")
         const amount1DesiredForCalculation = amount1Entered//ethers.utils.parseUnits(amount1Entered.toString(), token1.decimals).toString();
 

@@ -95,7 +95,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const [decimalDifference, setDecimalDifference] = useState(0);
   const [tokenToggleOccured, setTokenToggleOccured] = useState<boolean | null>(false);
-  const [isSorted, setIsSorted] = useState<boolean | null>(null);
+  const [isSorted, setIsSorted] = useState<boolean>(true);
   const [handlePricesAfterAdjust, setHandlePricesAfterAdjust] = useState<boolean>(false);
 
   const calculateRange = (price: number, percentage: number)=>{
@@ -309,10 +309,14 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
       const addressToApprove = activeProtocol === Protocol.V3 ? NFPMAddress : v2RouterAddress;
 
-      if(token0.symbol !== "PLS")
+      if(token0.symbol !== "PLS"){
         await getTokenApproval(token0, addressToApprove, approvalAmount0);
-      if(token1.symbol !== "PLS")
+        console.log("🚀 ~ handleAddLiquidity ~ approvalAmount0:", approvalAmount0)
+      }
+      if(token1.symbol !== "PLS"){
         await getTokenApproval(token1, addressToApprove, approvalAmount1);
+        console.log("🚀 ~ handleAddLiquidity ~ approvalAmount1:", approvalAmount1)
+      }
 
       alert("Tokens Approved!");
     }
@@ -469,7 +473,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       amount0ToEmulate.toString(),
       amount1ToEmulate.toString(),
       token0,
-      token1
+      token1,
+      isSorted
     );
 
     console.log('HEllo - ,', result);
@@ -512,25 +517,45 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     let amount1ToEmulateFromInput = 0;
   
     const tokenInput = document.getElementById(`token${inputElementId}`) as HTMLInputElement;
-
-    if((!tokenToggleOccured && inputElementId === 0) || (tokenToggleOccured && inputElementId === 1)){
-    if(inputElementId === 0){
-      amount0ToEmulateFromInput = (Number(tokenInput.value) || 0);
-      amount1ToEmulateFromInput = 0;
-
-      console.log("Adding for 0", inputElementId);
-
+    const value = (Number(tokenInput.value) || 0);
+    
+    if(tokenToggleOccured){
+      if(inputElementId === 0){
+        amount1ToEmulateFromInput = value;
+      }
+      else{
+        amount0ToEmulateFromInput = value;
+      }
     }
     else{
-      amount1ToEmulateFromInput = (Number(tokenInput.value) || 0);
-      amount0ToEmulateFromInput = 0;
-
-      console.log("Adding for 1", inputElementId);
+      if(inputElementId === 0){
+        amount0ToEmulateFromInput = value;
+      }
+      else{
+        amount1ToEmulateFromInput = value;
+      }
     }
 
     setAmount0ToEmulate(amount0ToEmulateFromInput);
     setAmount1ToEmulate(amount1ToEmulateFromInput);
-  }
+    // if((!tokenToggleOccured && inputElementId === 0) || (tokenToggleOccured && inputElementId === 1)){
+    //   if(inputElementId === 0){
+    //     amount0ToEmulateFromInput = (Number(tokenInput.value) || 0);
+    //     amount1ToEmulateFromInput = 0;
+
+    //     console.log("Adding for 0", inputElementId);
+
+    //   }
+    //   else{
+    //     amount1ToEmulateFromInput = (Number(tokenInput.value) || 0);
+    //     amount0ToEmulateFromInput = 0;
+
+    //     console.log("Adding for 1", inputElementId);
+    //   }
+
+    //   setAmount0ToEmulate(amount0ToEmulateFromInput);
+    //   setAmount1ToEmulate(amount1ToEmulateFromInput);
+    // }
     
   }
 
@@ -901,7 +926,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       </Typography>
                     </Box>
                     <Box className="inputField">
-                      <input onChange={()=>handleTokenAmountChange(0)} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} value={amount0Desired}/>
+                      <input onChange={()=>handleTokenAmountChange(0)} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} value={!tokenToggleOccured ? amount0Desired : amount1Desired}/>
                       {/* By default this input takes token amount of token 0. If token toggle has occured, then this also needs to be toggled */}
                     </Box>
                   </Box>
@@ -915,7 +940,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       </Typography>
                     </Box>
                     <Box className="inputField">
-                      <input onChange={()=>handleTokenAmountChange(1)} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} value={amount1Desired}/>
+                      <input onChange={()=>handleTokenAmountChange(1)} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} value={!tokenToggleOccured ? amount1Desired : amount0Desired}/>
                       {/* By default this input takes token amount of token 1. If token toggle has occured, then this also needs to be toggled */}
                     </Box>
                   </Box>
