@@ -23,6 +23,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import famousToken from "../../utils/famousToken.json";
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import { hooks } from '../ConnectWallet/connector';
+import tokenList from "../../utils/tokenList.json";
 
 const { useChainId, useIsActive } = hooks;
 interface Token {
@@ -56,23 +57,14 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [selectedGraph, setSelectedGraph] = useState<'graph1' | 'graph2'>('graph1');
     const [activeCurrency, setActiveCurrency] = useState<'PLS/9MM' | '9MM/PLS'>('PLS/9MM');
     const [series, setSeries] = useState<{ name: string; data: { x: number; y: number; }[] }[]>([]);
-    const [circleImages, setCircleImages] = useState<{ circle1: string | undefined; circle2: string | undefined; }>({
-        circle1: '/images/pls.png',
-        circle2: '/images/9mm.png',
-    });
-    // const [activeNewCurrency, setActiveNewCurrency] = useState<{ active1: string; active2: string }>({
-    console.log("🚀 ~ circleImages:", circleImages)
-    //     active1: 'PLS',
-    //     active2: '9MM'
-    // });
     const chainId = useChainId();
+    const initialTokens = Object.values(tokenList).slice(0, 3);
 
-    const [token0, setToken0] = useState<TokenDetails | null>(null);
-    console.log("🚀 ~ token0:", token0)
-    const [token1, setToken1] = useState<TokenDetails | null>(null);
-    console.log("🚀 ~ token1:", token1)
+    const [token0, setToken0] = useState<TokenDetails | null>(tokenList.TokenA);
+    const [token1, setToken1] = useState<TokenDetails | null>(tokenList.TokenE);
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
-
+    const [routePath, setRoutePath] = useState<TokenDetails[] | null>(null);
+    console.log("🚀 ~ routePath:", routePath)
     const [amountIn, setAmountIn] = useState("");
     const [amountOut, setAmountOut] = useState("");
 
@@ -89,11 +81,10 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
         if (tokenData.length > 0) {
             // Set token0 and token1 based on tokenData
-            setToken0(tokenData[0]);
-            setToken1(tokenData[1]);
+            // setToken0(tokenData[0]);
+            // setToken1(tokenData[1]);
         }
-    }, [chainId]); // Add chainId as a dependency
-
+    }, [chainId]);
 
     const handleOpenToken = useCallback((tokenNumber: number) => {
         setTokenBeingChosen(tokenNumber)
@@ -146,30 +137,51 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
         // Swap token0 and token1 regardless of currency
         const tempToken = token0;
-        setToken0(token1);
-        setToken1(tempToken);
+        // setToken0(token1);
+        // setToken1(tempToken);
     };
 
 
     const fetchSmartOrderRoute = async () => {
-
         if (!token0 || !token1) return;
 
         console.log("Fetch Run");
 
         let protocol = Protocol.V3;
         let tradeType: TradeType;
-        if (amountIn) {
-            tradeType = TradeType.EXACT_INPUT;
-            const amountOutAmountFromRoute = await getSmartOrderRoute(token0, token1, amountIn, [protocol], tradeType);
-            setAmountOut(amountOutAmountFromRoute?.toString() || "");
+
+        try {
+            if (amountIn) {
+                tradeType = TradeType.EXACT_INPUT;
+                const { data, value } = await getSmartOrderRoute(
+                    token0, token1, amountIn, [protocol], tradeType
+                );
+
+                if (data?.finalRoute?.tokenPath) {
+                    setRoutePath(data.finalRoute.tokenPath);
+                } else {
+                    console.error("Token path not found in response.");
+                }
+                setAmountOut(value?.toString() || "");
+            } else {
+                tradeType = TradeType.EXACT_OUTPUT;
+                const { data, value } = await getSmartOrderRoute(
+                    token1, token0, amountOut, [protocol], tradeType
+                );
+                console.log("🚀 ~ EXACT_OUTPUT ~ Data:", data);
+
+                if (data?.finalRoute?.tokenPath) {
+                    setRoutePath(data.tokenPath);
+                } else {
+                    console.error("Token path not found in response.");
+                }
+                setAmountIn(value?.toString() || "");
+            }
+        } catch (error) {
+            console.error("Error fetching route:", error);
         }
-        else {
-            tradeType = TradeType.EXACT_OUTPUT;
-            const amountInAmountFromRoute = await getSmartOrderRoute(token1, token0, amountOut, [protocol], tradeType);
-            setAmountIn(amountInAmountFromRoute?.toString() || "");
-        }
-    }
+    };
+
 
     const copyToClipboard = (text: string | undefined) => {
         console.log("🚀 ~ copyToClipboard ~ text:", text)
@@ -200,19 +212,18 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
     };
 
-
     return (
         <>
             <Box className="SwapWidgetSec">
                 <Box className="SwapWidgetInner">
                     <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                            <img src={token0?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
+                            {/* <img src={token0?.image} alt="logoURI" style={{ width: '20px', height: '20px' }} /> */}
                             <Typography onClick={() => handleOpenToken(0)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                {token0 && token0.symbol.toUpperCase()} <IoIosArrowDown />
+                                {token0?.symbol} <IoIosArrowDown />
                             </Typography>
                             <Typography
-                                onClick={() => copyToClipboard(token0?.address.contract_address)}
+                                onClick={() => copyToClipboard(token0?.address?.contract_address)}
                                 component="span"
                                 sx={{ ml: '5px', cursor: 'pointer' }}
                             >
@@ -240,7 +251,79 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 </Box>
                             )}
                         </Box>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                cursor: 'pointer',
+                                gap: '5px',
+                                marginTop: "10px",
+                                justifyContent: "space-between"
+                            }}
+                            onClick={() => copyToClipboard(token1?.address.contract_address)}
+                        >
+                            <Box sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                cursor: 'pointer',
+                                gap: '5px',
+                                marginTop: "10px",
+                            }}>
+                                <Typography sx={{color: 'var(--primary)', fontWeight: '700' }}>Route</Typography>
+                                <Box>
+                                    <span>
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth={2.5}  // Bold effect
+                                            stroke="currentColor"
+                                            width="20px"
+                                            height="20px"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+                                            />
+                                        </svg>
+                                    </span>
 
+                                </Box>
+
+                            </Box>
+                            <Box>
+                                <ul style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: 0, fontWeight:"700" }}>
+                                    {amountOut && routePath?.length ? (
+                                        routePath.map((route, index) => (
+                                            <React.Fragment key={index}>
+                                                <li className="route-item" style={{ listStyle: 'none' }}>
+                                                    <p>{route.symbol}</p>
+                                                </li>
+
+                                                {index < (routePath?.length ?? 0) - 1 && (
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="24" height="24"
+                                                        viewBox="0 0 24 24"
+                                                        strokeWidth={2}
+                                                        stroke="currentColor"
+                                                        fill="none"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        style={{ display: 'inline-block', width: "16px", height: "16px", marginBottom: "5px", fontWeight: "700" }}
+                                                    >
+                                                        <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                                    </svg>
+                                                )}
+                                            </React.Fragment>
+                                        ))
+                                    ) : null}
+                                </ul>
+
+                            </Box>
+
+                        </Box>
                         <Box className="slippageSec dsls">
                             {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                                 <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>Slippage Tolerance <PiPencilSimpleBold /></Typography>
@@ -250,8 +333,6 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 <Button variant="contained" color="secondary">{isActive ? "Swap" : "Connect Wallet"}</Button>
                             </Box>
                         </Box>
-
-
                     </Box>
 
                     <Box className="arrowBox" sx={{ pt: '40px' }}>
@@ -262,7 +343,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
                     <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                            <img src={token1?.logoURI} alt="circle2" style={{ width: '20px', height: '20px' }} />
+                            {/* <img src={token3?.logoURI} alt="circle2" style={{ width: '20px', height: '20px' }} /> */}
                             <Typography onClick={() => handleOpenToken(1)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: "pointer" }}>
                                 {token1 && token1.symbol.toUpperCase()}
                                 <IoIosArrowDown />

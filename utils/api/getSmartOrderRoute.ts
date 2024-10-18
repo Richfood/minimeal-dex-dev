@@ -34,18 +34,18 @@ function convertUniswapV3Amount(numeratorArray: Array<number>, denominatorArray:
 }
 
 export async function getSmartOrderRoute(
-    inputToken : TokenDetails, 
-    outputToken : TokenDetails,
-    amountToTrade : string,
-    protocol : [Protocol],
-    tradeType : TradeType,
-){
+    inputToken: TokenDetails,
+    outputToken: TokenDetails,
+    amountToTrade: string,
+    protocol: [Protocol],
+    tradeType: TradeType
+) {
     const url = "http://localhost:3001/smart-order-router/getPath";
-
     const newProvider = new ethers.providers.Web3Provider(window.ethereum);
     const newSigner = newProvider.getSigner();
-    const recepient = await newSigner.getAddress();
-            console.log(inputToken, outputToken, amountToTrade, protocol, tradeType, recepient);
+    const recipient = await newSigner.getAddress();
+
+    console.log(inputToken, outputToken, amountToTrade, protocol, tradeType, recipient);
 
     const config_headers = {
         headers: {
@@ -57,29 +57,29 @@ export async function getSmartOrderRoute(
         inputToken,
         outputToken,
         amountToTrade,
-        protocol : protocol,
+        protocol,
         tradeType,
-        recepient
+        recipient,
     };
 
-    try{
-        const response = await axios.get(url,{
-            params : body
-        })
+    try {
+        const response = await axios.get(url, {
+            params: body,
+        });
 
         console.log(response.data.finalRoute);
-        const quoteAdjustedForGas = response.data.finalRoute.quoteAdjustedForGas;
-        const quote = response.data.finalRoute.quote;
-        const numerator = quote.numerator;
-        const denominator = quote.denominator;
-        const decimalScale = quote.decimalScale;
+
+        const { quoteAdjustedForGas, quote } = response.data.finalRoute;
+        const { numerator, denominator, decimalScale } = quote;
         const value = convertUniswapV3Amount(numerator, denominator, decimalScale);
 
-        console.log(value);
+        console.log("Value:", value);
 
-        return value;
-    }
-    catch(error){
-        console.log("No Data", error);
+        // Return both response data and value
+        return { data: response.data, value };
+    } catch (error) {
+        console.error("No Data", error);
+        throw error; // Optionally rethrow the error if needed
     }
 }
+

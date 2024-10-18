@@ -101,9 +101,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
     const [openManage, setOpenManage] = useState(false);
     const [coinData, setCoinData] = useState<any[]>([]);
     console.log("🚀 ~ coinData:", coinData)
-    const [tokenA, setTokenA] = useState<TokenDetails | any>(null);
-    const [tokenB, setTokenB] = useState<TokenDetails | any>(null);
-    const [tokens, setTokens] = useState<any[]>([]);
+    const [tokens, setTokens] = useState<TokenDetails[]>([]);
     console.log("🚀 ~ tokens:", tokens)
     const isConnected = useAccounts();
     const chainId = useChainId();
@@ -123,11 +121,6 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
             const tokenData = isTestnet ? famousTokenTestnet : famousToken;
             setTokens(tokenData);
 
-            const savedTokenA = localStorage.getItem('token0');
-            const savedTokenB = localStorage.getItem('token1');
-
-            setTokenA(savedTokenA ? JSON.parse(savedTokenA) : null);
-            setTokenB(savedTokenB ? JSON.parse(savedTokenB) : null);
         };
 
         initializeData();
