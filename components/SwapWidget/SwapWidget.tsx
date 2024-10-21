@@ -24,6 +24,7 @@ import famousToken from "../../utils/famousToken.json";
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import { hooks } from '../ConnectWallet/connector';
 import tokenList from "../../utils/tokenList.json";
+import { swapV3 } from '@/utils/swapTokens';
 
 const { useChainId, useIsActive } = hooks;
 interface Token {
@@ -68,23 +69,25 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [amountIn, setAmountIn] = useState("");
     const [amountOut, setAmountOut] = useState("");
 
+    const [dataForSwap, setDataForSwap] = useState<any>(null);
+
     const [amountOutLoading, setAmountOutLoading] = useState(false);
     const [amountInLoading, setAmountInLoading] = useState(false);
     const { theme } = useTheme();
     const isActive = useIsActive()
 
     // Load token data from local storage and set it to state
-    useEffect(() => {
-        const isTestnet = chainId === 943;
+    // useEffect(() => {
+    //     const isTestnet = chainId === 943;
 
-        const tokenData = isTestnet ? famousTokenTestnet : famousToken;
+    //     const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
-        if (tokenData.length > 0) {
-            // Set token0 and token1 based on tokenData
-            // setToken0(tokenData[0]);
-            // setToken1(tokenData[1]);
-        }
-    }, [chainId]);
+    //     if (tokenData.length > 0) {
+    //         // Set token0 and token1 based on tokenData
+    //         // setToken0(tokenData[0]);
+    //         // setToken1(tokenData[1]);
+    //     }
+    // }, [chainId]);
 
     const handleOpenToken = useCallback((tokenNumber: number) => {
         setTokenBeingChosen(tokenNumber)
@@ -123,6 +126,19 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
         setAmountInLoading(false);
     }
 
+    const handleSwap = async ()=>{
+        if(token0){
+            try{
+                await swapV3(token0, dataForSwap, "1", "0");
+            }   
+            catch(error){
+                console.log("Error swapping tokens.", error);
+            }
+        }
+        else{
+            console.log("🚀 ~ handleSwap ~ token0:", token0)
+        }
+    }
 
     const toggleGraph = async () => {
 
@@ -159,6 +175,8 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
                 if (data?.finalRoute?.tokenPath) {
                     setRoutePath(data.finalRoute.tokenPath);
+                    setDataForSwap(data.finalRoute);
+
                 } else {
                     console.error("Token path not found in response.");
                 }
@@ -211,6 +229,8 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
         }
 
     };
+
+
 
     return (
         <>
@@ -330,7 +350,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
                             </Box> */}
                             <Box sx={{ mt: '25px' }}>
-                                <Button variant="contained" color="secondary">{isActive ? "Swap" : "Connect Wallet"}</Button>
+                                <Button variant="contained" color="secondary" onClick={ handleSwap } disabled={!isActive}>{isActive ? "Swap" : "Connect Wallet"}</Button>
                             </Box>
                         </Box>
                     </Box>
