@@ -309,13 +309,20 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
       const addressToApprove = activeProtocol === Protocol.V3 ? NFPMAddress : v2RouterAddress;
 
-      if(token0.symbol !== "PLS"){
+      if(activeProtocol === Protocol.V3){
         await getTokenApproval(token0, addressToApprove, approvalAmount0);
-        console.log("🚀 ~ handleAddLiquidity ~ approvalAmount0:", approvalAmount0)
-      }
-      if(token1.symbol !== "PLS"){
         await getTokenApproval(token1, addressToApprove, approvalAmount1);
-        console.log("🚀 ~ handleAddLiquidity ~ approvalAmount1:", approvalAmount1)
+      }
+      else{
+        if(token0.symbol !== "PLS"){
+          await getTokenApproval(token0, addressToApprove, approvalAmount0);
+          console.log("🚀 ~ handleAddLiquidity ~ approvalAmount0:", approvalAmount0)
+          console.log("🚀 ~ handleAddLiquidity ~ token0.symbol:", token0.symbol)
+        }
+        if(token1.symbol !== "PLS"){
+          await getTokenApproval(token1, addressToApprove, approvalAmount1);
+          console.log("🚀 ~ handleAddLiquidity ~ approvalAmount1:", approvalAmount1)
+        }
       }
 
       alert("Tokens Approved!");
@@ -481,7 +488,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
     if(result){
       setEmulateError(false);
-      const {        
+      let {        
         tickLower : tickLowerEmulate,
         tickUpper : tickUpperEmulate,
         amount0Desired : amount0DesiredEmulate,
@@ -492,6 +499,16 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
         sqrtPriceX96 : sqrtPriceX96Emulate
       } =  result
 
+      let approvalAmount0ToSet = amount0DesiredEmulate;
+      let approvalAmount1ToSet = amount1DesiredEmulate;
+
+      if(tokenToggleOccured){
+        const temp = approvalAmount0ToSet;
+        approvalAmount0ToSet = approvalAmount1ToSet;
+        approvalAmount1ToSet = temp;
+      }
+
+
       setAmount0Desired(amount0DesiredEmulate || "");
       setAmount1Desired(amount1DesiredEmulate || "");
       setTickLower(tickLowerEmulate);
@@ -500,8 +517,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       setAmount1Min(amount1MinEmulate || "");
       setDeadline(deadlineEmulate);
       setSqrtPriceX96(sqrtPriceX96Emulate);
-      setApprovalAmount0(amount0DesiredEmulate || "");
-      setApprovalAmount1(amount1DesiredEmulate || "");
+      setApprovalAmount0(approvalAmount0ToSet || "");
+      setApprovalAmount1(approvalAmount1ToSet || "");
     }
     else{
       setAmount0Desired("");
@@ -630,7 +647,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   useEffect(()=>{
       calculate();
-      console.log("🚀 ~ [priceLower,priceUpper, priceCurrent, amount0ToEmulate, amount1ToEmulate]:")
   },[priceLower,priceUpper, priceCurrent, amount0ToEmulate, amount1ToEmulate])
 
   useEffect(()=>{

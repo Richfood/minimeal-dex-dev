@@ -14,7 +14,7 @@ import {
 } from "./utils";
 import { ethers } from "ethers";
 import { TokenDetails } from "@/interfaces";
-import { adjustForSlippage, roundToPrecision } from "./generalFunctions";
+import { adjustForSlippage, decimalRound, roundToPrecision } from "./generalFunctions";
  
 function emulate(
     priceLower: string, 
@@ -109,10 +109,10 @@ function emulate(
 
     const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 minutes
 
-    let amount0Desired: string | undefined;
-    let amount1Desired: string | undefined;
-    let amount0Min: string | undefined;
-    let amount1Min: string | undefined;
+    let amount0Desired: string;
+    let amount1Desired: string;
+    let amount0Min: string;
+    let amount1Min: string;
 
     console.log(`
         After - 
@@ -143,7 +143,7 @@ function emulate(
         amount0Desired = ethers.utils.formatUnits(amount0Desired, token0.decimals);
         amount1Desired = ethers.utils.formatUnits(amount1Desired, token1.decimals);
 
-    } else if (amount1Entered !== "0") {
+    } { // else if (amount1Entered !== "0")
         console.log("🚀 ~ amount1Entered:", amount1Entered)
         console.log("amount 1 entered")
         const amount1DesiredForCalculation = amount1Entered//ethers.utils.parseUnits(amount1Entered.toString(), token1.decimals).toString();
@@ -155,6 +155,8 @@ function emulate(
         amount1Desired = ethers.utils.formatUnits(amount1Entered.toString(),token1.decimals);
         amount0Desired = ethers.utils.formatUnits(amount0Desired.toString(),token0.decimals);
     }
+
+
 
     console.log("Inside Emulate - ");
     console.log("lower, current, upper ticks : ", tickLower, currentTick, tickUpper)
@@ -200,8 +202,23 @@ function emulate(
         amount0Min = ethers.utils.formatUnits(amount0Min,token0.decimals);
         amount1Min = ethers.utils.formatUnits(amount1Min,token1.decimals);
 
+        amount0Desired = decimalRound(amount0Desired, token0.decimals/2);
+        amount1Desired = decimalRound(amount1Desired, token1.decimals/2);
+        amount0Min = decimalRound(amount0Min, token0.decimals/2);
+        amount1Min = decimalRound(amount1Min, token1.decimals/2);
+
         console.log(amount0Desired, amount1Desired);
         console.log(amount0Min, amount1Min);
+
+        // if(!isSorted){
+        //     let temp1 = amount0Min;
+        //     amount0Min = amount1Min;
+        //     amount1Min = temp1;
+
+        //     let temp2 = amount0Desired;
+        //     amount0Desired = amount1Desired;
+        //     amount1Desired = temp2;
+        // }
 
         // Return the final parameters
         return {

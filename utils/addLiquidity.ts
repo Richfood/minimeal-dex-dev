@@ -121,6 +121,12 @@ export async function addLiquidityV3(
         amount1Min = "0";
     }
 
+    if(token0.address.contract_address > token1.address.contract_address){
+        const temp = token0;
+        token0 = token1;
+        token1 = temp;
+    }
+
     console.log(`Amounts Desired and Minimum for Liquidity Provision:
         - Token 0 Desired: ${amount0Desired}
         - Token 1 Desired: ${amount1Desired}
@@ -130,9 +136,13 @@ export async function addLiquidityV3(
       `);
 
     amount0Desired = ethers.utils.parseUnits(amount0Desired, token0.address.decimals).toString();
+    console.log("🚀 ~ amount0Desired:", amount0Desired)
     amount1Desired = ethers.utils.parseUnits(amount1Desired, token1.address.decimals).toString();
+    console.log("🚀 ~ amount1Desired:", amount1Desired)
     amount0Min = ethers.utils.parseUnits(amount0Min, token0.address.decimals).toString();
+    console.log("🚀 ~ amount0Min:", amount0Min)
     amount1Min = ethers.utils.parseUnits(amount1Min, token1.address.decimals).toString();
+    console.log("🚀 ~ amount1Min:", amount1Min)
 
     console.log(`Amounts Desired and Minimum for Liquidity Provision:
         - Token 0 Desired: ${amount0Desired}

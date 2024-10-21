@@ -76,7 +76,7 @@ export async function getPositionsData(): Promise<any> {
       
     } catch (error) {
       console.error("Error fetching pool data:", error);
-      return null;
+      return [];
     }
 }
 

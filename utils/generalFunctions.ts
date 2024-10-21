@@ -12,3 +12,7 @@ export function adjustForSlippage(amount: string, slippageTolerance: number): nu
     const slippageFactor = slippageTolerance / 100;
     return Number(amount) * slippageFactor;
 }   
+
+export function decimalRound(value : string, decimal: number){
+    return (parseFloat(Number(value).toFixed(decimal))).toString()
+}
