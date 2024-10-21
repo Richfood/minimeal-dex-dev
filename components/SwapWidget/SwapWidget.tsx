@@ -60,8 +60,8 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const chainId = useChainId();
     const initialTokens = Object.values(tokenList).slice(0, 3);
 
-    const [token0, setToken0] = useState<TokenDetails | null>(tokenList.TokenA);
-    const [token1, setToken1] = useState<TokenDetails | null>(tokenList.TokenE);
+    const [token0, setToken0] = useState<TokenDetails | null>(tokenList.TokenC);
+    const [token1, setToken1] = useState<TokenDetails | null>(tokenList.TokenD);
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
     const [routePath, setRoutePath] = useState<TokenDetails[] | null>(null);
     console.log("🚀 ~ routePath:", routePath)
