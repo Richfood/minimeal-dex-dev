@@ -1,36 +1,14 @@
 import { Protocol, TokenDetails } from "@/interfaces";
-import { TradeType } from "@uniswap/sdk-core";
+import { TradeType, CurrencyAmount, Currency, Token, Price, ChainId, Percent } from "@uniswap/sdk-core";
+import { Route } from "@uniswap/v3-sdk";
 import axios from "axios";
-import { ethers } from "ethers";
+import { AnyTxtRecord } from "dns";
+import { BigNumber, ethers, FixedNumber } from "ethers";
 import JSBI from 'jsbi';
+import { decimalRound } from "../generalFunctions";
 
-function arrayToJSBI(numbers: number[]): JSBI {
-    let result = JSBI.BigInt(0);
-    for (let i = numbers.length - 1; i >= 0; i--) {
-        if(numbers[i]!=0)
-            result = JSBI.add(JSBI.multiply(result, JSBI.BigInt(10)), JSBI.BigInt(numbers[i]));
-    }
-    return result;
-  }
-
-function convertUniswapV3Amount(numeratorArray: Array<number>, denominatorArray: Array<number>, decimalScale: Array<number>) {
-
-    const numerator = arrayToJSBI(numeratorArray);
-    const denominator = arrayToJSBI(denominatorArray);
-    const decimals = arrayToJSBI(decimalScale);
-
-    console.log("Converted string to big number");
-  
-    // Calculate the fraction using BigNumber division
-    const fraction = JSBI.divide(numerator, denominator);
-
-    console.log("division done");
-  
-    const result = JSBI.toNumber(fraction) / JSBI.toNumber(decimals);
-  
-    console.log("heloo = ", result);
-
-    return result.toString();
+function calculateRawQuote(rawQuote : BigNumber, decimals : number){
+    return (Number(BigNumber.from(rawQuote)) / Math.pow(10,decimals)).toString()
 }
 
 export async function getSmartOrderRoute(
@@ -69,9 +47,9 @@ export async function getSmartOrderRoute(
 
         console.log(response.data.finalRoute);
 
-        const { quoteAdjustedForGas, quote } = response.data.finalRoute;
-        const { numerator, denominator, decimalScale } = quote;
-        const value = convertUniswapV3Amount(numerator, denominator, decimalScale);
+        const { rawQuote } = response.data.finalRoute;
+        const decimals = outputToken.address.decimals;
+        const value = decimalRound(calculateRawQuote(rawQuote, decimals),decimals/2);
 
         console.log("Value:", value);
 
