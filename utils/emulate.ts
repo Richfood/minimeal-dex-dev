@@ -143,7 +143,8 @@ function emulate(
         amount0Desired = ethers.utils.formatUnits(amount0Desired, token0.decimals);
         amount1Desired = ethers.utils.formatUnits(amount1Desired, token1.decimals);
 
-    } { // else if (amount1Entered !== "0")
+    } 
+    else { // else if (amount1Entered !== "0")
         console.log("🚀 ~ amount1Entered:", amount1Entered)
         console.log("amount 1 entered")
         const amount1DesiredForCalculation = amount1Entered//ethers.utils.parseUnits(amount1Entered.toString(), token1.decimals).toString();
