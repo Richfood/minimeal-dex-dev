@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-export async function getTokenUsdPrice(tokenAddress : string) {
+export async function getTokenUsdPrice(tokenAddress : string|undefined) {
 
   if(!tokenAddress) return null;
 

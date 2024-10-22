@@ -24,8 +24,13 @@ import famousToken from "../../utils/famousToken.json";
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import { hooks } from '../ConnectWallet/connector';
 import tokenList from "../../utils/tokenList.json";
+<<<<<<< Updated upstream
 import { swapV3 } from '@/utils/swapTokens';
 
+=======
+import { flushSync } from 'react-dom';
+import { getTokenUsdPrice } from "@/utils/api/getTokenUsdPrice"
+>>>>>>> Stashed changes
 const { useChainId, useIsActive } = hooks;
 interface Token {
     name: string;
@@ -48,6 +53,22 @@ interface PoolDetails {
     fee: number;
 }
 
+const fetchCoinUSDPrice = async (tokenAddress?: string) => {
+    if (!tokenAddress) {
+        console.error('Invalid token address!');
+        return null;
+    }
+
+    try {
+        const usdData = await getTokenUsdPrice(tokenAddress);
+        console.log("🚀 ~ fetchCoinUSDPrice ~ usdData:", usdData);
+        return usdData;
+    } catch (error) {
+        console.error('Error fetching data from API:', error);
+        return null;
+    }
+};
+
 const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(0);
     const [activeItem, setActiveItem] = useState<string | null>(null);
@@ -59,13 +80,15 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [activeCurrency, setActiveCurrency] = useState<'PLS/9MM' | '9MM/PLS'>('PLS/9MM');
     const [series, setSeries] = useState<{ name: string; data: { x: number; y: number; }[] }[]>([]);
     const chainId = useChainId();
-    const initialTokens = Object.values(tokenList).slice(0, 3);
 
-    const [token0, setToken0] = useState<TokenDetails | null>(tokenList.TokenC);
-    const [token1, setToken1] = useState<TokenDetails | null>(tokenList.TokenD);
+    const [token0, setToken0] = useState<TokenDetails | null>(null);
+    console.log("🚀 ~ token0:", token0)
+    const [token1, setToken1] = useState<TokenDetails | null>(null);
+    const [token0Price, setToken0Price] = useState<string | null>("0");
+    console.log("🚀 ~ token0Price:", token0Price)
+    const [token1Price, setToken1Price] = useState<string | null>("0");
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
     const [routePath, setRoutePath] = useState<TokenDetails[] | null>(null);
-    console.log("🚀 ~ routePath:", routePath)
     const [amountIn, setAmountIn] = useState("");
     const [amountOut, setAmountOut] = useState("");
 
@@ -74,7 +97,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     const [amountOutLoading, setAmountOutLoading] = useState(false);
     const [amountInLoading, setAmountInLoading] = useState(false);
     const { theme } = useTheme();
-    const isActive = useIsActive()
+    const isActive = useIsActive();
 
     // Load token data from local storage and set it to state
     // useEffect(() => {
@@ -82,12 +105,22 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
     //     const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
+<<<<<<< Updated upstream
     //     if (tokenData.length > 0) {
     //         // Set token0 and token1 based on tokenData
     //         // setToken0(tokenData[0]);
     //         // setToken1(tokenData[1]);
     //     }
     // }, [chainId]);
+=======
+        if (tokenData.length > 0) {
+            // Set token0 and token1 based on tokenData
+            setToken0(tokenData[0]);
+            setToken1(tokenData[1]);
+        }
+        const priceToken1 = fetchCoinUSDPrice(token1?.address?.contract_address);
+    }, [chainId]);
+>>>>>>> Stashed changes
 
     const handleOpenToken = useCallback((tokenNumber: number) => {
         setTokenBeingChosen(tokenNumber)
@@ -95,35 +128,93 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
     }, []);
     const handleCloseToken = () => setOpenToken(false);
 
-    const handleOpen = useCallback(() => setIsOpen(prev => !prev), []);
-    const handleClose = () => setIsOpen(false);
+    // const handleOpen = useCallback(() => setIsOpen(prev => !prev), []);
+    // const handleClose = () => setIsOpen(false);
 
-    const handleOpenRecent = useCallback(() => setIsOpenRecent(prev => !prev), []);
-    const handleCloseRecent = () => setIsOpenRecent(false);
+    // const handleOpenRecent = useCallback(() => setIsOpenRecent(prev => !prev), []);
+    // const handleCloseRecent = () => setIsOpenRecent(false);
 
-    const handleOpenExpert = useCallback(() => setIsOpenExpert(prev => !prev), []);
-    const handleCloseExpert = () => setIsOpenExpert(false);
+    // const handleOpenExpert = useCallback(() => setIsOpenExpert(prev => !prev), []);
+    // const handleCloseExpert = () => setIsOpenExpert(false);
 
-    const handleItemClick = (item: string) => {
-        setActiveItem(prevItem => (prevItem === item ? null : item));
-        if (item === 'settings') {
-            setIsOpen(true);
-        }
-        onToggle();
-    };
+    // const handleItemClick = (item: string) => {
+    //     setActiveItem(prevItem => (prevItem === item ? null : item));
+    //     if (item === 'settings') {
+    //         setIsOpen(true);
+    //     }
+    //     onToggle();
+    // };
 
     const handleAmountIn = async () => {
+        flushSync(() => setAmountOutLoading(true));
         setAmountOut("");
-        setAmountOutLoading(true);
         await fetchSmartOrderRoute();
-        setAmountOutLoading(false);
-    }
+        flushSync(() => setAmountOutLoading(false));
+    };
+
+    const handlePriceForToken0 = async (tokenValue: string) => {
+        try {
+            // Fetch the USD price for the token
+            const usdPrice = await fetchCoinUSDPrice(token0?.address?.contract_address);
+            console.log("🚀 ~ handlePriceForToken0 ~ usdPrice:", usdPrice);
+
+            if (!usdPrice) {
+                console.error('Failed to fetch USD price');
+                return;
+            }
+
+            // Ensure tokenValue is a number before multiplying
+            const numericTokenValue = parseFloat(tokenValue);
+            if (isNaN(numericTokenValue)) {
+                console.error('Invalid token value');
+                return;
+            }
+
+            // Calculate the total value in USD and convert to a string with 3 decimals
+            const totalValue = (numericTokenValue * usdPrice).toFixed(3);
+
+            // Set the formatted value as a string
+            setToken0Price(totalValue);
+        } catch (error) {
+            console.error('Error in handlePriceForToken0:', error);
+        }
+    };
+
+    const handlePriceForToken1 = async (tokenValue: string) => {
+        try {
+            // Fetch the USD price for the token
+            const usdPrice = await fetchCoinUSDPrice(token1?.address?.contract_address);
+            console.log("🚀 ~ handlePriceForToken0 ~ usdPrice:", usdPrice);
+
+            if (!usdPrice) {
+                console.error('Failed to fetch USD price');
+                return;
+            }
+
+            // Ensure tokenValue is a number before multiplying
+            const numericTokenValue = parseFloat(tokenValue);
+            if (isNaN(numericTokenValue)) {
+                console.error('Invalid token value');
+                return;
+            }
+
+            // Calculate the total value in USD and convert to a string with 3 decimals
+            const totalValue = (numericTokenValue * usdPrice).toFixed(3);
+
+            // Set the formatted value as a string
+            setToken1Price(totalValue);
+        } catch (error) {
+            console.error('Error in handlePriceForToken0:', error);
+        }
+    };
+
+
 
     const handleAmountOut = async () => {
         setAmountIn("");
-        setAmountInLoading(true);
+        flushSync(() => setAmountInLoading(true)); // Ensure state updates before proceeding
         await fetchSmartOrderRoute();
-        setAmountInLoading(false);
+        flushSync(() => setAmountInLoading(false));
     }
 
     const handleSwap = async ()=>{
@@ -258,19 +349,34 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                     <input
                                         type="number"
                                         placeholder="0.0"
+                                        step="0.001" // Optional: Limit step to 3 decimals
                                         onChange={(e) => {
                                             if (token0) {
-                                                setAmountIn(e.target.value);
+                                                const value = e.target.value;
+                                                setAmountIn(value);
                                                 setAmountOut("");
+                                                handlePriceForToken0(value); // Call function with formatted value
                                             }
                                         }}
-                                        onBlur={handleAmountIn}
+                                        onBlur={handleAmountIn} // Handle blur event properly
                                         value={amountIn}
                                     />
-                                    <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}>~195,194.61 USD</Typography>
+                                    {amountIn > "0" && (
+                                        <Typography
+                                            sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}
+                                        >
+                                            ~{Number(token0Price || 0).toLocaleString(undefined, {
+                                                minimumFractionDigits: 0,
+                                                maximumFractionDigits: 3
+                                            })} USD
+                                        </Typography>
+
+                                    )}
                                 </Box>
                             )}
                         </Box>
+
+
                         <Box
                             sx={{
                                 display: 'flex',
@@ -280,7 +386,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 marginTop: "10px",
                                 justifyContent: "space-between"
                             }}
-                            onClick={() => copyToClipboard(token1?.address.contract_address)}
+                            onClick={() => copyToClipboard(token1?.address?.contract_address)}
                         >
                             <Box sx={{
                                 display: 'flex',
@@ -289,7 +395,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 gap: '5px',
                                 marginTop: "10px",
                             }}>
-                                <Typography sx={{color: 'var(--primary)', fontWeight: '700' }}>Route</Typography>
+                                <Typography sx={{ color: 'var(--primary)', fontWeight: '700' }}>Route</Typography>
                                 <Box>
                                     <span>
                                         <svg
@@ -313,7 +419,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
                             </Box>
                             <Box>
-                                <ul style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: 0, fontWeight:"700" }}>
+                                <ul style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: 0, fontWeight: "700" }}>
                                     {amountOut && routePath?.length ? (
                                         routePath.map((route, index) => (
                                             <React.Fragment key={index}>
@@ -368,7 +474,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 {token1 && token1.symbol.toUpperCase()}
                                 <IoIosArrowDown />
                             </Typography>
-                            <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }} onClick={() => copyToClipboard(token1?.address.contract_address)}>
+                            <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }} onClick={() => copyToClipboard(token1?.address?.contract_address)}>
                                 {token1?.symbol !== "PLS" && <PiCopy />}
                             </Typography>
                         </Box>
@@ -379,18 +485,29 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 <Box>
                                     <input
                                         type="number"
-                                        placeholder='0.0'
+                                        placeholder="0.0"
+                                        step="0.001" // Optional: Limit step to 3 decimals
                                         onChange={(e) => {
                                             if (token1) {
-                                                setAmountOut(e.target.value);
-                                                setAmountIn("");
+                                                const value = e.target.value;
+                                                setAmountOut(value);
+                                                handlePriceForToken1(value); // Call function with formatted value
                                             }
                                         }}
-                                        onBlur={handleAmountOut}
-                                        value={amountOut}
                                     />
-                                    <Typography sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}>~195,194.61 USD</Typography>
+                                    {amountOut > "0" && (
+                                        <Typography
+                                            sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}
+                                        >
+                                            ~{Number(token0Price || 0).toLocaleString(undefined, {
+                                                minimumFractionDigits: 0,
+                                                maximumFractionDigits: 3
+                                            })} USD
+                                        </Typography>
+
+                                    )}
                                 </Box>
+
                             )}
                         </Box>
                     </Box>
