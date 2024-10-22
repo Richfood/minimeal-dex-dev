@@ -14,11 +14,9 @@ const { useChainId, useAccounts, useProvider } = hooks;
 
 const Header = () => {
   const [openSettingsModal, setOpenSettingsModal] = React.useState(false);
-  const [openWallet, setOpenWallet] = React.useState(false);
+  // const [openWallet, setOpenWallet] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [selectedNetwork, setSelectedNetwork] = React.useState('PulseChain');
   const [address, setAddress] = React.useState<string | null>(null);
-  console.log("🚀 ~ Header ~ address:", address)
   const accounts = useAccounts();
   const isConnected = useAccounts();
   const chainId = useChainId();
@@ -139,7 +137,7 @@ const Header = () => {
                   >
                     <Image src={networkImages['PulseChain']} width={24} height={24} alt="Profile" />
                     <Typography sx={{ fontWeight: '700', fontSize: '12px', display: 'flex', gap: '3px', color: 'var(--white)' }}>
-                      {selectedNetwork} <IoIosArrowDown size={16} />
+                      PulseChain<IoIosArrowDown size={16} />
                     </Typography>
                   </IconButton>
                 </Tooltip>

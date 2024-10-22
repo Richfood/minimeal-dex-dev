@@ -23,12 +23,8 @@ const IndexPage = () => {
     };
 
     const [show, setShow] = useState(false);
-    const [isWidgetListActive, setIsWidgetListActive] = useState(true); // State to manage class
 
-    const handleToggle = useCallback(() => {
-        // setShow(prevShow => !prevShow);
-        // setIsWidgetListActive(prevState => !prevState);
-    }, []);
+ 
 
 
 
@@ -76,7 +72,7 @@ const IndexPage = () => {
                         },
                     }}>
                         <Box>
-                            <SwapWidget onToggle={handleToggle} />
+                            <SwapWidget />
                         </Box>
                     </Box>
                 </Box>

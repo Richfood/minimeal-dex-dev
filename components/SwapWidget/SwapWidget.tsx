@@ -22,16 +22,13 @@ import { TradeType } from '@uniswap/sdk-core';
 import CircularProgress from '@mui/material/CircularProgress';
 import famousToken from "../../utils/famousToken.json";
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
-import { hooks } from '../ConnectWallet/connector';
+import { hooks, metaMask } from '../ConnectWallet/connector';
 import tokenList from "../../utils/tokenList.json";
-<<<<<<< Updated upstream
 import { swapV3 } from '@/utils/swapTokens';
 
-=======
 import { flushSync } from 'react-dom';
 import { getTokenUsdPrice } from "@/utils/api/getTokenUsdPrice"
->>>>>>> Stashed changes
-const { useChainId, useIsActive } = hooks;
+const { useChainId, useIsActive, useAccounts } = hooks;
 interface Token {
     name: string;
     symbol: string;
@@ -40,10 +37,6 @@ interface Token {
         decimals: number;
     };
     image?: string; // URL to the token's image
-}
-
-interface SwapWidgetProps {
-    onToggle: () => void;
 }
 
 interface PoolDetails {
@@ -69,63 +62,90 @@ const fetchCoinUSDPrice = async (tokenAddress?: string) => {
     }
 };
 
-const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
-    const [activeIndex, setActiveIndex] = useState<number | null>(0);
-    const [activeItem, setActiveItem] = useState<string | null>(null);
-    const [isOpen, setIsOpen] = useState(true);
+const SwapWidget = () => {
+    // const [activeIndex, setActiveIndex] = useState<number | null>(0);
+    // const [activeItem, setActiveItem] = useState<string | null>(null);
+    // const [isOpen, setIsOpen] = useState(true);
     const [openToken, setOpenToken] = useState(false);
-    const [isOpenRecent, setIsOpenRecent] = useState(false);
-    const [isOpenExpert, setIsOpenExpert] = useState(false);
-    const [selectedGraph, setSelectedGraph] = useState<'graph1' | 'graph2'>('graph1');
+    // const [isOpenRecent, setIsOpenRecent] = useState(false);
+    // const [isOpenExpert, setIsOpenExpert] = useState(false);
+    // const [selectedGraph, setSelectedGraph] = useState<'graph1' | 'graph2'>('graph1');
     const [activeCurrency, setActiveCurrency] = useState<'PLS/9MM' | '9MM/PLS'>('PLS/9MM');
-    const [series, setSeries] = useState<{ name: string; data: { x: number; y: number; }[] }[]>([]);
+    // const [series, setSeries] = useState<{ name: string; data: { x: number; y: number; }[] }[]>([]);
     const chainId = useChainId();
-
-    const [token0, setToken0] = useState<TokenDetails | null>(null);
-    console.log("🚀 ~ token0:", token0)
-    const [token1, setToken1] = useState<TokenDetails | null>(null);
+    const [token0, setToken0] = useState<TokenDetails | null>(tokenList.TokenC);
+    const [token1, setToken1] = useState<TokenDetails | null>(tokenList.TokenD);
     const [token0Price, setToken0Price] = useState<string | null>("0");
-    console.log("🚀 ~ token0Price:", token0Price)
     const [token1Price, setToken1Price] = useState<string | null>("0");
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
     const [routePath, setRoutePath] = useState<TokenDetails[] | null>(null);
     const [amountIn, setAmountIn] = useState("");
     const [amountOut, setAmountOut] = useState("");
-
     const [dataForSwap, setDataForSwap] = useState<any>(null);
-
     const [amountOutLoading, setAmountOutLoading] = useState(false);
     const [amountInLoading, setAmountInLoading] = useState(false);
     const { theme } = useTheme();
     const isActive = useIsActive();
+    const accounts = useAccounts();
+    const isConnected = useAccounts();
+    const [address, setAddress] = React.useState<string | null>(null);
+    const [buttonText, setButtonText] = React.useState<string | null>(null);
 
     // Load token data from local storage and set it to state
-    // useEffect(() => {
-    //     const isTestnet = chainId === 943;
+    useEffect(() => {
+        const isTestnet = chainId === 943;
 
-    //     const tokenData = isTestnet ? famousTokenTestnet : famousToken;
+        const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
-<<<<<<< Updated upstream
-    //     if (tokenData.length > 0) {
-    //         // Set token0 and token1 based on tokenData
-    //         // setToken0(tokenData[0]);
-    //         // setToken1(tokenData[1]);
-    //     }
-    // }, [chainId]);
-=======
-        if (tokenData.length > 0) {
-            // Set token0 and token1 based on tokenData
-            setToken0(tokenData[0]);
-            setToken1(tokenData[1]);
-        }
-        const priceToken1 = fetchCoinUSDPrice(token1?.address?.contract_address);
+        // if (tokenData.length > 0) {
+        //     setToken0(tokenData[0]);
+        //     setToken1(tokenData[1]);
+        // }
     }, [chainId]);
->>>>>>> Stashed changes
 
     const handleOpenToken = useCallback((tokenNumber: number) => {
         setTokenBeingChosen(tokenNumber)
         setOpenToken(prev => !prev)
     }, []);
+
+    useEffect(() => {
+        const updateAddressAndButtonText = async () => {
+            if (accounts && accounts.length > 0 && isConnected) {
+                // Shorten the address for display (e.g., 0x123...789)
+                const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+                setAddress(shortenedAddress);
+            }
+            setButtonText(isConnected ? address : 'Connect Wallet');
+
+
+            // Update the button text based on connection status
+        };
+
+        updateAddressAndButtonText();
+    }, [accounts, isConnected]);
+
+
+    // const handleNetworkSelect = (chainId: number) => {
+    //   metaMask.activate(chainId);
+    //   setSelectedChainId(chainId);
+    //   handleCloseMenu(); // Close the menu after selection
+    // };
+
+    const handleClick = () => {
+        if (isConnected) {
+            console.log("🚀 ~ handleClick ~ isConnected:", isConnected);
+
+            // Check if deactivate is available before calling it
+            if (metaMask.deactivate) {
+                metaMask.deactivate?.();
+            } else {
+                console.log(metaMask.resetState());
+            }
+        } else {
+            metaMask.activate();
+        }
+    };
+
     const handleCloseToken = () => setOpenToken(false);
 
     // const handleOpen = useCallback(() => setIsOpen(prev => !prev), []);
@@ -152,39 +172,36 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
         flushSync(() => setAmountOutLoading(false));
     };
 
-    const handlePriceForToken0 = async (tokenValue: string) => {
+    const handlePriceForToken0 = async (tokenValue: string): Promise<any> => {
         try {
             // Fetch the USD price for the token
             const usdPrice = await fetchCoinUSDPrice(token0?.address?.contract_address);
-            console.log("🚀 ~ handlePriceForToken0 ~ usdPrice:", usdPrice);
 
             if (!usdPrice) {
-                console.error('Failed to fetch USD price');
+                console.log('Failed to fetch USD price');
                 return;
             }
 
             // Ensure tokenValue is a number before multiplying
             const numericTokenValue = parseFloat(tokenValue);
             if (isNaN(numericTokenValue)) {
-                console.error('Invalid token value');
+                console.log('Invalid token value');
                 return;
             }
 
             // Calculate the total value in USD and convert to a string with 3 decimals
             const totalValue = (numericTokenValue * usdPrice).toFixed(3);
-
-            // Set the formatted value as a string
             setToken0Price(totalValue);
         } catch (error) {
-            console.error('Error in handlePriceForToken0:', error);
+            console.log('Error in handlePriceForToken0:', error);
         }
     };
 
-    const handlePriceForToken1 = async (tokenValue: string) => {
+    const handlePriceForToken1 = async (tokenValue: string): Promise<any> => {
         try {
             // Fetch the USD price for the token
             const usdPrice = await fetchCoinUSDPrice(token1?.address?.contract_address);
-            console.log("🚀 ~ handlePriceForToken0 ~ usdPrice:", usdPrice);
+            console.log("🚀 ~ handlePriceForToken1 ~ usdPrice:", usdPrice)
 
             if (!usdPrice) {
                 console.error('Failed to fetch USD price');
@@ -204,7 +221,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
             // Set the formatted value as a string
             setToken1Price(totalValue);
         } catch (error) {
-            console.error('Error in handlePriceForToken0:', error);
+            console.log("🚀 ~ handlePriceForToken1 ~ error:", error)
         }
     };
 
@@ -217,16 +234,16 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
         flushSync(() => setAmountInLoading(false));
     }
 
-    const handleSwap = async ()=>{
-        if(token0){
-            try{
+    const handleSwap = async () => {
+        if (token0) {
+            try {
                 await swapV3(token0, dataForSwap, "1", "0");
-            }   
-            catch(error){
+            }
+            catch (error) {
                 console.log("Error swapping tokens.", error);
             }
         }
-        else{
+        else {
             console.log("🚀 ~ handleSwap ~ token0:", token0)
         }
     }
@@ -250,7 +267,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
 
     const fetchSmartOrderRoute = async () => {
-        if (!token0 || !token1) return;
+        if (!token0 || !token1) return; // Ensure both tokens are present
 
         console.log("Fetch Run");
 
@@ -260,6 +277,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
         try {
             if (amountIn) {
                 tradeType = TradeType.EXACT_INPUT;
+
                 const { data, value } = await getSmartOrderRoute(
                     token0, token1, amountIn, [protocol], tradeType
                 );
@@ -267,29 +285,39 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                 if (data?.finalRoute?.tokenPath) {
                     setRoutePath(data.finalRoute.tokenPath);
                     setDataForSwap(data.finalRoute);
-
+                    const token1Price = await handlePriceForToken1(value);
+                    setToken1Price(token1Price);
                 } else {
-                    console.error("Token path not found in response.");
+                    console.log("Token path not found in response.");
                 }
+
                 setAmountOut(value?.toString() || "");
             } else {
                 tradeType = TradeType.EXACT_OUTPUT;
+
                 const { data, value } = await getSmartOrderRoute(
                     token1, token0, amountOut, [protocol], tradeType
                 );
                 console.log("🚀 ~ EXACT_OUTPUT ~ Data:", data);
 
                 if (data?.finalRoute?.tokenPath) {
-                    setRoutePath(data.tokenPath);
+                    setRoutePath(data.finalRoute.tokenPath);
+                    const token0Price = await handlePriceForToken0(value);
+                    console.log("🚀 ~ fetchSmartOrderRoute ~ token0Price:", token0Price)
+
+                    setToken0Price(token0Price);
+
                 } else {
                     console.error("Token path not found in response.");
                 }
+
                 setAmountIn(value?.toString() || "");
             }
         } catch (error) {
             console.error("Error fetching route:", error);
         }
     };
+
 
 
     const copyToClipboard = (text: string | undefined) => {
@@ -349,16 +377,16 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                     <input
                                         type="number"
                                         placeholder="0.0"
-                                        step="0.001" // Optional: Limit step to 3 decimals
+                                        step="0.001"
                                         onChange={(e) => {
                                             if (token0) {
                                                 const value = e.target.value;
                                                 setAmountIn(value);
                                                 setAmountOut("");
-                                                handlePriceForToken0(value); // Call function with formatted value
+                                                handlePriceForToken0(value);
                                             }
                                         }}
-                                        onBlur={handleAmountIn} // Handle blur event properly
+                                        onBlur={handleAmountIn}
                                         value={amountIn}
                                     />
                                     {amountIn > "0" && (
@@ -386,7 +414,6 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 marginTop: "10px",
                                 justifyContent: "space-between"
                             }}
-                            onClick={() => copyToClipboard(token1?.address?.contract_address)}
                         >
                             <Box sx={{
                                 display: 'flex',
@@ -452,13 +479,20 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                         </Box>
                         <Box className="slippageSec dsls">
                             {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                                <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>Slippage Tolerance <PiPencilSimpleBold /></Typography>
-                                <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
-                            </Box> */}
+        <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>Slippage Tolerance <PiPencilSimpleBold /></Typography>
+        <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
+    </Box> */}
                             <Box sx={{ mt: '25px' }}>
-                                <Button variant="contained" color="secondary" onClick={ handleSwap } disabled={!isActive}>{isActive ? "Swap" : "Connect Wallet"}</Button>
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={isActive ? handleSwap : handleClick} // Conditional onClick handler
+                                >
+                                    {isActive ? "Swap" : "Connect Wallet"}
+                                </Button>
                             </Box>
                         </Box>
+
                     </Box>
 
                     <Box className="arrowBox" sx={{ pt: '40px' }}>
@@ -483,23 +517,25 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
                                 <CircularProgress size={30} />
                             ) : (
                                 <Box>
+                                    {/* Input for Amount Out */}
                                     <input
                                         type="number"
                                         placeholder="0.0"
-                                        step="0.001" // Optional: Limit step to 3 decimals
+                                        value={amountOut}
                                         onChange={(e) => {
                                             if (token1) {
-                                                const value = e.target.value;
-                                                setAmountOut(value);
-                                                handlePriceForToken1(value); // Call function with formatted value
+                                                const inputValue = e.target.value;
+                                                setAmountOut(inputValue);
+                                                handlePriceForToken1(inputValue);
                                             }
                                         }}
+                                        onBlur={() => handleAmountOut()}
                                     />
-                                    {amountOut > "0" && (
+                                    {Number(amountOut) > 0 && (
                                         <Typography
                                             sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}
                                         >
-                                            ~{Number(token0Price || 0).toLocaleString(undefined, {
+                                            ~{Number(token1Price || 0).toLocaleString(undefined, {
                                                 minimumFractionDigits: 0,
                                                 maximumFractionDigits: 3
                                             })} USD
@@ -507,9 +543,10 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ onToggle }) => {
 
                                     )}
                                 </Box>
-
                             )}
                         </Box>
+
+
                     </Box>
 
 
