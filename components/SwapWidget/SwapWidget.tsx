@@ -25,9 +25,10 @@ import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import { hooks, metaMask } from '../ConnectWallet/connector';
 import tokenList from "../../utils/tokenList.json";
 import { swapV3 } from '@/utils/swapTokens';
-
+import addresses from "@/utils/address.json";
 import { flushSync } from 'react-dom';
 import { getTokenUsdPrice } from "@/utils/api/getTokenUsdPrice"
+import getTokenApproval from '@/utils/getTokenApproval';
 const { useChainId, useIsActive, useAccounts } = hooks;
 interface Token {
     name: string;
@@ -91,6 +92,8 @@ const SwapWidget = () => {
     const [address, setAddress] = React.useState<string | null>(null);
     const [buttonText, setButtonText] = React.useState<string | null>(null);
     const [slippageTolerance, setSlippageTolerance] = useState(0.5);
+
+    const smartRouterAddress = addresses.SmartRouterAddress;
 
     // Load token data from local storage and set it to state
     useEffect(() => {
@@ -236,7 +239,13 @@ const SwapWidget = () => {
     }
 
     const handleSwap = async () => {
-        if (token0) {
+        if (token0 && token1) {
+            try{
+                await getTokenApproval(token0, smartRouterAddress, amountIn);
+            }
+            catch(error){
+                console.log("Error getting token approval.", error);
+            }
             try {
                 await swapV3(token0, dataForSwap, amountIn, slippageTolerance);
             }
