@@ -16,3 +16,21 @@ export function adjustForSlippage(amount: string, slippageTolerance: number): nu
 export function decimalRound(value : string, decimal: number){
     return (parseFloat(Number(value).toFixed(decimal))).toString()
 }
+
+export function expandIfNeeded(numStr : string) {
+    if (!/[eE]/.test(numStr)) {
+      return numStr;
+    }
+  
+    let data = numStr.split(/[eE]/);
+    let base = data[0];
+    let exponent = parseInt(data[1]);
+  
+    if (exponent > 0) {
+      return base.replace('.', '') + '0'.repeat(exponent - (base.split('.')[1]?.length || 0));
+    } else {
+      const decimalPlaces = Math.abs(exponent);
+      const [whole, decimal] = base.split('.');
+      return '0.' + '0'.repeat(decimalPlaces - 1) + whole.replace('.', '') + (decimal || '');
+    }
+  }

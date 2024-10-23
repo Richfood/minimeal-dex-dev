@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import emulate from "./emulate";
 import { FeeAmount } from "@uniswap/v3-sdk";
 import { TokenDetails } from "@/interfaces";
-import { adjustForSlippage } from "./generalFunctions";
+import { adjustForSlippage, expandIfNeeded } from "./generalFunctions";
 import v2RouterArtifact from "../abis/PancakeV2Router.sol/PancakeRouter.json";
 import addresses from "./address.json";
 import nfpmArtifact from "../abis/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
@@ -32,10 +32,10 @@ export async function addLiquidityETH(
 
     const slippageTolerance = 10;
     
-    amountTokenDesired = ethers.utils.parseUnits(amountTokenDesired, token.address.decimals).toString();
+    amountTokenDesired = ethers.utils.parseUnits(expandIfNeeded(amountTokenDesired), token.address.decimals).toString();
 
     let amountTokenMin = amountTokenDesired;
-    let amountETHMin = ethers.utils.parseUnits(amountETHDesired, "18").toString();
+    let amountETHMin = ethers.utils.parseUnits(expandIfNeeded(amountETHDesired), "18").toString();
     amountTokenMin = adjustForSlippage(amountTokenMin, slippageTolerance).toString();
     amountETHMin = adjustForSlippage(amountETHMin, slippageTolerance).toString();
 
@@ -74,10 +74,10 @@ export async function addLiquidityV2(
 
     const slippageTolerance = 10;
 
-    amount0Desired = ethers.utils.parseUnits(amount0Desired, token0.address.decimals).toString();
-    amount1Desired = ethers.utils.parseUnits(amount1Desired, token1.address.decimals).toString();
-    let amount0Min = ethers.utils.parseUnits(amount0Desired, token0.address.decimals).toString();
-    let amount1Min = ethers.utils.parseUnits(amount1Desired, token1.address.decimals).toString();
+    amount0Desired = ethers.utils.parseUnits(expandIfNeeded(amount0Desired), token0.address.decimals).toString();
+    amount1Desired = ethers.utils.parseUnits(expandIfNeeded(amount1Desired), token1.address.decimals).toString();
+    let amount0Min = ethers.utils.parseUnits(expandIfNeeded(amount0Desired), token0.address.decimals).toString();
+    let amount1Min = ethers.utils.parseUnits(expandIfNeeded(amount1Desired), token1.address.decimals).toString();
 
     amount0Min = adjustForSlippage(amount0Min, slippageTolerance).toString();
     amount1Min = adjustForSlippage(amount1Min, slippageTolerance).toString();
@@ -135,13 +135,13 @@ export async function addLiquidityV3(
         - sqrtPriceX96: ${sqrtPriceX96}
       `);
 
-    amount0Desired = ethers.utils.parseUnits(amount0Desired, token0.address.decimals).toString();
+    amount0Desired = ethers.utils.parseUnits(expandIfNeeded(amount0Desired), token0.address.decimals).toString();
     console.log("🚀 ~ amount0Desired:", amount0Desired)
-    amount1Desired = ethers.utils.parseUnits(amount1Desired, token1.address.decimals).toString();
+    amount1Desired = ethers.utils.parseUnits(expandIfNeeded(amount1Desired), token1.address.decimals).toString();
     console.log("🚀 ~ amount1Desired:", amount1Desired)
-    amount0Min = ethers.utils.parseUnits(amount0Min, token0.address.decimals).toString();
+    amount0Min = ethers.utils.parseUnits(expandIfNeeded(amount0Min), token0.address.decimals).toString();
     console.log("🚀 ~ amount0Min:", amount0Min)
-    amount1Min = ethers.utils.parseUnits(amount1Min, token1.address.decimals).toString();
+    amount1Min = ethers.utils.parseUnits(expandIfNeeded(amount1Min), token1.address.decimals).toString();
     console.log("🚀 ~ amount1Min:", amount1Min)
 
     console.log(`Amounts Desired and Minimum for Liquidity Provision:

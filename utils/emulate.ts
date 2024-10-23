@@ -14,7 +14,7 @@ import {
 } from "./utils";
 import { ethers } from "ethers";
 import { TokenDetails } from "@/interfaces";
-import { adjustForSlippage, decimalRound, roundToPrecision } from "./generalFunctions";
+import { adjustForSlippage, decimalRound, expandIfNeeded, roundToPrecision } from "./generalFunctions";
  
 function emulate(
     priceLower: string, 
@@ -85,8 +85,8 @@ function emulate(
 
     const tickSpacing = TICK_SPACINGS[fee];
 
-    amount0Entered = ethers.utils.parseUnits(Number(amount0Entered).toString(), token0.decimals).toString();
-    amount1Entered = ethers.utils.parseUnits(Number(amount1Entered).toString(), token1.decimals).toString();
+    amount0Entered = ethers.utils.parseUnits(expandIfNeeded(amount0Entered), token0.decimals).toString();
+    amount1Entered = ethers.utils.parseUnits(expandIfNeeded(amount1Entered), token1.decimals).toString();
 
     const decimalDifference = token1.decimals - token0.decimals;
 

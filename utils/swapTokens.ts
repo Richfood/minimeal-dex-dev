@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { FeeAmount } from "@uniswap/v3-sdk";
 import { TokenDetails } from "@/interfaces";
-import { adjustForSlippage } from "./generalFunctions";
+import { adjustForSlippage, expandIfNeeded } from "./generalFunctions";
 import SmartRouterArtifact from "../abis/SmartRouter.sol/SmartRouter.json";
 import addresses from "./address.json";
 import EXACT_INPUT_ABI from "../abis/SmartRouter.sol/exactInputAbi.json";
@@ -59,7 +59,7 @@ export async function swapV3(
     const path = ethers.utils.solidityPack(dataTypeArray, pathArray);
     console.log(path);
 
-    amountIn = ethers.utils.parseUnits(amountIn, token.address.decimals).toString();
+    amountIn = ethers.utils.parseUnits(expandIfNeeded(amountIn), token.address.decimals).toString();
 
     const SmartRouterAddress = addresses.SmartRouterAddress;
     const SmartRouterContract = new ethers.Contract(SmartRouterAddress, SMART_ROUTER_ABI, newSigner);

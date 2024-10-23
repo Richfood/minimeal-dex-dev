@@ -541,26 +541,43 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const handleTokenAmountChange = async (inputElementId : number)=>{
 
+    if(!token0 || !token1) return;
+
     let amount0ToEmulateFromInput = 0;
     let amount1ToEmulateFromInput = 0;
   
     const tokenInput = document.getElementById(`token${inputElementId}`) as HTMLInputElement;
     const value = (Number(tokenInput.value) || 0);
-    
+    const valueString = tokenInput.value;
+
+    const checkDecimals = (decimals: number)=>{
+      console.log("🚀 ~ checkDecimals ~ valueString:", valueString,valueString.split('.')[1]?.length, decimals)
+      if (valueString.includes('.') && valueString.split('.')[1]?.length > decimals) {
+        console.log("🚀 ~ checkDecimals ~ false:", false)
+        return false;
+      }
+
+      return true;
+    }
+
     if(tokenToggleOccured){
       if(inputElementId === 0){
-        amount1ToEmulateFromInput = value;
+        if(checkDecimals(token1.address.decimals))
+          amount1ToEmulateFromInput = value;
       }
       else{
-        amount0ToEmulateFromInput = value;
+        if(checkDecimals(token0.address.decimals))
+          amount0ToEmulateFromInput = value;
       }
     }
     else{
       if(inputElementId === 0){
-        amount0ToEmulateFromInput = value;
+        if(checkDecimals(token0.address.decimals))
+          amount0ToEmulateFromInput = value;
       }
       else{
-        amount1ToEmulateFromInput = value;
+        if(checkDecimals(token1.address.decimals))
+          amount1ToEmulateFromInput = value;
       }
     }
 
