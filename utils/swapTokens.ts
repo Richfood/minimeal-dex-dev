@@ -18,7 +18,7 @@ export async function swapV3(
     token : TokenDetails,
     data: any,
     amountIn: string,
-    amountOutMinimum: string
+    slippageTolerance : number
 ) {
 
     if (!window.ethereum) return;
@@ -73,8 +73,17 @@ export async function swapV3(
     // let path = {};
     let recipient = newSignerAddress;
 
+    let amountOutMinimum = (Number(amountIn) - Math.round(adjustForSlippage(amountIn, slippageTolerance))).toString();
+
+    console.log("🚀 ~ slippageTolerance:", slippageTolerance)
+    console.log("🚀 ~ amountOutMinimum:", amountOutMinimum)
+    console.log("🚀 ~ amountIn:", amountIn)
+    console.log("🚀 ~ recipient:", recipient)
+    console.log("🚀 ~ path:", path)
+
     const exactInput = new ethers.utils.Interface(EXACT_INPUT_ABI);
     const exactInputData = exactInput.encodeFunctionData("exactInput",[[path, recipient, amountIn, amountOutMinimum]]);
+
 
     const combinedData = [exactInputData, refundETHData];
 

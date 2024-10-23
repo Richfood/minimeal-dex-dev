@@ -51,7 +51,7 @@ export async function getSmartOrderRoute(
         const decimals = outputToken.address.decimals;
         const value = decimalRound(calculateRawQuote(rawQuote, decimals),decimals/2);
 
-        console.log("Value:", value);
+        console.log(`Value: with trade type ${tradeType} `, value);
 
         // Return both response data and value
         return { data: response.data, value };

@@ -90,6 +90,7 @@ const SwapWidget = () => {
     const isConnected = useAccounts();
     const [address, setAddress] = React.useState<string | null>(null);
     const [buttonText, setButtonText] = React.useState<string | null>(null);
+    const [slippageTolerance, setSlippageTolerance] = useState(0.5);
 
     // Load token data from local storage and set it to state
     useEffect(() => {
@@ -237,7 +238,7 @@ const SwapWidget = () => {
     const handleSwap = async () => {
         if (token0) {
             try {
-                await swapV3(token0, dataForSwap, "1", "0");
+                await swapV3(token0, dataForSwap, amountIn, slippageTolerance);
             }
             catch (error) {
                 console.log("Error swapping tokens.", error);
@@ -296,7 +297,7 @@ const SwapWidget = () => {
                 tradeType = TradeType.EXACT_OUTPUT;
 
                 const { data, value } = await getSmartOrderRoute(
-                    token1, token0, amountOut, [protocol], tradeType
+                    token0, token1, amountOut, [protocol], tradeType
                 );
                 console.log("🚀 ~ EXACT_OUTPUT ~ Data:", data);
 
