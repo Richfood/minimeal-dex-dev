@@ -1,5 +1,5 @@
 // src/components/SwapWidget.tsx
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Box, Typography, Button, List, ListItem, ListItemButton, Badge } from '@mui/material';
 import { IoIosArrowDown } from 'react-icons/io';
 import { FaArrowRight } from 'react-icons/fa';
@@ -29,15 +29,12 @@ import addresses from "@/utils/address.json";
 import { flushSync } from 'react-dom';
 import { getTokenUsdPrice } from "@/utils/api/getTokenUsdPrice"
 import getTokenApproval from '@/utils/getTokenApproval';
+import { debounce } from '@syncfusion/ej2-base';
 const { useChainId, useIsActive, useAccounts } = hooks;
-interface Token {
-    name: string;
-    symbol: string;
-    address: {
-        contract_address: string;
-        decimals: number;
-    };
-    image?: string; // URL to the token's image
+
+interface TokenPair {
+    token0: TokenDetails | null;
+    token1: TokenDetails | null;
 }
 
 interface PoolDetails {
@@ -92,7 +89,11 @@ const SwapWidget = () => {
     const [address, setAddress] = React.useState<string | null>(null);
     const [buttonText, setButtonText] = React.useState<string | null>(null);
     const [slippageTolerance, setSlippageTolerance] = useState(0.5);
-
+    const [prevTokens, setPrevTokens] = useState<{ token0: TokenDetails | null; token1: TokenDetails | null }>({
+        token0: null,
+        token1: null,
+    });
+    console.log("🚀 ~ SwapWidget ~ prevTokens:", prevTokens)
     const smartRouterAddress = addresses.SmartRouterAddress;
 
     // Load token data from local storage and set it to state
@@ -169,12 +170,25 @@ const SwapWidget = () => {
     //     onToggle();
     // };
 
-    const handleAmountIn = async () => {
-        flushSync(() => setAmountOutLoading(true));
-        setAmountOut("");
-        await fetchSmartOrderRoute();
-        flushSync(() => setAmountOutLoading(false));
-    };
+    const debouncedHandleAmountIn = useCallback(
+        debounce(async (amountIn: string) => {
+            flushSync(() => setAmountOutLoading(true));
+            await fetchSmartOrderRoute(amountIn,true);
+            flushSync(() => setAmountOutLoading(false));
+        }, 1000),
+        [] // Ensure the debounce is created only once
+    );
+
+    // Debounced function for handling AmountOut input
+    const debouncedHandleAmountOut = useCallback(
+        debounce(async (amountOut: string) => {
+            flushSync(() => setAmountInLoading(true));
+            await fetchSmartOrderRoute(amountOut,false);
+            flushSync(() => setAmountInLoading(false));
+        }, 1000),
+        [] // Ensure the debounce is created only once
+    );
+
 
     const handlePriceForToken0 = async (tokenValue: string): Promise<any> => {
         try {
@@ -229,21 +243,12 @@ const SwapWidget = () => {
         }
     };
 
-
-
-    const handleAmountOut = async () => {
-        setAmountIn("");
-        flushSync(() => setAmountInLoading(true)); // Ensure state updates before proceeding
-        await fetchSmartOrderRoute();
-        flushSync(() => setAmountInLoading(false));
-    }
-
     const handleSwap = async () => {
         if (token0 && token1) {
-            try{
+            try {
                 await getTokenApproval(token0, smartRouterAddress, amountIn);
             }
-            catch(error){
+            catch (error) {
                 console.log("Error getting token approval.", error);
             }
             try {
@@ -276,7 +281,7 @@ const SwapWidget = () => {
     };
 
 
-    const fetchSmartOrderRoute = async () => {
+    const fetchSmartOrderRoute = async (tokenAmount: string, isAmountIn:boolean) => {
         if (!token0 || !token1) return; // Ensure both tokens are present
 
         console.log("Fetch Run");
@@ -285,11 +290,12 @@ const SwapWidget = () => {
         let tradeType: TradeType;
 
         try {
-            if (amountIn) {
+            if (isAmountIn) {
                 tradeType = TradeType.EXACT_INPUT;
+                console.log("🚀 ~ fetchSmartOrderRoute ~ tradeType:", tradeType)
 
                 const { data, value } = await getSmartOrderRoute(
-                    token0, token1, amountIn, [protocol], tradeType
+                    token0, token1, tokenAmount, [protocol], tradeType
                 );
 
                 if (data?.finalRoute?.tokenPath) {
@@ -304,9 +310,10 @@ const SwapWidget = () => {
                 setAmountOut(value?.toString() || "");
             } else {
                 tradeType = TradeType.EXACT_OUTPUT;
+                console.log("🚀 ~ fetchSmartOrderRoute ~ tradeType:", tradeType)
 
                 const { data, value } = await getSmartOrderRoute(
-                    token0, token1, amountOut, [protocol], tradeType
+                    token0, token1, tokenAmount, [protocol], tradeType
                 );
                 console.log("🚀 ~ EXACT_OUTPUT ~ Data:", data);
 
@@ -379,6 +386,7 @@ const SwapWidget = () => {
                                 {token0?.symbol !== "PLS" && <PiCopy />}
                             </Typography>
                         </Box>
+
                         <Box className="inputField">
                             {amountInLoading ? (
                                 <CircularProgress size={30} />
@@ -388,18 +396,20 @@ const SwapWidget = () => {
                                         type="number"
                                         placeholder="0.0"
                                         step="0.001"
+                                        value={amountIn}
                                         onChange={(e) => {
                                             if (token0) {
                                                 const value = e.target.value;
                                                 setAmountIn(value);
-                                                setAmountOut("");
-                                                handlePriceForToken0(value);
+                                                setAmountOut(""); // Clear amountOut
+                                                handlePriceForToken0(value); // Update price immediately
+
+                                                // Debounced function to trigger when user stops typing
+                                                debouncedHandleAmountIn(value);
                                             }
                                         }}
-                                        onBlur={handleAmountIn}
-                                        value={amountIn}
                                     />
-                                    {amountIn > "0" && (
+                                    {Number(amountIn) > 0 && ( // Ensure amountIn is treated as a number
                                         <Typography
                                             sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}
                                         >
@@ -408,7 +418,6 @@ const SwapWidget = () => {
                                                 maximumFractionDigits: 3
                                             })} USD
                                         </Typography>
-
                                     )}
                                 </Box>
                             )}
@@ -527,7 +536,6 @@ const SwapWidget = () => {
                                 <CircularProgress size={30} />
                             ) : (
                                 <Box>
-                                    {/* Input for Amount Out */}
                                     <input
                                         type="number"
                                         placeholder="0.0"
@@ -536,10 +544,12 @@ const SwapWidget = () => {
                                             if (token1) {
                                                 const inputValue = e.target.value;
                                                 setAmountOut(inputValue);
-                                                handlePriceForToken1(inputValue);
+                                                handlePriceForToken1(inputValue); // Update price immediately
+
+                                                // Debounced function to trigger when user stops typing
+                                                debouncedHandleAmountOut(inputValue);
                                             }
                                         }}
-                                        onBlur={() => handleAmountOut()}
                                     />
                                     {Number(amountOut) > 0 && (
                                         <Typography
@@ -550,13 +560,10 @@ const SwapWidget = () => {
                                                 maximumFractionDigits: 3
                                             })} USD
                                         </Typography>
-
                                     )}
                                 </Box>
                             )}
                         </Box>
-
-
                     </Box>
 
 
@@ -627,3 +634,7 @@ const SwapWidget = () => {
 };
 
 export default SwapWidget;
+function isEqual(current: TokenDetails | null, token0: TokenDetails | null) {
+    throw new Error('Function not implemented.');
+}
+
