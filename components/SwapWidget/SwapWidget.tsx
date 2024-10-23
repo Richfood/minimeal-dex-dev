@@ -247,34 +247,30 @@ const SwapWidget = () => {
     };
 
     const handleSwap = async () => {
-        if (token0 && token1) {
-            try {
-                await getTokenApproval(token0, smartRouterAddress, amountIn);
-                setAmountIn("");
-                setAmountOut("");
-            }
-            catch (error) {
-                console.log("Error getting token approval.", error);
-                setAmountIn("");
-                setAmountOut("");
-            }
-            try {
-                await swapV3(token0, dataForSwap, amountIn, slippageTolerance);
-                setAmountIn("");
-                setAmountOut("");
-            }
-            catch (error) {
-                console.log("Error swapping tokens.", error);
-                setAmountIn("");
-                setAmountOut("");
-            }
+        if (!token0 || !token1) {
+            console.log("🚀 ~ handleSwap ~ Missing tokens:", token0, token1);
+            return; // Exit early if tokens are missing
         }
-        else {
-            console.log("🚀 ~ handleSwap ~ token0:", token0);
+
+        try {
+            // Approve token for the swap
+            await getTokenApproval(token0, smartRouterAddress, amountIn);
+
+            // Execute the swap after approval
+            await swapV3(token0, dataForSwap, amountIn, slippageTolerance);
+
+            // Reset the input and output values after successful swap
+            setAmountIn("");
+            setAmountOut("");
+        } catch (error) {
+            console.error("Error during swap process:", error);
+
+            // Reset the input and output values in case of any error
             setAmountIn("");
             setAmountOut("");
         }
-    }
+    };
+
 
     const toggleGraph = async () => {
 
