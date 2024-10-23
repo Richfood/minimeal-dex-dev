@@ -62,12 +62,13 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const NFPMAddress = addresses.PancakePositionManagerAddress;
   const v2RouterAddress = addresses.PancakeV2RouterAddress;
-  const tempToken0 = tokenList.MOCK_USDC;
-  const tempToken1 = tokenList.Pulse;
+  const tempToken0 = tokenList.TokenB;
+  const tempToken1 = tokenList.TokenA;
   const [token0,setToken0] =  useState<TokenDetails | null>(tempToken1);
   const [token1, setToken1] = useState<TokenDetails | null>(tempToken0);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
   const [isFullRange, setIsFullRange] = useState(false);
+  const [isButton, setIsButton] = useState(false);
   const [amount0Desired, setAmount0Desired] = useState("");
   const [amount1Desired, setAmount1Desired] = useState("");
   const [priceLower, setPriceLower] = useState("");
@@ -207,7 +208,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     setPriceUpperEntered("");
     setPriceCurrentEntered("");
 
-    setIsFullRange(false);
+    handleButton(false,false);
+    // setIsFullRange(false);
   }
 
   const sortTokens = ()=>{
@@ -512,14 +514,14 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       }
 
 
-      if(!amount0ToEmulate){
+      // if(!amount0ToEmulate){
         setAmount0Desired(amount0DesiredEmulate);
-        setAmount0ToEmulate(0);
-      }
-      if(!amount1ToEmulate){
+        // setAmount0ToEmulate(0);
+      // }
+      // if(!amount1ToEmulate){
         setAmount1Desired(amount1DesiredEmulate);
-        setAmount1ToEmulate(0);
-      }
+        // setAmount1ToEmulate(0);
+      // }
       setTickLower(tickLowerEmulate);
       setTickUpper(tickUpperEmulate);
       setAmount0Min(amount0MinEmulate || "");
@@ -672,7 +674,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   useEffect(()=>{
       if(priceLowerEntered){
         // setPriceLower("");
-        if(isFullRange)
+        if(isButton)
           handlePriceLower();
 
         // console.log("🚀 ~ useEffect ~ setPriceLower:", priceLowerEntered);
@@ -683,7 +685,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   useEffect(()=>{
       if(priceUpperEntered){
         // setPriceUpper("");
-        if(isFullRange)
+        if(isButton)
           handlePriceUpper();
         // console.log("🚀 ~ useEffect ~ priceUpperEntered:", priceUpperEntered)
       }
@@ -717,6 +719,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       handlePriceUpper();
       console.log("🚀 ~ handlePricesAfterAdjust:", handlePricesAfterAdjust)
   },[handlePricesAfterAdjust])
+
+  const handleButton = (buttonValue : boolean, fullRangeValue : boolean)=>{
+    setIsButton(buttonValue);
+    setIsFullRange(fullRangeValue);
+  }
 
   return (
     <Box className="AddLiquiditySec">
@@ -1089,11 +1096,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                         <Typography sx={{ fontWeight: '600' }}>Min Price</Typography>
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Box><FaMinus onClick={()=>{setIsFullRange(false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) - 0.0001).toString()); handlePriceLower() }}/></Box>
+                          <Box><FaMinus onClick={()=>{handleButton(false,false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) - 0.0001).toString()); handlePriceLower() }}/></Box>
                           <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                            <input type="number" placeholder="0.0" style={{ textAlign: 'center' }} onBlur={handlePriceLower} onChange={(e)=>{setIsFullRange(false);setPriceLowerEntered(e.target.value)}} value={isFullRange ? "0" : priceLowerEntered}/>
+                            <input type="number" placeholder="0.0" style={{ textAlign: 'center' }} onBlur={handlePriceLower} onChange={(e)=>{handleButton(false,false);setPriceLowerEntered(e.target.value)}} value={isFullRange ? "0" : priceLowerEntered}/>
                           </Box>
-                          <Box><FaPlus onClick={()=>{setIsFullRange(false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
+                          <Box><FaPlus onClick={()=>{handleButton(false,false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
                         </Box>
 
                         {token0 && token1 ? (
@@ -1115,11 +1122,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                         <Typography sx={{ fontWeight: '600' }}>Max Price</Typography>
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Box><FaMinus onClick={()=>{setIsFullRange(false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) - 0.0001).toString()); handlePriceUpper()}}/></Box>
+                          <Box><FaMinus onClick={()=>{handleButton(false,false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) - 0.0001).toString()); handlePriceUpper()}}/></Box>
                           <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                            <input type="text" placeholder="0.0" style={{ textAlign: 'center' , fontSize: isFullRange ? '1.5em' : '1em'}} onBlur={handlePriceUpper} onChange={(e)=>{setIsFullRange(false);setPriceUpperEntered(e.target.value)}} value={isFullRange ? "∞" : priceUpperEntered}/>
+                            <input type="text" placeholder="0.0" style={{ textAlign: 'center' , fontSize: isFullRange ? '1.5em' : '1em'}} onBlur={handlePriceUpper} onChange={(e)=>{handleButton(false,false);setPriceUpperEntered(e.target.value)}} value={isFullRange ? "∞" : priceUpperEntered}/>
                           </Box>
-                          <Box><FaPlus onClick={()=>{setIsFullRange(false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) + 0.0001).toString()); handlePriceUpper()}}/></Box>
+                          <Box><FaPlus onClick={()=>{handleButton(false,false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) + 0.0001).toString()); handlePriceUpper()}}/></Box>
                         </Box>
 
                         {token0 && token1 ? (
@@ -1146,7 +1153,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                           console.log("CLicked")
                           setPriceLowerEntered(calculateRange(Number(priceCurrent), -10));
                           setPriceUpperEntered(calculateRange(Number(priceCurrent), 10));
-                          setIsFullRange(false)                 
+
+                          handleButton(true, false);
+                          // setIsFullRange(false)                 
                         }}
                         sx={{
                           width: 'calc(25% - 15px)',
@@ -1171,7 +1180,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                           console.log("CLicked")
                           setPriceLowerEntered(calculateRange(Number(priceCurrent), -20));
                           setPriceUpperEntered(calculateRange(Number(priceCurrent), 20));
-                          setIsFullRange(false)
+                          handleButton(true, false);
+                          // setIsFullRange(false)
                         }}
                         sx={{
                           width: 'calc(25% - 15px)',
@@ -1195,7 +1205,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                           console.log("CLicked")
                           setPriceLowerEntered(calculateRange(Number(priceCurrent), -50));
                           setPriceUpperEntered(calculateRange(Number(priceCurrent), 50));
-                          setIsFullRange(false)                              
+                          handleButton(true, false);
+                          // setIsFullRange(false)                              
                         }}
                         sx={{
                           width: 'calc(25% - 15px)',
@@ -1220,7 +1231,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                           const newPriceUpper = tickToPrice(MAX_TICK, decimalDifference);
                           setPriceUpperEntered(newPriceUpper.toString());
 
-                          setIsFullRange(true);                             
+                          handleButton(true, true);
+                          // setIsFullRange(true);                          
                         }}
                         sx={{
                           width: 'calc(25% - 15px)',

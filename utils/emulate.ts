@@ -85,8 +85,8 @@ function emulate(
 
     const tickSpacing = TICK_SPACINGS[fee];
 
-    amount0Entered = ethers.utils.parseUnits(amount0Entered.toString(), token0.decimals).toString();
-    amount1Entered = ethers.utils.parseUnits(amount1Entered.toString(), token1.decimals).toString();
+    amount0Entered = ethers.utils.parseUnits(Number(amount0Entered).toString(), token0.decimals).toString();
+    amount1Entered = ethers.utils.parseUnits(Number(amount1Entered).toString(), token1.decimals).toString();
 
     const decimalDifference = token1.decimals - token0.decimals;
 
@@ -196,9 +196,13 @@ function emulate(
         amount0Min = parseFloat(amount0DesiredFromPosition.toString()).toString();
         amount1Min = parseFloat(amount1DesiredFromPosition.toString()).toString();
 
+        console.log(amount0DesiredFromPosition.toString(), amount1DesiredFromPosition.toString());
+
         const slippageTolerance = 10;
-        amount0Min = roundToPrecision((Number(amount0Min) - adjustForSlippage(amount0Min, slippageTolerance)).toString() , token0.decimals).toString()//(roundToPrecision(amount0Min,6) - roundToPrecision("0.000001",6)).toString(); // Math.pow(10,-token0.decimals+4)
-        amount1Min = roundToPrecision((Number(amount1Min) - adjustForSlippage(amount1Min, slippageTolerance)).toString() , token1.decimals).toString()//(roundToPrecision(amount1Min,6) - roundToPrecision("0.000001",6)).toString();
+        amount0Min = roundToPrecision((Number(amount0Min) - adjustForSlippage(amount0Min, slippageTolerance)).toFixed(0) , token0.decimals).toString()//(roundToPrecision(amount0Min,6) - roundToPrecision("0.000001",6)).toString(); // Math.pow(10,-token0.decimals+4)
+        console.log("🚀 ~ amount0Min:", amount0Min)
+        amount1Min = roundToPrecision((Number(amount1Min) - adjustForSlippage(amount1Min, slippageTolerance)).toFixed(0) , token1.decimals).toString()//(roundToPrecision(amount1Min,6) - roundToPrecision("0.000001",6)).toString();
+        console.log("🚀 ~ amount1Min:", amount1Min)
 
         amount0Min = ethers.utils.formatUnits(amount0Min,token0.decimals);
         amount1Min = ethers.utils.formatUnits(amount1Min,token1.decimals);

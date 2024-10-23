@@ -73,12 +73,12 @@ export function calculateAmount1WhenLiquidity0Given(
     liquidity0: bigint,
     sqrtPriceCurrent: bigint | string,
     sqrtPriceLower: bigint | string
-): number {
+): bigint {
 
     sqrtPriceCurrent = BigInt(sqrtPriceCurrent);
     sqrtPriceLower = BigInt(sqrtPriceLower);
 
-    return Number((liquidity0 * BigInt(Math.abs(Number(sqrtPriceCurrent - sqrtPriceLower)))) / Q96);
+    return (liquidity0 * BigInt(Math.abs(Number(sqrtPriceCurrent - sqrtPriceLower)))) / Q96;
 }
 
 // Returns a number (as the original return seems to be an amount, which is a float)
@@ -86,10 +86,10 @@ export function calculateAmount0WhenLiquidity1Given(
     liquidity1: bigint,
     sqrtPriceCurrent: bigint | string,
     sqrtPriceUpper: bigint | string
-): number {
+): bigint {
 
     sqrtPriceCurrent = BigInt(sqrtPriceCurrent);
     sqrtPriceUpper = BigInt(sqrtPriceUpper);
 
-    return Number(((liquidity1 * BigInt(Math.abs(Number(sqrtPriceCurrent - sqrtPriceUpper)))) * Q96) / (sqrtPriceCurrent * sqrtPriceUpper));
+    return ((liquidity1 * BigInt(Math.abs(Number(sqrtPriceCurrent - sqrtPriceUpper)))) * Q96) / (sqrtPriceCurrent * sqrtPriceUpper);
 }
