@@ -95,10 +95,13 @@ const SwapWidget = () => {
     });
     console.log("🚀 ~ SwapWidget ~ prevTokens:", prevTokens)
     const smartRouterAddress = addresses.SmartRouterAddress;
+    const [isTestnet, setIsTestnet] = React.useState<boolean | null>(null);
 
     // Load token data from local storage and set it to state
     useEffect(() => {
         const isTestnet = chainId === 943;
+        setIsTestnet(isTestnet)
+        console.log("🚀 ~ useEffect ~ isTestnet:", isTestnet)
 
         const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
@@ -173,7 +176,7 @@ const SwapWidget = () => {
     const debouncedHandleAmountIn = useCallback(
         debounce(async (amountIn: string) => {
             flushSync(() => setAmountOutLoading(true));
-            await fetchSmartOrderRoute(amountIn,true);
+            await fetchSmartOrderRoute(amountIn, true);
             flushSync(() => setAmountOutLoading(false));
         }, 1000),
         [] // Ensure the debounce is created only once
@@ -183,7 +186,7 @@ const SwapWidget = () => {
     const debouncedHandleAmountOut = useCallback(
         debounce(async (amountOut: string) => {
             flushSync(() => setAmountInLoading(true));
-            await fetchSmartOrderRoute(amountOut,false);
+            await fetchSmartOrderRoute(amountOut, false);
             flushSync(() => setAmountInLoading(false));
         }, 1000),
         [] // Ensure the debounce is created only once
@@ -247,19 +250,29 @@ const SwapWidget = () => {
         if (token0 && token1) {
             try {
                 await getTokenApproval(token0, smartRouterAddress, amountIn);
+                setAmountIn("");
+                setAmountOut("");
             }
             catch (error) {
                 console.log("Error getting token approval.", error);
+                setAmountIn("");
+                setAmountOut("");
             }
             try {
                 await swapV3(token0, dataForSwap, amountIn, slippageTolerance);
+                setAmountIn("");
+                setAmountOut("");
             }
             catch (error) {
                 console.log("Error swapping tokens.", error);
+                setAmountIn("");
+                setAmountOut("");
             }
         }
         else {
-            console.log("🚀 ~ handleSwap ~ token0:", token0)
+            console.log("🚀 ~ handleSwap ~ token0:", token0);
+            setAmountIn("");
+            setAmountOut("");
         }
     }
 
@@ -281,7 +294,7 @@ const SwapWidget = () => {
     };
 
 
-    const fetchSmartOrderRoute = async (tokenAmount: string, isAmountIn:boolean) => {
+    const fetchSmartOrderRoute = async (tokenAmount: string, isAmountIn: boolean) => {
         if (!token0 || !token1) return; // Ensure both tokens are present
 
         console.log("Fetch Run");
@@ -409,7 +422,7 @@ const SwapWidget = () => {
                                             }
                                         }}
                                     />
-                                    {Number(amountIn) > 0 && ( // Ensure amountIn is treated as a number
+                                    {(!isTestnet && Number(amountIn) > 0) && ( // Ensure amountIn is treated as a number
                                         <Typography
                                             sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}
                                         >
@@ -551,7 +564,7 @@ const SwapWidget = () => {
                                             }
                                         }}
                                     />
-                                    {Number(amountOut) > 0 && (
+                                    {!isTestnet && Number(amountOut) > 0 && (
                                         <Typography
                                             sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}
                                         >
