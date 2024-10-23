@@ -16,13 +16,12 @@ const Header = () => {
   const [openSettingsModal, setOpenSettingsModal] = React.useState(false);
   // const [openWallet, setOpenWallet] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [address, setAddress] = React.useState<string | null>(null);
   const accounts = useAccounts();
   const isConnected = useAccounts();
   const chainId = useChainId();
   const { theme } = useTheme();
   const router = useRouter();
-  const [buttonText, setButtonText] = React.useState<string | null>(null);
+  const [buttonText, setButtonText] = React.useState('Connect Wallet'); // Single useState
 
   const handleOpenSettings = () => setOpenSettingsModal(true);
   const handleCloseSettings = () => setOpenSettingsModal(false);
@@ -38,28 +37,20 @@ const Header = () => {
     setAnchorEl(null);
   };
 
+
   useEffect(() => {
-    const updateAddressAndButtonText = async () => {
+    const updateButtonText = () => {
       if (accounts && accounts.length > 0 && isConnected) {
-        // Shorten the address for display (e.g., 0x123...789)
         const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
-        setAddress(shortenedAddress);
+        setButtonText(shortenedAddress); // Update with shortened address
+      } else {
+        setButtonText('Connect Wallet');
       }
-      setButtonText(isConnected ? address : 'Connect Wallet');
-
-
-      // Update the button text based on connection status
     };
 
-    updateAddressAndButtonText();
+    updateButtonText();
   }, [accounts, isConnected]);
 
-
-  // const handleNetworkSelect = (chainId: number) => {
-  //   metaMask.activate(chainId);
-  //   setSelectedChainId(chainId);
-  //   handleCloseMenu(); // Close the menu after selection
-  // };
 
   const handleClick = () => {
     if (isConnected) {
@@ -69,13 +60,12 @@ const Header = () => {
       if (metaMask.deactivate) {
         metaMask.deactivate?.();
       } else {
-        console.log(metaMask.resetState());
+        metaMask.resetState();
       }
     } else {
       metaMask.activate();
     }
   };
-
 
   const openMenu = Boolean(anchorEl);
 
