@@ -100,8 +100,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const [isSorted, setIsSorted] = useState<boolean>(true);
   const [handlePricesAfterAdjust, setHandlePricesAfterAdjust] = useState<boolean>(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);  // Ref for the input element
+  const checkRange = ()=>{
+    if(!priceUpper || !priceLower || !priceCurrent) return true;
 
+    return Boolean(Number(priceCurrent) < Number(priceUpper) && Number(priceCurrent) > Number(priceLower));
+  }
 
   const calculateRange = (price: number, percentage: number)=>{
     return (price + ((percentage*price)/100)).toString();
@@ -958,7 +961,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                 </Box>
               </Box>
 
-              {!false ?
+              {checkRange() ?
 
                 <Box className="SwapWidgetInner" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
 
@@ -974,7 +977,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       </Typography>
                     </Box>
                     <Box className="inputField">
-                      <input onChange={()=>handleTokenAmountChange(0)} id="token0" type="text" placeholder='0.0' style={{ textAlign: 'end' }} 
+                      <input autoComplete="off" onChange={()=>handleTokenAmountChange(0)} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
                       value={!tokenToggleOccured ? (!Number(amount0Desired) ? amount0ToEmulate : amount0Desired) : (!Number(amount1Desired) ? amount1ToEmulate : amount1Desired)}/>
                       {/* By default this input takes token amount of token 0. If token toggle has occured, then this also needs to be toggled */}
                     </Box>
@@ -989,7 +992,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       </Typography>
                     </Box>
                     <Box className="inputField">
-                      <input onChange={()=>handleTokenAmountChange(1)} type="text" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} 
+                      <input autoComplete="off" onChange={()=>handleTokenAmountChange(1)} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} 
                       value={!tokenToggleOccured ? (!Number(amount1Desired) ? amount1ToEmulate : amount1Desired) : (!Number(amount0Desired) ? amount0ToEmulate : amount0Desired)}/>
                       {/* By default this input takes token amount of token 1. If token toggle has occured, then this also needs to be toggled */}
                     </Box>
@@ -1114,7 +1117,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <Box><FaMinus onClick={()=>{handleButton(false,false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) - 0.0001).toString()); handlePriceLower() }}/></Box>
                           <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                            <input type="number" placeholder="0.0" style={{ textAlign: 'center' }} onBlur={handlePriceLower} onChange={(e)=>{handleButton(false,false);setPriceLowerEntered(e.target.value)}} value={isFullRange ? "0" : priceLowerEntered}/>
+                            <input type="text" placeholder="0.0" style={{ textAlign: 'center' }} onBlur={handlePriceLower} onChange={(e)=>{handleButton(false,false);setPriceLowerEntered(e.target.value)}} value={isFullRange ? "0" : priceLowerEntered}/>
                           </Box>
                           <Box><FaPlus onClick={()=>{handleButton(false,false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
                         </Box>
