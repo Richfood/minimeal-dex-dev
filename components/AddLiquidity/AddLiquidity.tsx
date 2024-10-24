@@ -290,11 +290,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
     const currentPath = router.asPath;
     if(activeProtocol === Protocol.V3){
-      router.replace("/add/V2/token/token");
+      router.replace(`/add/V2/${token0?.address.contract_address || "token"}/${token1?.address.contract_address || "token"}`);
       // router.push("/add/V2/token/token");
     }
     else{
-      router.replace("/add/V3/token/token");
+      router.replace(`/add/V3/${token0?.address.contract_address || "token"}/${token1?.address.contract_address || "token"}`);
       // router.push("/add/V3/token/token");
     }
 

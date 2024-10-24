@@ -11,7 +11,9 @@ import router from 'next/router';
 import ImportPool from '../ImportPool/ImportPool'; 
 import { getPositionsData } from '@/utils/api/getPositionsData';
 import { calculatePositionData } from '@/utils/calculatePositionData';
-import { PositionData } from '@/interfaces';
+import { PositionData, TokenDetails } from '@/interfaces';
+
+import tokenList from "@/utils/tokenList.json";
 
 interface LiquidityProps {
   theme: 'light' | 'dark';
@@ -35,6 +37,9 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
 
   const handleOpenRecent = useCallback(() => setIsOpenRecent(true), []);
   const handleCloseRecent = () => setIsOpenRecent(false);
+
+  const [startToken0, setStartToken0] = useState<TokenDetails>(tokenList.TokenB);
+  const [startToken1, setStartToken1] = useState<TokenDetails>(tokenList.TokenA);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -138,7 +143,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
           <Button 
             onClick={() => {
               const pathVal = value === '2' ? "V2" : "V3";
-              let path = `/add/${pathVal}/token/token`;
+              let path = `/add/${pathVal}/${startToken0.address.contract_address}/${startToken1.address.contract_address}`//`/add/${pathVal}/token/token`;
               
               // path = (value === '2' ? 'V2/' : 'V3/') + path;
               router.push(path)
