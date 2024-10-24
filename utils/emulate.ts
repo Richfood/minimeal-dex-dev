@@ -28,6 +28,9 @@ function emulate(
     isSorted : boolean,
     // decimalDifference : number
 ) {
+    amount0Entered = amount0Entered === "" ? "0" : amount0Entered;
+    amount1Entered = amount1Entered === "" ? "0" : amount1Entered;
+
     console.log("🚀 ~ old isSorted:", isSorted)
     console.log("🚀 ~ old token1Details:", token1Details)
     console.log("🚀 ~ old token0Details:", token0Details)
