@@ -30,6 +30,7 @@ import { flushSync } from 'react-dom';
 import { getTokenUsdPrice } from "@/utils/api/getTokenUsdPrice"
 import getTokenApproval from '@/utils/getTokenApproval';
 import { debounce } from '@syncfusion/ej2-base';
+import getUserBalance from '@/utils/api/getUserBalance';
 const { useChainId, useIsActive, useAccounts } = hooks;
 
 interface TokenPair {
@@ -89,6 +90,7 @@ const SwapWidget = () => {
     const [address, setAddress] = React.useState<string | null>(null);
     const [buttonText, setButtonText] = React.useState<string | null>(null);
     const [slippageTolerance, setSlippageTolerance] = useState(0.5);
+    const [userBalance, setUserBalance] = useState<string | null>(null);
     const [prevTokens, setPrevTokens] = useState<{ token0: TokenDetails | null; token1: TokenDetails | null }>({
         token0: null,
         token1: null,
@@ -97,6 +99,20 @@ const SwapWidget = () => {
     const smartRouterAddress = addresses.SmartRouterAddress;
     const [isTestnet, setIsTestnet] = React.useState<boolean | null>(null);
 
+    useEffect(()=>{
+        if(!token0) return;
+
+        const runGetUserBalance = async()=>{
+            const balance = await getUserBalance(token0);
+            setUserBalance(balance);
+        }
+
+        runGetUserBalance();
+        
+    },[amountIn,isConnected]);
+
+
+    console.log(userBalance, amountIn);
     // Load token data from local storage and set it to state
     useEffect(() => {
         const isTestnet = chainId === 943;
@@ -515,8 +531,9 @@ const SwapWidget = () => {
                                     variant="contained"
                                     color="secondary"
                                     onClick={isActive ? handleSwap : handleClick} // Conditional onClick handler
+                                    disabled={amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn)}
                                 >
-                                    {isActive ? "Swap" : "Connect Wallet"}
+                                    {isActive ? ((userBalance && Number(userBalance) >= Number(amountIn)) ? "Swap" : "Insufficient Balance") : "Connect Wallet"}
                                 </Button>
                             </Box>
                         </Box>
