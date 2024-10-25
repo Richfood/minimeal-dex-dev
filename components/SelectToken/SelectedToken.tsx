@@ -128,6 +128,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
 
 
     const handleSelectToken = (token: TokenDetails) => {
+        console.log("🚀 ~ handleSelectToken ~ token:", token)
         console.log("🚀 ~ handleSelectToken ~ tokenNumber1:", tokenNumber);
         if (tokenNumber === 0) {
             if (token.address === token1?.address) {

@@ -1,5 +1,5 @@
 // src/components/SwapWidget.tsx
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, ChangeEvent } from 'react';
 import { Box, Typography, Button, List, ListItem, ListItemButton, Badge } from '@mui/material';
 import { IoIosArrowDown } from 'react-icons/io';
 import { FaArrowRight } from 'react-icons/fa';
@@ -33,17 +33,17 @@ import { debounce } from '@syncfusion/ej2-base';
 import getUserBalance from '@/utils/api/getUserBalance';
 const { useChainId, useIsActive, useAccounts } = hooks;
 
-interface TokenPair {
-    token0: TokenDetails | null;
-    token1: TokenDetails | null;
-}
+// interface TokenPair {
+//     token0: TokenDetails | null;
+//     token1: TokenDetails | null;
+// }
 
-interface PoolDetails {
-    sqrtPriceX96: BigNumber | string;
-    liquidity: BigNumber | string;
-    tick: number;
-    fee: number;
-}
+// interface PoolDetails {
+//     sqrtPriceX96: BigNumber | string;
+//     liquidity: BigNumber | string;
+//     tick: number;
+//     fee: number;
+// }
 
 const fetchCoinUSDPrice = async (tokenAddress?: string) => {
     if (!tokenAddress) {
@@ -72,8 +72,10 @@ const SwapWidget = () => {
     const [activeCurrency, setActiveCurrency] = useState<'PLS/9MM' | '9MM/PLS'>('PLS/9MM');
     // const [series, setSeries] = useState<{ name: string; data: { x: number; y: number; }[] }[]>([]);
     const chainId = useChainId();
-    const [token0, setToken0] = useState<TokenDetails | null>(tokenList.TokenC);
-    const [token1, setToken1] = useState<TokenDetails | null>(tokenList.TokenD);
+    const [token0, setToken0] = useState<TokenDetails | null>(null);
+    console.log("🚀 ~ SwapWidget ~ token0:", token0)
+    const [token1, setToken1] = useState<TokenDetails | null>(null);
+    console.log("🚀 ~ SwapWidget ~ token1:", token1)
     const [token0Price, setToken0Price] = useState<string | null>("0");
     const [token1Price, setToken1Price] = useState<string | null>("0");
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
@@ -99,17 +101,17 @@ const SwapWidget = () => {
     const smartRouterAddress = addresses.SmartRouterAddress;
     const [isTestnet, setIsTestnet] = React.useState<boolean | null>(null);
 
-    useEffect(()=>{
-        if(!token0) return;
+    useEffect(() => {
+        if (!token0) return;
 
-        const runGetUserBalance = async()=>{
+        const runGetUserBalance = async () => {
             const balance = await getUserBalance(token0);
             setUserBalance(balance);
         }
 
         runGetUserBalance();
-        
-    },[amountIn,isConnected]);
+
+    }, [amountIn, isConnected]);
 
 
     console.log(userBalance, amountIn);
@@ -121,10 +123,10 @@ const SwapWidget = () => {
 
         const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
-        // if (tokenData.length > 0) {
-        //     setToken0(tokenData[0]);
-        //     setToken1(tokenData[1]);
-        // }
+        if (tokenData.length > 0) {
+            setToken0(tokenData[0]);
+            setToken1(tokenData[1]);
+        }
     }, [chainId]);
 
     const handleOpenToken = useCallback((tokenNumber: number) => {
@@ -148,6 +150,54 @@ const SwapWidget = () => {
         updateAddressAndButtonText();
     }, [accounts, isConnected]);
 
+    // Using useRef to maintain a consistent timeout reference across renders
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const handleAmountInChange = useCallback((amountIn: string) => {
+        // Clear previous timeout to debounce
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+        // Set a new timeout to debounce the fetch call
+        timeoutRef.current = setTimeout(async () => {
+            try {
+                flushSync(() => setAmountOutLoading(true));
+                await fetchSmartOrderRoute(amountIn, true); // Fetch route
+            } finally {
+                flushSync(() => setAmountOutLoading(false));
+            }
+        }, 1000); // 1-second delay
+    }, []);
+
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setAmountIn(value); // Update state immediately
+        handleAmountInChange(value); // Trigger debounced handler
+    };
+
+    const handleAmountOutChange = useCallback((inputValue: string) => {
+        // Clear any previous timeout to debounce input
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+        // Set a new timeout to trigger API call after 1-second delay
+        timeoutRef.current = setTimeout(async () => {
+            try {
+                flushSync(() => setAmountInLoading(true));
+
+                await fetchSmartOrderRoute(inputValue, false); // API call
+
+            } finally {
+                flushSync(() => setAmountInLoading(false));
+            }
+
+
+        }, 1000); // 1-second delay
+    }, []);
+
+    const handleOutputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const inputValue = e.target.value;
+        setAmountOut(inputValue); // Update amountOut state immediately
+        handleAmountOutChange(inputValue); // Trigger debounced logic
+    };
 
     // const handleNetworkSelect = (chainId: number) => {
     //   metaMask.activate(chainId);
@@ -188,26 +238,6 @@ const SwapWidget = () => {
     //     }
     //     onToggle();
     // };
-
-    const debouncedHandleAmountIn = useCallback(
-        debounce(async (amountIn: string) => {
-            flushSync(() => setAmountOutLoading(true));
-            await fetchSmartOrderRoute(amountIn, true);
-            flushSync(() => setAmountOutLoading(false));
-        }, 1000),
-        [] // Ensure the debounce is created only once
-    );
-
-    // Debounced function for handling AmountOut input
-    const debouncedHandleAmountOut = useCallback(
-        debounce(async (amountOut: string) => {
-            flushSync(() => setAmountInLoading(true));
-            await fetchSmartOrderRoute(amountOut, false);
-            flushSync(() => setAmountInLoading(false));
-        }, 1000),
-        [] // Ensure the debounce is created only once
-    );
-
 
     const handlePriceForToken0 = async (tokenValue: string): Promise<any> => {
         try {
@@ -306,59 +336,51 @@ const SwapWidget = () => {
     };
 
 
-    const fetchSmartOrderRoute = async (tokenAmount: string, isAmountIn: boolean) => {
-        if (!token0 || !token1) return; // Ensure both tokens are present
+    const fetchSmartOrderRoute = useCallback(
+        async (tokenAmount: string, isAmountIn: boolean) => {
+            if (!token0 || !token1) return;
+            console.log("🚀 fetchSmartOrderRoute~ token1:", token1)
+            console.log("🚀 fetchSmartOrderRoute~ token0:", token0)
+            let protocol = Protocol.V3;
+            let tradeType = isAmountIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT;
 
-        console.log("Fetch Run");
-
-        let protocol = Protocol.V3;
-        let tradeType: TradeType;
-
-        try {
-            if (isAmountIn) {
-                tradeType = TradeType.EXACT_INPUT;
-                console.log("🚀 ~ fetchSmartOrderRoute ~ tradeType:", tradeType)
+            try {
+                console.log("🚀 ~ fetchSmartOrderRoute ~ tradeType:", tradeType);
 
                 const { data, value } = await getSmartOrderRoute(
-                    token0, token1, tokenAmount, [protocol], tradeType
+                    token0,
+                    token1,
+                    tokenAmount,
+                    [protocol],
+                    tradeType
                 );
 
                 if (data?.finalRoute?.tokenPath) {
                     setRoutePath(data.finalRoute.tokenPath);
                     setDataForSwap(data.finalRoute);
-                    const token1Price = await handlePriceForToken1(value);
-                    setToken1Price(token1Price);
-                } else {
-                    console.log("Token path not found in response.");
-                }
 
-                setAmountOut(value?.toString() || "");
-            } else {
-                tradeType = TradeType.EXACT_OUTPUT;
-                console.log("🚀 ~ fetchSmartOrderRoute ~ tradeType:", tradeType)
-
-                const { data, value } = await getSmartOrderRoute(
-                    token0, token1, tokenAmount, [protocol], tradeType
-                );
-                console.log("🚀 ~ EXACT_OUTPUT ~ Data:", data);
-
-                if (data?.finalRoute?.tokenPath) {
-                    setRoutePath(data.finalRoute.tokenPath);
-                    const token0Price = await handlePriceForToken0(value);
-                    console.log("🚀 ~ fetchSmartOrderRoute ~ token0Price:", token0Price)
-
-                    setToken0Price(token0Price);
-
+                    if (isAmountIn) {
+                        const token1Price = await handlePriceForToken1(value);
+                        setToken1Price(token1Price);
+                        setAmountOut(value?.toString() || "");
+                    } else {
+                        const token0Price = await handlePriceForToken0(value);
+                        console.log("🚀 ~ fetchSmartOrderRoute ~ token0Price:", token0Price);
+                        setToken0Price(token0Price);
+                        setAmountIn(value?.toString() || "");
+                    }
                 } else {
                     console.error("Token path not found in response.");
                 }
-
-                setAmountIn(value?.toString() || "");
+            } catch (error) {
+                console.error("Error fetching route:", error);
             }
-        } catch (error) {
-            console.error("Error fetching route:", error);
-        }
-    };
+        },
+          
+        [token0, token1] // Add dependencies to track changes
+    );
+
+
 
 
 
@@ -420,19 +442,8 @@ const SwapWidget = () => {
                                     <input
                                         type="number"
                                         placeholder="0.0"
-                                        step="0.001"
                                         value={amountIn}
-                                        onChange={(e) => {
-                                            if (token0) {
-                                                const value = e.target.value;
-                                                setAmountIn(value);
-                                                setAmountOut(""); // Clear amountOut
-                                                handlePriceForToken0(value); // Update price immediately
-
-                                                // Debounced function to trigger when user stops typing
-                                                debouncedHandleAmountIn(value);
-                                            }
-                                        }}
+                                        onChange={handleInputChange} // Use updated handler
                                     />
                                     {(!isTestnet && Number(amountIn) > 0) && ( // Ensure amountIn is treated as a number
                                         <Typography
@@ -566,16 +577,7 @@ const SwapWidget = () => {
                                         type="number"
                                         placeholder="0.0"
                                         value={amountOut}
-                                        onChange={(e) => {
-                                            if (token1) {
-                                                const inputValue = e.target.value;
-                                                setAmountOut(inputValue);
-                                                handlePriceForToken1(inputValue); // Update price immediately
-
-                                                // Debounced function to trigger when user stops typing
-                                                debouncedHandleAmountOut(inputValue);
-                                            }
-                                        }}
+                                        onChange={handleOutputChange} // Use updated handler
                                     />
                                     {!isTestnet && Number(amountOut) > 0 && (
                                         <Typography
