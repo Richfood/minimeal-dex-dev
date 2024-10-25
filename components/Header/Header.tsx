@@ -10,7 +10,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { metaMask, hooks } from '../ConnectWallet/connector';
 import NetworkMenu from './account';
-const { useChainId, useAccounts, useProvider } = hooks;
+const { useChainId, useAccounts } = hooks;
 
 const Header = () => {
   const [openSettingsModal, setOpenSettingsModal] = React.useState(false);
@@ -118,20 +118,42 @@ const Header = () => {
               <ListItem disablePadding>
                 <Tooltip title="Account settings">
                   <IconButton
-                    sx={{ borderRadius: '30px', bgcolor: 'var(--secondary-dark)', display: 'flex', gap: '10px', '&:hover': { bgcolor: 'var(--secondary-dark)' }, alignItems: 'center' }}
+                    sx={{
+                      borderRadius: '30px',
+                      bgcolor: 'var(--secondary-dark)',
+                      display: 'flex',
+                      gap: '10px',
+                      '&:hover': { bgcolor: 'var(--secondary-dark)' },
+                      alignItems: 'center',
+                    }}
                     size="small"
                     onClick={handleClickMenu}
                     aria-controls={openMenu ? 'network-menu' : undefined}
                     aria-haspopup="true"
                     aria-expanded={openMenu ? 'true' : undefined}
                   >
-                    <Image src={networkImages['PulseChain']} width={24} height={24} alt="Profile" />
-                    <Typography sx={{ fontWeight: '700', fontSize: '12px', display: 'flex', gap: '3px', color: 'var(--white)' }}>
-                      PulseChain<IoIosArrowDown size={16} />
+                    <Image
+                      src={networkImages['PulseChain']}
+                      width={24}
+                      height={24}
+                      alt="Profile"
+                    />
+                    <Typography
+                      sx={{
+                        fontWeight: '700',
+                        fontSize: '12px',
+                        display: 'flex',
+                        gap: '3px',
+                        color: 'var(--white)',
+                      }}
+                    >
+                      {chainId === 943 ? 'PulseChain Testnet' : 'PulseChain Mainnet'}
+                      <IoIosArrowDown size={16} />
                     </Typography>
                   </IconButton>
                 </Tooltip>
               </ListItem>
+
 
               <NetworkMenu
                 anchorEl={anchorEl}
@@ -151,17 +173,29 @@ const Header = () => {
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    '& .MuiTypography-root': {
-                      fontWeight: 700,
-                      ml: '3px',
-                      '@media (max-width: 899px)': {
-                        display: 'none',
-                      },
+                    justifyContent: 'center',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    minWidth: '120px',
+                    '@media (max-width: 899px)': {
+                      padding: '6px 12px', // Compact padding for smaller screens
                     },
                   }}
                 >
-                  <Typography>{buttonText}</Typography>
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                      ml: '5px',
+                      fontSize: '1rem',
+                      '@media (max-width: 899px)': {
+                        fontSize: '0.85rem',
+                      },
+                    }}
+                  >
+                    {buttonText}
+                  </Typography>
                 </Button>
+
               </ListItem>
             </List>
           </Box>

@@ -331,8 +331,8 @@ const SwapWidget = () => {
 
         // Swap token0 and token1 regardless of currency
         const tempToken = token0;
-        // setToken0(token1);
-        // setToken1(tempToken);
+        setToken0(token1);
+        setToken1(tempToken);
     };
 
 
@@ -421,7 +421,7 @@ const SwapWidget = () => {
                 <Box className="SwapWidgetInner">
                     <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                            {/* <img src={token0?.image} alt="logoURI" style={{ width: '20px', height: '20px' }} /> */}
+                            <img src={token0?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
                             <Typography onClick={() => handleOpenToken(0)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                                 {token0?.symbol} <IoIosArrowDown />
                             </Typography>
@@ -559,7 +559,7 @@ const SwapWidget = () => {
 
                     <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                         <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                            {/* <img src={token3?.logoURI} alt="circle2" style={{ width: '20px', height: '20px' }} /> */}
+                            <img src={token1?.logoURI} alt="circle2" style={{ width: '20px', height: '20px' }} />
                             <Typography onClick={() => handleOpenToken(1)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: "pointer" }}>
                                 {token1 && token1.symbol.toUpperCase()}
                                 <IoIosArrowDown />
