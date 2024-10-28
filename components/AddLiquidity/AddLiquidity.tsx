@@ -65,8 +65,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const v2RouterAddress = addresses.PancakeV2RouterAddress;
   const tempToken0 = tokenList.TokenA;
   const tempToken1 = tokenList.TokenB;
-  const [token0,setToken0] =  useState<TokenDetails | null>(tempToken1);
-  const [token1, setToken1] = useState<TokenDetails | null>(tempToken0);
+  const [token0,setToken0] =  useState<TokenDetails | null>(tempToken0);
+  const [token1, setToken1] = useState<TokenDetails | null>(tempToken1);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
   const [isFullRange, setIsFullRange] = useState(false);
   const [isButton, setIsButton] = useState(false);
@@ -533,11 +533,17 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
           console.log("in if")
           amountAt0ToSet = amount0DesiredEmulate;
           amountAt1ToSet = amount1DesiredEmulate;
+
+          setApprovalAmount0(amount0DesiredEmulate);
+          setApprovalAmount1(amount1DesiredEmulate);
         }
         else{
           console.log("in else")
           amountAt0ToSet = amount1DesiredEmulate;
           amountAt1ToSet = amount0DesiredEmulate;
+
+          setApprovalAmount0(amount1DesiredEmulate);
+          setApprovalAmount1(amount0DesiredEmulate);
         }
 
         setAmountAt0(amountAt0ToSet);
