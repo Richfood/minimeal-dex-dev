@@ -153,7 +153,7 @@ const SwapWidget = () => {
     // Using useRef to maintain a consistent timeout reference across renders
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
- 
+
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -162,9 +162,9 @@ const SwapWidget = () => {
     };
 
     const handleOutputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const inputValue = e.target.value;
-        setAmountOut(inputValue); // Update amountOut state immediately
-        handleAmountOutChange(inputValue); // Trigger debounced logic
+        const value = e.target.value;
+        setAmountOut(value); // Update state immediately
+        handleAmountOutChange(value); // Trigger debounced handler
     };
 
     // const handleNetworkSelect = (chainId: number) => {
@@ -310,13 +310,13 @@ const SwapWidget = () => {
                 console.warn("Tokens not available:", { token0, token1 });
                 return;
             }
-    
+
             console.log("🚀 fetchSmartOrderRoute~ token0:", token0);
             console.log("🚀 fetchSmartOrderRoute~ token1:", token1);
-    
+
             const protocol = Protocol.V3;
             const tradeType = isAmountIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT;
-    
+
             try {
                 const { data, value } = await getSmartOrderRoute(
                     token0,
@@ -325,11 +325,11 @@ const SwapWidget = () => {
                     [protocol],
                     tradeType
                 );
-    
+
                 if (data?.finalRoute?.tokenPath) {
                     setRoutePath(data.finalRoute.tokenPath);
                     setDataForSwap(data.finalRoute);
-    
+
                     if (isAmountIn) {
                         const token1Price = await handlePriceForToken1(value);
                         setToken1Price(token1Price);
@@ -353,7 +353,7 @@ const SwapWidget = () => {
         (amountIn: string) => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current); // Clear previous timeout
             flushSync(() => setAmountOut("")); // Clear amount out
-    
+
             timeoutRef.current = setTimeout(async () => {
                 try {
                     flushSync(() => setAmountOutLoading(true)); // Show loading state
@@ -365,27 +365,24 @@ const SwapWidget = () => {
         },
         [fetchSmartOrderRoute, setAmountOut] // Add dependencies
     );
-    
-    
+
+
     const handleAmountOutChange = useCallback(
         (amountOut: string) => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current); // Clear previous timeout
-            flushSync(() => setAmountOut("")); // Clear amount out
-    
+            flushSync(() => setAmountIn("")); // Clear amount out
+
             timeoutRef.current = setTimeout(async () => {
                 try {
                     flushSync(() => setAmountInLoading(true)); // Show loading state
-                    await fetchSmartOrderRoute(amountIn, true); // Use latest tokens
+                    await fetchSmartOrderRoute(amountOut, true); // Use latest tokens
                 } finally {
                     flushSync(() => setAmountInLoading(false)); // Hide loading state
                 }
             }, 1000); // 1-second debounce
         },
-        [fetchSmartOrderRoute, setAmountOut] // Add dependencies
+        [fetchSmartOrderRoute, setAmountIn] // Add dependencies
     );
-
-
-
 
     const copyToClipboard = (text: string | undefined) => {
         console.log("🚀 ~ copyToClipboard ~ text:", text)
@@ -603,6 +600,7 @@ const SwapWidget = () => {
                                 </Box>
                             )}
                         </Box>
+
                     </Box>
 
 
