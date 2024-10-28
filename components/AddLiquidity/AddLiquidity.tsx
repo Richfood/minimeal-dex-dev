@@ -33,6 +33,7 @@ import SettingsModal from '../SettingModal/SettingModal';
 import tokenList from "../../utils/tokenList.json";
 import { calculateV2Amounts } from '@/utils/calculateV2TokenAmounts';
 import { debounce } from '@syncfusion/ej2-base';
+import { flushSync } from 'react-dom';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -584,44 +585,47 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   //   }, 300),
   //   []
   // );
-
-  const handleTokenAmountChange = async (amountAtIndex : number, value : string) => {
-    console.log("🚀 ~ handleTokenAmountChange ~ value:", amountAtIndex, value)
-      if(!token0 || !token1) return;
-
-      if(!value){
-        setAmountAt0("");
-        setAmountAt0("");
-        setAmount0ToEmulate("");
-        setAmount1ToEmulate("");
+  
+  const handleTokenAmountChange = useCallback(
+    debounce(async (amountAtIndex : number, value : string) => {
+      if (!token0 || !token1) return;
+  
+      if (!value) {
+        flushSync(() => {
+          setAmountAt0("");
+          setAmountAt1("");
+          setAmount0ToEmulate("");
+          setAmount1ToEmulate("");
+        });
+        return;
       }
-
-      let amountAt0ToEmulate : string = "";
-      let amountAt1ToEmulate : string = "";
-    
-      if(amountAtIndex === 0){
+  
+      let amountAt0ToEmulate = "";
+      let amountAt1ToEmulate = "";
+  
+      if (amountAtIndex === 0) {
         amountAt0ToEmulate = value;
         amountAt1ToEmulate = "0";
-      }
-      else{
+      } else {
         amountAt0ToEmulate = "0";
         amountAt1ToEmulate = value;
-      } 
-
-      console.log("🚀 ~ handleTokenAmountChange ~ amountAt0ToEmulate:", amountAt0ToEmulate)
-      console.log("🚀 ~ handleTokenAmountChange ~ amountAt1ToEmulate:", amountAt1ToEmulate)
-
-
-      // if((isSorted && !tokenToggleOccured) || (!isSorted && tokenToggleOccured)){
-      if(isSorted){
-        setAmount0ToEmulate(amountAt0ToEmulate);
-        setAmount1ToEmulate(amountAt1ToEmulate);
       }
-      else{
-        setAmount0ToEmulate(amountAt1ToEmulate);
-        setAmount1ToEmulate(amountAt0ToEmulate);
+  
+      if (isSorted) {
+        flushSync(() => {
+          setAmount0ToEmulate(amountAt0ToEmulate);
+          setAmount1ToEmulate(amountAt1ToEmulate);
+        });
+      } else {
+        flushSync(() => {
+          setAmount0ToEmulate(amountAt1ToEmulate);
+          setAmount1ToEmulate(amountAt0ToEmulate);
+        });
       }
-  }
+    }, 1000),
+    [token0, token1, isSorted]
+  );
+  
 
   const handleTokenToggle = ()=>{
     setTokenToggleOccured(!tokenToggleOccured);
@@ -998,6 +1002,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                     </Box>
                     <Box className="inputField">
                       <input autoComplete="off" onChange={(e)=>{
+                        setAmountAt1("")
+                        setAmountAt0(e.target.value);
                         handleTokenAmountChange(0, e.target.value)
                       }} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
                       value={amountAt0}/>
@@ -1015,6 +1021,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                     </Box>
                     <Box className="inputField">
                       <input autoComplete="off" onChange={(e)=>{
+                        setAmountAt0("")
+                        setAmountAt1(e.target.value);
                         handleTokenAmountChange(1, e.target.value)
                       }} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} 
                       value={amountAt1}/>
