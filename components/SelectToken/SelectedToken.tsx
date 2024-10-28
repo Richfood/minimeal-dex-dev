@@ -9,7 +9,7 @@ import { List, ListItem } from '@mui/material';
 import ManageToken from '../ManageToken/ManageToken';
 import Image from 'next/image';
 import { metaMask, hooks } from '../ConnectWallet/connector';
-
+import tokenList from "../../utils/tokenList.json"
 const { useChainId, useAccounts } = hooks;
 
 import famousToken from "../../utils/famousToken.json";
@@ -102,6 +102,8 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
     const [coinData, setCoinData] = useState<any[]>([]);
     console.log("🚀 ~ coinData:", coinData)
     const [tokens, setTokens] = useState<TokenDetails[]>([]);
+    const [tokensOfLiquidity, setTokensOfLiquidity] = useState<TokenDetails[]>([]);
+
     console.log("🚀 ~ tokens:", tokens)
     const isConnected = useAccounts();
     const chainId = useChainId();
@@ -120,6 +122,10 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
 
             const tokenData = isTestnet ? famousTokenTestnet : famousToken;
             setTokens(tokenData);
+            const tokenOfLiquidityData = isTestnet && tokenList ? Object.entries(tokenList).map(([key, value]) => value) : [];
+            setTokensOfLiquidity(tokenOfLiquidityData);
+            
+
 
         };
 
@@ -128,8 +134,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
 
 
     const handleSelectToken = (token: TokenDetails) => {
-        console.log("🚀 ~ handleSelectToken ~ token:", token)
-        console.log("🚀 ~ handleSelectToken ~ tokenNumber1:", tokenNumber);
+
         if (tokenNumber === 0) {
             if (token.address === token1?.address) {
                 // If the selected token is already token1, swap it with token0
@@ -307,14 +312,17 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                     })}
 
                                     {/* Mapping over coinData */}
-                                    {/* {coinData?.map((asset) => {
+                                    {tokensOfLiquidity?.map((token: TokenDetails) => {
+                                        // Select the relevant token based on tokenNumber
                                         const selectedToken = tokenNumber === 0 ? token0 : token1;
-                                        const isTokenDisabled =
-                                            asset.address?.contract_address === selectedToken?.address?.contract_address;
+
+
+                                        // Check if the token should be disabled
+                                        const isTokenDisabled = token.address === selectedToken?.address;
 
                                         return (
                                             <ListItem
-                                                key={asset.symbol}
+                                                key={token.symbol}
                                                 sx={{
                                                     display: "flex",
                                                     flexDirection: "column",
@@ -323,33 +331,34 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                                     '&:hover': { backgroundColor: 'rgb(248 250 252)' },
                                                     padding: 1,
                                                 }}
-                                                onClick={!isTokenDisabled ? () => handleSelectToken(asset) : undefined}
+                                                onClick={!isTokenDisabled ? () => handleSelectToken(token) : undefined} // Only enable click if not disabled
                                             >
                                                 <Box
+                                                    className="token_box"
                                                     sx={{
                                                         cursor: isTokenDisabled ? "default" : "pointer",
                                                         opacity: isTokenDisabled ? 0.4 : 1,
+                                                        display: "flex",
+                                                        alignItems: "center",
                                                     }}
                                                 >
-                                                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                                                        <img
-                                                            src={asset.image}
-                                                            alt={`${asset.symbol} logo`}
-                                                            style={{ width: 24, height: 24, marginRight: 8 }}
-                                                        />
-                                                        <Box sx={{ display: "flex", flexDirection: "column" }}>
-                                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                                {asset.symbol.toUpperCase()}
-                                                            </Typography>
-                                                            <Typography color="text.secondary" variant="body2">
-                                                                {asset.name}
-                                                            </Typography>
-                                                        </Box>
+                                                    <img
+                                                        src={token.logoURI}
+                                                        alt={`${token.symbol} logo`}
+                                                        style={{ width: 24, height: 24, marginRight: 8 }}
+                                                    />
+                                                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                                                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                            {token.symbol.toUpperCase()}
+                                                        </Typography>
+                                                        <Typography color="text.secondary" variant="body2">
+                                                            {token.name}
+                                                        </Typography>
                                                     </Box>
                                                 </Box>
                                             </ListItem>
                                         );
-                                    })} */}
+                                    })}
                                 </List>
                             </Box>
 

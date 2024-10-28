@@ -153,45 +153,13 @@ const SwapWidget = () => {
     // Using useRef to maintain a consistent timeout reference across renders
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const handleAmountInChange = useCallback((amountIn: string) => {
-        // Clear previous timeout to debounce
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-
-        // Set a new timeout to debounce the fetch call
-        timeoutRef.current = setTimeout(async () => {
-            try {
-                flushSync(() => setAmountOutLoading(true));
-                await fetchSmartOrderRoute(amountIn, true); // Fetch route
-            } finally {
-                flushSync(() => setAmountOutLoading(false));
-            }
-        }, 1000); // 1-second delay
-    }, []);
+ 
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setAmountIn(value); // Update state immediately
         handleAmountInChange(value); // Trigger debounced handler
     };
-
-    const handleAmountOutChange = useCallback((inputValue: string) => {
-        // Clear any previous timeout to debounce input
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-
-        // Set a new timeout to trigger API call after 1-second delay
-        timeoutRef.current = setTimeout(async () => {
-            try {
-                flushSync(() => setAmountInLoading(true));
-
-                await fetchSmartOrderRoute(inputValue, false); // API call
-
-            } finally {
-                flushSync(() => setAmountInLoading(false));
-            }
-
-
-        }, 1000); // 1-second delay
-    }, []);
 
     const handleOutputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const inputValue = e.target.value;
@@ -338,15 +306,18 @@ const SwapWidget = () => {
 
     const fetchSmartOrderRoute = useCallback(
         async (tokenAmount: string, isAmountIn: boolean) => {
-            if (!token0 || !token1) return;
-            console.log("🚀 fetchSmartOrderRoute~ token1:", token1)
-            console.log("🚀 fetchSmartOrderRoute~ token0:", token0)
-            let protocol = Protocol.V3;
-            let tradeType = isAmountIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT;
-
+            if (!token0 || !token1) {
+                console.warn("Tokens not available:", { token0, token1 });
+                return;
+            }
+    
+            console.log("🚀 fetchSmartOrderRoute~ token0:", token0);
+            console.log("🚀 fetchSmartOrderRoute~ token1:", token1);
+    
+            const protocol = Protocol.V3;
+            const tradeType = isAmountIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT;
+    
             try {
-                console.log("🚀 ~ fetchSmartOrderRoute ~ tradeType:", tradeType);
-
                 const { data, value } = await getSmartOrderRoute(
                     token0,
                     token1,
@@ -354,18 +325,17 @@ const SwapWidget = () => {
                     [protocol],
                     tradeType
                 );
-
+    
                 if (data?.finalRoute?.tokenPath) {
                     setRoutePath(data.finalRoute.tokenPath);
                     setDataForSwap(data.finalRoute);
-
+    
                     if (isAmountIn) {
                         const token1Price = await handlePriceForToken1(value);
                         setToken1Price(token1Price);
                         setAmountOut(value?.toString() || "");
                     } else {
                         const token0Price = await handlePriceForToken0(value);
-                        console.log("🚀 ~ fetchSmartOrderRoute ~ token0Price:", token0Price);
                         setToken0Price(token0Price);
                         setAmountIn(value?.toString() || "");
                     }
@@ -376,10 +346,43 @@ const SwapWidget = () => {
                 console.error("Error fetching route:", error);
             }
         },
-          
-        [token0, token1] // Add dependencies to track changes
+        [token0, token1, setRoutePath, setDataForSwap, setToken1Price, setAmountOut, setToken0Price, setAmountIn]
     );
 
+    const handleAmountInChange = useCallback(
+        (amountIn: string) => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current); // Clear previous timeout
+            flushSync(() => setAmountOut("")); // Clear amount out
+    
+            timeoutRef.current = setTimeout(async () => {
+                try {
+                    flushSync(() => setAmountOutLoading(true)); // Show loading state
+                    await fetchSmartOrderRoute(amountIn, true); // Use latest tokens
+                } finally {
+                    flushSync(() => setAmountOutLoading(false)); // Hide loading state
+                }
+            }, 1000); // 1-second debounce
+        },
+        [fetchSmartOrderRoute, setAmountOut] // Add dependencies
+    );
+    
+    
+    const handleAmountOutChange = useCallback(
+        (amountOut: string) => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current); // Clear previous timeout
+            flushSync(() => setAmountOut("")); // Clear amount out
+    
+            timeoutRef.current = setTimeout(async () => {
+                try {
+                    flushSync(() => setAmountInLoading(true)); // Show loading state
+                    await fetchSmartOrderRoute(amountIn, true); // Use latest tokens
+                } finally {
+                    flushSync(() => setAmountInLoading(false)); // Hide loading state
+                }
+            }, 1000); // 1-second debounce
+        },
+        [fetchSmartOrderRoute, setAmountOut] // Add dependencies
+    );
 
 
 
@@ -542,11 +545,19 @@ const SwapWidget = () => {
                                     variant="contained"
                                     color="secondary"
                                     onClick={isActive ? handleSwap : handleClick} // Conditional onClick handler
-                                    disabled={amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn)}
+                                    disabled={isActive && (amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn))}
                                 >
-                                    {isActive ? ((userBalance && Number(userBalance) >= Number(amountIn)) ? "Swap" : "Insufficient Balance") : "Connect Wallet"}
+                                    {isActive
+                                        ? (userBalance && Number(userBalance) >= Number(amountIn)
+                                            ? "Swap"
+                                            : "Insufficient Balance"
+                                        )
+                                        : "Connect Wallet"
+                                    }
                                 </Button>
                             </Box>
+
+
                         </Box>
 
                     </Box>
@@ -662,7 +673,5 @@ const SwapWidget = () => {
 };
 
 export default SwapWidget;
-function isEqual(current: TokenDetails | null, token0: TokenDetails | null) {
-    throw new Error('Function not implemented.');
-}
+
 

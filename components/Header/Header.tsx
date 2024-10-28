@@ -175,10 +175,10 @@ const Header = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: '8px 16px',
-                    borderRadius: '8px',
+                    borderRadius: '20px',
                     minWidth: '120px',
                     '@media (max-width: 899px)': {
-                      padding: '6px 12px', // Compact padding for smaller screens
+                      padding: '6px 12px', 
                     },
                   }}
                 >
