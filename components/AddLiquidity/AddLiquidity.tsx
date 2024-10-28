@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Box, Button, Link, Typography, useTheme } from '@mui/material';
+import { Box, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
 import { BsArrowLeft } from 'react-icons/bs';
 import { CiCalculator2 } from 'react-icons/ci';
 import { BsQuestionCircle } from 'react-icons/bs';
@@ -38,6 +38,12 @@ import { flushSync } from 'react-dom';
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
   defaultActiveProtocol : Protocol;
+}
+
+interface AddLiquidityLoader {
+  tokenApproval0 : boolean,
+  tokenApproval1 : boolean,
+  addLiquidity : boolean
 }
 
 const MIN_TICK = -887272;
@@ -104,6 +110,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   // console.log("🚀 ~ tokenToggleOccured:", tokenToggleOccured)
   const [isSorted, setIsSorted] = useState<boolean>(true);
   const [handlePricesAfterAdjust, setHandlePricesAfterAdjust] = useState<boolean>(false);
+
+  const [addLiquidityRunning, setAddLiquidityRunning] = useState(false);
 
   // const renderCount = useRef(0);
 
@@ -327,6 +335,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const handleAddLiquidity = async ()=>{
     if(!token0 || !token1) return;
+
+    setAddLiquidityRunning(true);
     try{
 
       const addressToApprove = activeProtocol === Protocol.V3 ? NFPMAddress : v2RouterAddress;
@@ -350,6 +360,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       alert("Tokens Approved!");
     }
     catch(error){
+      setAddLiquidityRunning(false);
       alert("Error approving tokens");
       //console.log(error)
       return;
@@ -400,6 +411,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       }
       catch(error){
         //console.log("Error adding liquidity", error);
+        setAddLiquidityRunning(false);
         alert(`Error adding liquidity`);
       }
     }
@@ -427,9 +439,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       }
       catch(error){
         //console.log("Error adding liquidity", error);
+        setAddLiquidityRunning(false);
         alert(`Error adding liquidity`);
       }
     }
+    setAddLiquidityRunning(false);
   }
 
   const handleGettingPoolData = async ()=>{
@@ -1047,9 +1061,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       variant="contained" 
                       color="secondary" 
                       sx={{ width: '100%' }}
-                      disabled={!amount0Desired || !amount1Desired || !token0 || !token1}
+                      disabled={!amount0Desired || !amount1Desired || !token0 || !token1 || addLiquidityRunning}
                     >
-                      Create Liquidity
+                      {addLiquidityRunning ? <CircularProgress size={30}/> : <>Create Liquidity</>}
                     </Button>
                   </Box>
               ) : (
@@ -1305,8 +1319,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                     </Box>
 
                     <Box>
-                      <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired}>
-                        Create Liquidity{/* {Enter an amount} */}
+                      <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning}>
+                        {addLiquidityRunning ? <CircularProgress size={30}/> : <>Create Liquidity</>}
                       </Button>
                     </Box>
                   </Box>

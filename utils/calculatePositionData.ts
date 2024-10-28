@@ -31,6 +31,7 @@ function feeGrowthInsideX128(
   
 
 export function calculatePositionData(position : PositionData){
+// console.log("🚀 ~ calculatePositionData ~ position:", position)
 
     // Fetch necessary data: liquidity, feeGrowthInsideLastX128, etc.
 const liquidity = position.liquidity;
@@ -72,5 +73,5 @@ console.log("🚀 ~ calculatePositionData ~ humanReadableFeesToken1:", humanRead
 
 
 
-    return position;
+    return {humanReadableFeesToken0, humanReadableFeesToken1};
 }

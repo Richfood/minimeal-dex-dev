@@ -49,10 +49,6 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
     const runGetPositionsData = async()=>{
       let newPositions : PositionData[] = await getPositionsData();
 
-      newPositions = newPositions.map((position : PositionData)=>{
-        return calculatePositionData(position);
-      })
-
       setPositions(newPositions);
     }
 
@@ -126,7 +122,23 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
           )}
           {value === '1' && (
             <Box sx={{ py: '15px', textAlign: 'center' }}>
-              <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
+              {positions ? (
+                  <List>{
+                  positions.map((elem)=>{
+                    // console.log("positions map, elem : ", elem);
+                    return (
+                        <ListItem>
+                          <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{elem.id}</Typography>
+                          <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{elem.liquidity}</Typography>
+                          <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{calculatePositionData(elem).humanReadableFeesToken0}</Typography>
+                        </ListItem>
+                    )
+                  })
+                  }
+                  </List>
+                ) : (
+                  <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
+                )}
             </Box>
           )}
           {value === '2' && (

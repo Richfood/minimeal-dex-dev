@@ -14,7 +14,7 @@ export async function getPositionsData(): Promise<any> {
       query {
         positions(
           first: 20
-          orderBy: id
+          orderBy: pool__createdAtTimestamp
           orderDirection: desc
           where: {owner: "${userAddress.toLowerCase()}"}
         ) {
