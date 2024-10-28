@@ -63,8 +63,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const NFPMAddress = addresses.PancakePositionManagerAddress;
   const v2RouterAddress = addresses.PancakeV2RouterAddress;
-  const tempToken0 = tokenList.TokenB;
-  const tempToken1 = tokenList.TokenA;
+  const tempToken0 = tokenList.TokenA;
+  const tempToken1 = tokenList.TokenB;
   const [token0,setToken0] =  useState<TokenDetails | null>(tempToken1);
   const [token1, setToken1] = useState<TokenDetails | null>(tempToken0);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
@@ -88,6 +88,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const [amount0ToEmulate, setAmount0ToEmulate] = useState<number | string>("");
   const [amount1ToEmulate, setAmount1ToEmulate] = useState<number | string>("");
 
+  const [amountAt0, setAmountAt0] = useState("");
+  const [amountAt1, setAmountAt1] = useState("");
+
   const [priceLowerEntered, setPriceLowerEntered] = useState("");
   const [priceUpperEntered, setPriceUpperEntered] = useState("");
   const [priceCurrentEntered, setPriceCurrentEntered] = useState("");
@@ -96,9 +99,12 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const [currentV2PoolRatio, setCurrentV2PoolRatio] = useState<number | null>(null);
 
   const [decimalDifference, setDecimalDifference] = useState(0);
-  const [tokenToggleOccured, setTokenToggleOccured] = useState<boolean | null>(false);
+  const [tokenToggleOccured, setTokenToggleOccured] = useState<boolean | null>(true);
+  // console.log("🚀 ~ tokenToggleOccured:", tokenToggleOccured)
   const [isSorted, setIsSorted] = useState<boolean>(true);
   const [handlePricesAfterAdjust, setHandlePricesAfterAdjust] = useState<boolean>(false);
+
+  // const renderCount = useRef(0);
 
   const checkRange = ()=>{
     if(!priceUpper || !priceLower || !priceCurrent) return true;
@@ -112,7 +118,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const adjustPricesForTokenToggle = ()=>{
 
-    console.log("Adjust Price RUn");
+    // console.log("Adjust Price RUn");
     if(token0 && token1){
       
       const tempToken = token0;
@@ -154,7 +160,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       setPriceLower(newPrice.toString());
       setPriceLowerEntered(newPrice.toString());
 
-      console.log("🚀 ~ handlePriceLower ~ newPrice:", newPrice)
+      // console.log("🚀 ~ handlePriceLower ~ newPrice:", newPrice)
     }
     else{
       setPriceLower("");
@@ -169,7 +175,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
       setPriceUpper(newPrice.toString());
       setPriceUpperEntered(newPrice.toString());
-      console.log("🚀 ~ handlePriceUpper ~ newPrice:", newPrice) 
+      // console.log("🚀 ~ handlePriceUpper ~ newPrice:", newPrice) 
     }
     else{
       setPriceUpper("");
@@ -179,7 +185,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const handlePriceCurrent = ()=>{
     if(fee && priceCurrentEntered && token0 && token1 && Number(priceCurrentEntered) > 0){
       const tick = priceToTick(priceCurrentEntered, decimalDifference);
-      console.log("🚀 ~ handlePriceCurrent ~ tick:", tick, priceCurrentEntered);
+      // console.log("🚀 ~ handlePriceCurrent ~ tick:", tick, priceCurrentEntered);
 
       
       const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
@@ -187,7 +193,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
       setPriceCurrent(newPrice.toString());
       setPriceCurrentEntered(newPrice.toString());
-      console.log("🚀 ~ handlePriceCurrent ~ newPrice:", newPrice); 
+      // console.log("🚀 ~ handlePriceCurrent ~ newPrice:", newPrice); 
     }
     else{
       setPriceCurrent("");
@@ -216,6 +222,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     setPriceCurrentEntered("");
 
     handleButton(false,false);
+
+    setAmountAt0("");
+    setAmountAt1("");
     // setIsFullRange(false);
   }
 
@@ -280,7 +289,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   // }
 
   const toggleClass = () => {
-    console.log("🚀 ~ toggleClass ~ isActive:", isActive)
+    //console.log("🚀 ~ toggleClass ~ isActive:", isActive)
     setIsActive(!isActive);
   };
 
@@ -328,12 +337,12 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       else{
         if(token0.symbol !== "PLS"){
           await getTokenApproval(token0, addressToApprove, approvalAmount0);
-          console.log("🚀 ~ handleAddLiquidity ~ approvalAmount0:", approvalAmount0)
-          console.log("🚀 ~ handleAddLiquidity ~ token0.symbol:", token0.symbol)
+          //console.log("🚀 ~ handleAddLiquidity ~ approvalAmount0:", approvalAmount0)
+          //console.log("🚀 ~ handleAddLiquidity ~ token0.symbol:", token0.symbol)
         }
         if(token1.symbol !== "PLS"){
           await getTokenApproval(token1, addressToApprove, approvalAmount1);
-          console.log("🚀 ~ handleAddLiquidity ~ approvalAmount1:", approvalAmount1)
+          //console.log("🚀 ~ handleAddLiquidity ~ approvalAmount1:", approvalAmount1)
         }
       }
 
@@ -341,7 +350,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     }
     catch(error){
       alert("Error approving tokens");
-      console.log(error)
+      //console.log(error)
       return;
     }
 
@@ -389,7 +398,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
         }
       }
       catch(error){
-        console.log("Error adding liquidity", error);
+        //console.log("Error adding liquidity", error);
         alert(`Error adding liquidity`);
       }
     }
@@ -416,7 +425,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
         }
       }
       catch(error){
-        console.log("Error adding liquidity", error);
+        //console.log("Error adding liquidity", error);
         alert(`Error adding liquidity`);
       }
     }
@@ -476,14 +485,16 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     }
 
     if(!priceLower || !priceUpper || !priceCurrent || !fee || !token1 || !token0 || ((!Number(amount0ToEmulate) && !Number(amount1ToEmulate)))) {
+      
       if((!Number(amount0ToEmulate) && !Number(amount1ToEmulate))) {
+        console.log("🚀 ~ calculate ~ (!Number(amount0ToEmulate) && !Number(amount1ToEmulate)):", (!Number(amount0ToEmulate) && !Number(amount1ToEmulate)))
         setAmount0Desired("");
         setAmount1Desired("");
       }
       return;
     }
 
-    console.log("Running emulate");
+    //console.log("Running emulate");
     const result = emulate(
       priceLower, 
       priceUpper,
@@ -512,32 +523,47 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
           sqrtPriceX96 : sqrtPriceX96Emulate
         } =  result
 
-        let approvalAmount0ToSet = amount0DesiredEmulate;
-        let approvalAmount1ToSet = amount1DesiredEmulate;
+        let amountAt0ToSet = "";
+        let amountAt1ToSet = "";
 
-        if(tokenToggleOccured){
-          const temp = approvalAmount0ToSet;
-          approvalAmount0ToSet = approvalAmount1ToSet;
-          approvalAmount1ToSet = temp;
+        console.log("🚀 ~ calculate ~ tokenToggleOccured:", tokenToggleOccured)
+          console.log("🚀 ~ calculate ~ isSorted:", isSorted)
+        // if((isSorted && !tokenToggleOccured) || (!isSorted && tokenToggleOccured)){
+        if(isSorted){
+          console.log("in if")
+          amountAt0ToSet = amount0DesiredEmulate;
+          amountAt1ToSet = amount1DesiredEmulate;
+        }
+        else{
+          console.log("in else")
+          amountAt0ToSet = amount1DesiredEmulate;
+          amountAt1ToSet = amount0DesiredEmulate;
         }
 
+        setAmountAt0(amountAt0ToSet);
+        setAmountAt1(amountAt1ToSet);
 
-        // if(!amount0ToEmulate){
-          setAmount0Desired(expandIfNeeded(amount0DesiredEmulate));
-          // setAmount0ToEmulate(0);
-        // }
-        // if(!amount1ToEmulate){
-          setAmount1Desired(expandIfNeeded(amount1DesiredEmulate));
-          // setAmount1ToEmulate(0);
-        // }
+        setAmount0Desired(expandIfNeeded(amount0DesiredEmulate));
+        setAmount1Desired(expandIfNeeded(amount1DesiredEmulate));
         setTickLower(tickLowerEmulate);
         setTickUpper(tickUpperEmulate);
-        setAmount0Min(expandIfNeeded(amount0MinEmulate) || "");
-        setAmount1Min(expandIfNeeded(amount1MinEmulate) || "");
+        setAmount0Min(expandIfNeeded(amount0MinEmulate));
+        setAmount1Min(expandIfNeeded(amount1MinEmulate));
         setDeadline(deadlineEmulate);
         setSqrtPriceX96(sqrtPriceX96Emulate);
-        setApprovalAmount0(approvalAmount0ToSet || "");
-        setApprovalAmount1(approvalAmount1ToSet || "");
+        // setApprovalAmount0(approvalAmount0ToSet || "");
+        // setApprovalAmount1(approvalAmount1ToSet || "");
+
+        // console.log("🚀 ~ calculate ~ sqrtPriceX96Emulate:", sqrtPriceX96Emulate)
+        // console.log("🚀 ~ calculate ~ deadlineEmulate:", deadlineEmulate)
+        // console.log("🚀 ~ calculate ~ amount1MinEmulate:", amount1MinEmulate)
+        // console.log("🚀 ~ calculate ~ amount0MinEmulate:", amount0MinEmulate)
+        // console.log("🚀 ~ calculate ~ tickUpperEmulate:", tickUpperEmulate)
+        // console.log("🚀 ~ calculate ~ tickLowerEmulate:", tickLowerEmulate)
+        // console.log("🚀 ~ calculate ~ amount1DesiredEmulate:", amount1DesiredEmulate)
+        // console.log("🚀 ~ calculate ~ amount0DesiredEmulate:", amount0DesiredEmulate)
+        // console.log("🚀 ~ calculate ~ amountAt1ToSet:", amountAt1ToSet)
+        // console.log("🚀 ~ calculate ~ amountAt0ToSet:", amountAt0ToSet)
       }
     }
     else{
@@ -553,55 +579,41 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   //   []
   // );
 
-  const handleTokenAmountChange = async (inputElementId : number)=>{
-
+  const handleTokenAmountChange = async (amountAtIndex : number, value : string) => {
+    console.log("🚀 ~ handleTokenAmountChange ~ value:", amountAtIndex, value)
       if(!token0 || !token1) return;
 
-      let amount0ToEmulateFromInput : string = "";
-      let amount1ToEmulateFromInput : string = "";
-    
-      const tokenInput = document.getElementById(`token${inputElementId}`) as HTMLInputElement;
-      const value = (Number(tokenInput.value) || 0);
-      const valueString = expandIfNeeded(tokenInput.value);
-  
-      console.log("🚀 ~ checkDecimals ~ valueString:", valueString,amount0ToEmulate, amount1ToEmulate)
-  
-      let toSetValue = true;
-  
-      const checkDecimals = (decimals: number)=>{
-        if (valueString.includes('.') && valueString.split('.')[1]?.length > decimals) {
-          console.log("🚀 ~ checkDecimals ~ false:", false)
-          toSetValue = false;
-          return false;
-        }
-  
-        return true;
+      if(!value){
+        setAmountAt0("");
+        setAmountAt0("");
+        setAmount0ToEmulate("");
+        setAmount1ToEmulate("");
       }
-  
-      if(tokenToggleOccured){
-        if(inputElementId === 0){
-          if(checkDecimals(token1.address.decimals))
-            amount1ToEmulateFromInput = valueString;
-        }
-        else{
-          if(checkDecimals(token0.address.decimals))
-            amount0ToEmulateFromInput = valueString;
-        }
+
+      let amountAt0ToEmulate : string = "";
+      let amountAt1ToEmulate : string = "";
+    
+      if(amountAtIndex === 0){
+        amountAt0ToEmulate = value;
+        amountAt1ToEmulate = "0";
       }
       else{
-        if(inputElementId === 0){
-          if(checkDecimals(token0.address.decimals))
-            amount0ToEmulateFromInput = valueString;
-        }
-        else{
-          if(checkDecimals(token1.address.decimals))
-            amount1ToEmulateFromInput = valueString;
-        }
+        amountAt0ToEmulate = "0";
+        amountAt1ToEmulate = value;
+      } 
+
+      console.log("🚀 ~ handleTokenAmountChange ~ amountAt0ToEmulate:", amountAt0ToEmulate)
+      console.log("🚀 ~ handleTokenAmountChange ~ amountAt1ToEmulate:", amountAt1ToEmulate)
+
+
+      // if((isSorted && !tokenToggleOccured) || (!isSorted && tokenToggleOccured)){
+      if(isSorted){
+        setAmount0ToEmulate(amountAt0ToEmulate);
+        setAmount1ToEmulate(amountAt1ToEmulate);
       }
-  
-      if(toSetValue){
-        setAmount0ToEmulate(amount0ToEmulateFromInput); // updateAmount(amount0ToEmulateFromInput, setAmount0ToEmulate)
-        setAmount1ToEmulate(amount1ToEmulateFromInput); // updateAmount(amount1ToEmulateFromInput, setAmount0ToEmulate)
+      else{
+        setAmount0ToEmulate(amountAt1ToEmulate);
+        setAmount1ToEmulate(amountAt0ToEmulate);
       }
   }
 
@@ -610,7 +622,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   }
 
   const fetchPoolData = async () => {
-    console.log("🚀 ~ fetchPoolData ~ fetchPoolData: RUNN");
+    //console.log("🚀 ~ fetchPoolData ~ fetchPoolData: RUNN");
     if (token0 && token1 && fee) {
       const poolDataFromSubgraph: AddLiquidityPoolData = await getPoolData(token0, token1, fee);
       setCurrentPoolData(poolDataFromSubgraph);
@@ -658,11 +670,13 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     
       setCurrentV2PoolRatio(pairRatio);
   }
-
+  //console.log(renderCount.current);
   useEffect(()=>{
+//    renderCount.current++;
     if(token0 && token1){
       setDecimalDifference(token1.address.decimals - token0.address.decimals);
       setIsSorted(token0.address.contract_address < token1.address.contract_address);
+      handleTokenToggle()
     }
   },[])
 
@@ -671,7 +685,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
         handleGettingPoolData();
         calculate();
       }
-      console.log("🚀 ~ [fee]:")
+      //console.log("🚀 ~ [fee]:")
   }, [fee]);
 
   useEffect(()=>{
@@ -686,7 +700,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
         setDecimalDifference(token1.address.decimals - token0.address.decimals);
         setIsSorted(token0.address.contract_address < token1.address.contract_address);
       }
-      console.log("🚀 ~ token0, token1:")
+      //console.log("🚀 ~ token0, token1:")
   },[token0, token1])
 
   useEffect(()=>{
@@ -696,7 +710,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
           handlePriceLower();
         }
       }
-      console.log("🚀 ~ priceLowerEntered:")
+      //console.log("🚀 ~ priceLowerEntered:")
   },[priceLowerEntered])
   
   useEffect(()=>{
@@ -706,37 +720,37 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
           setIsButton(false);
           handlePriceUpper();
         }
-        // console.log("🚀 ~ useEffect ~ priceUpperEntered:", priceUpperEntered)
+        // //console.log("🚀 ~ useEffect ~ priceUpperEntered:", priceUpperEntered)
       }
-      console.log("🚀 ~ priceUpperEntered:")
+      //console.log("🚀 ~ priceUpperEntered:")
   },[priceUpperEntered])
 
   useEffect(()=>{
       if(priceCurrentEntered){
         // setPriceCurrent("");
-        if(isFullRange)
+        if(isButton)
           handlePriceCurrent();
-        // console.log("🚀 ~ useEffect ~ priceCurrentEntered:", priceCurrentEntered)
+        // //console.log("🚀 ~ useEffect ~ priceCurrentEntered:", priceCurrentEntered)
       }
-      console.log("🚀 ~ priceCurrentEntered:")
+      //console.log("🚀 ~ priceCurrentEntered:")
   },[priceCurrentEntered])
 
   useEffect(()=>{
       reset();
       handleGettingPoolData();
-      console.log("🚀 ~ activeProtocol:", activeProtocol)
+      //console.log("🚀 ~ activeProtocol:", activeProtocol)
   },[activeProtocol])
 
   useEffect(()=>{
       adjustPricesForTokenToggle();
-      console.log("🚀 ~ tokenToggleOccured:", tokenToggleOccured)
+      //console.log("🚀 ~ tokenToggleOccured:", tokenToggleOccured)
   },[tokenToggleOccured])
 
   useEffect(()=>{
       handlePriceCurrent();
       handlePriceLower();
       handlePriceUpper();
-      console.log("🚀 ~ handlePricesAfterAdjust:", handlePricesAfterAdjust)
+      //console.log("🚀 ~ handlePricesAfterAdjust:", handlePricesAfterAdjust)
   },[handlePricesAfterAdjust])
 
   const handleButton = (buttonValue : boolean, fullRangeValue : boolean)=>{
@@ -977,8 +991,10 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       </Typography>
                     </Box>
                     <Box className="inputField">
-                      <input autoComplete="off" onChange={()=>handleTokenAmountChange(0)} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
-                      value={!tokenToggleOccured ? (!Number(amount0Desired) ? amount0ToEmulate : amount0Desired) : (!Number(amount1Desired) ? amount1ToEmulate : amount1Desired)}/>
+                      <input autoComplete="off" onChange={(e)=>{
+                        handleTokenAmountChange(0, e.target.value)
+                      }} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
+                      value={amountAt0}/>
                       {/* By default this input takes token amount of token 0. If token toggle has occured, then this also needs to be toggled */}
                     </Box>
                   </Box>
@@ -992,8 +1008,10 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       </Typography>
                     </Box>
                     <Box className="inputField">
-                      <input autoComplete="off" onChange={()=>handleTokenAmountChange(1)} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} 
-                      value={!tokenToggleOccured ? (!Number(amount1Desired) ? amount1ToEmulate : amount1Desired) : (!Number(amount0Desired) ? amount0ToEmulate : amount0Desired)}/>
+                      <input autoComplete="off" onChange={(e)=>{
+                        handleTokenAmountChange(1, e.target.value)
+                      }} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} 
+                      value={amountAt1}/>
                       {/* By default this input takes token amount of token 1. If token toggle has occured, then this also needs to be toggled */}
                     </Box>
                   </Box>
@@ -1169,7 +1187,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                     <Box 
                         onClick={()=>{
                           if(!priceCurrent) return;
-                          console.log("CLicked")
+                          //console.log("CLicked")
                           setPriceLowerEntered(calculateRange(Number(priceCurrent), -10));
                           setPriceUpperEntered(calculateRange(Number(priceCurrent), 10));
 
@@ -1196,7 +1214,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       <Box 
                         onClick={()=>{
                           if(!priceCurrent) return;
-                          console.log("CLicked")
+                          //console.log("CLicked")
                           setPriceLowerEntered(calculateRange(Number(priceCurrent), -20));
                           setPriceUpperEntered(calculateRange(Number(priceCurrent), 20));
                           handleButton(true, false);
@@ -1221,7 +1239,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       <Box 
                         onClick={()=>{
                           if(!priceCurrent) return;
-                          console.log("CLicked")
+                          //console.log("CLicked")
                           setPriceLowerEntered(calculateRange(Number(priceCurrent), -50));
                           setPriceUpperEntered(calculateRange(Number(priceCurrent), 50));
                           handleButton(true, false);

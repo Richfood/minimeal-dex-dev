@@ -15,7 +15,7 @@ const getTokenApproval = async (token : TokenDetails, addressToApprove : string,
     await approveTransaction.wait()
 
     const approvalAmount = await tokenContract.allowance(userAddress, addressToApprove);
-    console.log("Amount Approved");
+    console.log("Amount Approved for Token : ", token.name);
     console.log(approvalAmount.toString());
 }
 

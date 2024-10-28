@@ -127,29 +127,21 @@ export async function addLiquidityV3(
         token1 = temp;
     }
 
-    console.log(`Amounts Desired and Minimum for Liquidity Provision:
-        - Token 0 Desired: ${amount0Desired}
-        - Token 1 Desired: ${amount1Desired}
-        - Token 0 Minimum: ${amount0Min}
-        - Token 1 Minimum: ${amount1Min}
-        - sqrtPriceX96: ${sqrtPriceX96}
-      `);
-
     amount0Desired = ethers.utils.parseUnits(expandIfNeeded(amount0Desired), token0.address.decimals).toString();
-    console.log("🚀 ~ amount0Desired:", amount0Desired)
+    // console.log("🚀 ~ amount0Desired:", amount0Desired)
     amount1Desired = ethers.utils.parseUnits(expandIfNeeded(amount1Desired), token1.address.decimals).toString();
-    console.log("🚀 ~ amount1Desired:", amount1Desired)
+    // console.log("🚀 ~ amount1Desired:", amount1Desired)
     amount0Min = ethers.utils.parseUnits(expandIfNeeded(amount0Min), token0.address.decimals).toString();
-    console.log("🚀 ~ amount0Min:", amount0Min)
+    // console.log("🚀 ~ amount0Min:", amount0Min)
     amount1Min = ethers.utils.parseUnits(expandIfNeeded(amount1Min), token1.address.decimals).toString();
-    console.log("🚀 ~ amount1Min:", amount1Min)
+    // console.log("🚀 ~ amount1Min:", amount1Min)
 
-    console.log(`Amounts Desired and Minimum for Liquidity Provision:
-        - Token 0 Desired: ${amount0Desired}
-        - Token 1 Desired: ${amount1Desired}
-        - Token 0 Minimum: ${amount0Min}
-        - Token 1 Minimum: ${amount1Min}
-      `);
+    // console.log(`Amounts Desired and Minimum for Liquidity Provision:
+    //     - Token 0 Desired: ${amount0Desired}
+    //     - Token 1 Desired: ${amount1Desired}
+    //     - Token 0 Minimum: ${amount0Min}
+    //     - Token 1 Minimum: ${amount1Min}
+    //   `);
 
     const createAndInitializePoolIfNecessary = new ethers.utils.Interface([
         "function createAndInitializePoolIfNecessary(address token0, address token1, uint24 fee, uint160 sqrtPriceX96) public returns (address)"
@@ -158,6 +150,19 @@ export async function addLiquidityV3(
 
     const mint = new ethers.utils.Interface(mintAbi);
     const mintData = mint.encodeFunctionData("mint", [[token0.address.contract_address, token1.address.contract_address, fee, tickLower, tickUpper, amount0Desired, amount1Desired, amount0Min, amount1Min, recepientAddress, deadline]]);
+    
+    console.log("Final Data - ");
+    console.log("🚀 ~ deadline:", deadline)
+    console.log("🚀 ~ recepientAddress:", recepientAddress)
+    console.log("🚀 ~ amount1Min:", amount1Min)
+    console.log("🚀 ~ amount0Min:", amount0Min)
+    console.log("🚀 ~ amount1Desired:", amount1Desired)
+    console.log("🚀 ~ amount0Desired:", amount0Desired)
+    console.log("🚀 ~ tickUpper:", tickUpper)
+    console.log("🚀 ~ tickLower:", tickLower)
+    console.log("🚀 ~ fee:", fee)
+    console.log("🚀 ~ token1:", token1)
+    console.log("🚀 ~ token0:", token0)
 
     const refundETH = new ethers.utils.Interface([
         "function refundETH() external"
