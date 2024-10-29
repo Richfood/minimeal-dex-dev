@@ -33,18 +33,6 @@ import { debounce } from '@syncfusion/ej2-base';
 import getUserBalance from '@/utils/api/getUserBalance';
 const { useChainId, useIsActive, useAccounts } = hooks;
 
-// interface TokenPair {
-//     token0: TokenDetails | null;
-//     token1: TokenDetails | null;
-// }
-
-// interface PoolDetails {
-//     sqrtPriceX96: BigNumber | string;
-//     liquidity: BigNumber | string;
-//     tick: number;
-//     fee: number;
-// }
-
 const fetchCoinUSDPrice = async (tokenAddress?: string) => {
     if (!tokenAddress) {
         console.error('Invalid token address!');
@@ -61,10 +49,14 @@ const fetchCoinUSDPrice = async (tokenAddress?: string) => {
     }
 };
 
-const SwapWidget = () => {
+interface SwapWidgetProps {
+    pageLoading: (isLoading: boolean) => void; // Expecting a function, not a boolean
+}
+
+const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
     // const [activeIndex, setActiveIndex] = useState<number | null>(0);
     // const [activeItem, setActiveItem] = useState<string | null>(null);
-    // const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
     const [openToken, setOpenToken] = useState(false);
     // const [isOpenRecent, setIsOpenRecent] = useState(false);
     // const [isOpenExpert, setIsOpenExpert] = useState(false);
@@ -72,10 +64,8 @@ const SwapWidget = () => {
     const [activeCurrency, setActiveCurrency] = useState<'PLS/9MM' | '9MM/PLS'>('PLS/9MM');
     // const [series, setSeries] = useState<{ name: string; data: { x: number; y: number; }[] }[]>([]);
     const chainId = useChainId();
-    const [token0, setToken0] = useState<TokenDetails | null>(null);
-    console.log("🚀 ~ SwapWidget ~ token0:", token0)
-    const [token1, setToken1] = useState<TokenDetails | null>(null);
-    console.log("🚀 ~ SwapWidget ~ token1:", token1)
+    const [token0, setToken0] = useState<TokenDetails | null>(tokenList.TokenC);
+    const [token1, setToken1] = useState<TokenDetails | null>(tokenList.TokenD);
     const [token0Price, setToken0Price] = useState<string | null>("0");
     const [token1Price, setToken1Price] = useState<string | null>("0");
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
@@ -100,7 +90,8 @@ const SwapWidget = () => {
     console.log("🚀 ~ SwapWidget ~ prevTokens:", prevTokens)
     const smartRouterAddress = addresses.SmartRouterAddress;
     const [isTestnet, setIsTestnet] = React.useState<boolean | null>(null);
-
+    const [allowSwapForV2, setAllowSwapForV2] = useState<boolean>(true);
+    const [allowSwapForV3, setAllowSwapForV3] = useState<boolean>(true);
     useEffect(() => {
         if (!token0) return;
 
@@ -123,10 +114,10 @@ const SwapWidget = () => {
 
         const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
-        if (tokenData.length > 0) {
-            setToken0(tokenData[0]);
-            setToken1(tokenData[1]);
-        }
+        // if (tokenData.length > 0) {
+        //     setToken0(tokenData[0]);
+        //     setToken1(tokenData[1]);
+        // }
     }, [chainId]);
 
     const handleOpenToken = useCallback((tokenNumber: number) => {
@@ -190,8 +181,8 @@ const SwapWidget = () => {
 
     const handleCloseToken = () => setOpenToken(false);
 
-    // const handleOpen = useCallback(() => setIsOpen(prev => !prev), []);
-    // const handleClose = () => setIsOpen(false);
+    const settingsModal = useCallback(() => setIsOpen((prev) => !prev), []);
+
 
     // const handleOpenRecent = useCallback(() => setIsOpenRecent(prev => !prev), []);
     // const handleCloseRecent = () => setIsOpenRecent(false);
@@ -205,7 +196,19 @@ const SwapWidget = () => {
     //         setIsOpen(true);
     //     }
     //     onToggle();
-    // };
+    // };    
+
+    // Handler to toggle V2 state
+    const handleToggleV2 = (newValue: boolean) => {
+        setAllowSwapForV2(newValue);
+        console.log('Toggle V2:', newValue ? 'Enabled' : 'Disabled');
+    };
+
+    // Handler to toggle V3 state
+    const handleToggleV3 = (newValue: boolean) => {
+        setAllowSwapForV3(newValue);
+        console.log('Toggle V3:', newValue ? 'Enabled' : 'Disabled');
+    };
 
     const handlePriceForToken0 = async (tokenValue: string): Promise<any> => {
         try {
@@ -261,8 +264,11 @@ const SwapWidget = () => {
     };
 
     const handleSwap = async () => {
+        pageLoading(true); // Start loading indicator
+
         if (!token0 || !token1) {
             console.log("🚀 ~ handleSwap ~ Missing tokens:", token0, token1);
+            pageLoading(false); // Stop loading indicator on error
             return; // Exit early if tokens are missing
         }
 
@@ -273,15 +279,19 @@ const SwapWidget = () => {
             // Execute the swap after approval
             await swapV3(token0, dataForSwap, amountIn, slippageTolerance);
 
-            // Reset the input and output values after successful swap
+            // Reset input/output values after swap
             setAmountIn("");
             setAmountOut("");
+
         } catch (error) {
             console.error("Error during swap process:", error);
 
-            // Reset the input and output values in case of any error
+            // Reset input/output values in case of an error
             setAmountIn("");
             setAmountOut("");
+
+        } finally {
+            pageLoading(false); // Stop loading indicator regardless of outcome
         }
     };
 
@@ -306,26 +316,43 @@ const SwapWidget = () => {
 
     const fetchSmartOrderRoute = useCallback(
         async (tokenAmount: string, isAmountIn: boolean) => {
+            // Check if tokens are available
             if (!token0 || !token1) {
                 console.warn("Tokens not available:", { token0, token1 });
                 return;
             }
 
-            console.log("🚀 fetchSmartOrderRoute~ token0:", token0);
-            console.log("🚀 fetchSmartOrderRoute~ token1:", token1);
+            let protocol: Protocol; // Declare protocol as a single Protocol type
 
-            const protocol = Protocol.V3;
+            // Determine which protocol(s) are enabled
+            if (allowSwapForV2 && allowSwapForV3) {
+                // Both V2 and V3 are enabled
+                protocol = Protocol.V3; // Choose one protocol (you can decide which one to prefer)
+                // Optionally handle the V3 case separately in the API call if needed
+            } else if (allowSwapForV2) {
+                // Only V2 is enabled
+                protocol = Protocol.V2; // Assign only V2 protocol
+            } else if (allowSwapForV3) {
+                // Only V3 is enabled
+                protocol = Protocol.V3; // Assign only V3 protocol
+            } else {
+                // Both are disabled, exit the function
+                return;
+            }
+
             const tradeType = isAmountIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT;
 
             try {
+                // Always pass the selected protocol as a tuple (array with one element)
                 const { data, value } = await getSmartOrderRoute(
                     token0,
                     token1,
                     tokenAmount,
-                    [protocol],
+                    [protocol], // Wrap the selected protocol in an array
                     tradeType
                 );
 
+                // Check if the response contains a valid token path
                 if (data?.finalRoute?.tokenPath) {
                     setRoutePath(data.finalRoute.tokenPath);
                     setDataForSwap(data.finalRoute);
@@ -346,8 +373,11 @@ const SwapWidget = () => {
                 console.error("Error fetching route:", error);
             }
         },
-        [token0, token1, setRoutePath, setDataForSwap, setToken1Price, setAmountOut, setToken0Price, setAmountIn]
+        [token0, token1, allowSwapForV2, allowSwapForV3, setRoutePath, setDataForSwap, setToken1Price, setAmountOut, setToken0Price, setAmountIn] // Ensure allowSwapForV2 and allowSwapForV3 are dependencies
     );
+
+
+
 
     const handleAmountInChange = useCallback(
         (amountIn: string) => {
@@ -419,190 +449,200 @@ const SwapWidget = () => {
         <>
             <Box className="SwapWidgetSec">
                 <Box className="SwapWidgetInner">
-                    <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
-                        <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                            <img src={token0?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
-                            <Typography onClick={() => handleOpenToken(0)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                {token0?.symbol} <IoIosArrowDown />
-                            </Typography>
-                            <Typography
-                                onClick={() => copyToClipboard(token0?.address?.contract_address)}
-                                component="span"
-                                sx={{ ml: '5px', cursor: 'pointer' }}
+                    <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
+                        <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
+                            <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
+                                <img src={token0?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
+                                <Typography onClick={() => handleOpenToken(0)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                    {token0?.symbol} <IoIosArrowDown />
+                                </Typography>
+                                <Typography
+                                    onClick={() => copyToClipboard(token0?.address?.contract_address)}
+                                    component="span"
+                                    sx={{ ml: '5px', cursor: 'pointer' }}
+                                >
+                                    {token0?.symbol !== "PLS" && <PiCopy />}
+                                </Typography>
+                            </Box>
+
+                            <Box className="inputField">
+                                {amountInLoading ? (
+                                    <CircularProgress size={30} />
+                                ) : (
+                                    <Box>
+                                        <input
+                                            type="number"
+                                            placeholder="0.0"
+                                            value={amountIn}
+                                            onChange={handleInputChange} // Use updated handler
+                                        />
+                                        {(!isTestnet && Number(amountIn) > 0) && ( // Ensure amountIn is treated as a number
+                                            <Typography
+                                                sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}
+                                            >
+                                                ~{Number(token0Price || 0).toLocaleString(undefined, {
+                                                    minimumFractionDigits: 0,
+                                                    maximumFractionDigits: 3
+                                                })} USD
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                )}
+                            </Box>
+
+
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    cursor: 'pointer',
+                                    gap: '5px',
+                                    marginTop: "10px",
+                                    justifyContent: "space-between"
+                                }}
                             >
-                                {token0?.symbol !== "PLS" && <PiCopy />}
-                            </Typography>
-                        </Box>
+                                <Box sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    cursor: 'pointer',
+                                    gap: '5px',
+                                    marginTop: "10px",
+                                }}>
+                                    <Typography sx={{ color: 'var(--primary)', fontWeight: '700' }}>Route</Typography>
+                                    <Box>
+                                        <span>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={2.5}  // Bold effect
+                                                stroke="currentColor"
+                                                width="20px"
+                                                height="20px"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+                                                />
+                                            </svg>
+                                        </span>
 
-                        <Box className="inputField">
-                            {amountInLoading ? (
-                                <CircularProgress size={30} />
-                            ) : (
-                                <Box>
-                                    <input
-                                        type="number"
-                                        placeholder="0.0"
-                                        value={amountIn}
-                                        onChange={handleInputChange} // Use updated handler
-                                    />
-                                    {(!isTestnet && Number(amountIn) > 0) && ( // Ensure amountIn is treated as a number
-                                        <Typography
-                                            sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}
-                                        >
-                                            ~{Number(token0Price || 0).toLocaleString(undefined, {
-                                                minimumFractionDigits: 0,
-                                                maximumFractionDigits: 3
-                                            })} USD
-                                        </Typography>
-                                    )}
-                                </Box>
-                            )}
-                        </Box>
-
-
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                cursor: 'pointer',
-                                gap: '5px',
-                                marginTop: "10px",
-                                justifyContent: "space-between"
-                            }}
-                        >
-                            <Box sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                cursor: 'pointer',
-                                gap: '5px',
-                                marginTop: "10px",
-                            }}>
-                                <Typography sx={{ color: 'var(--primary)', fontWeight: '700' }}>Route</Typography>
-                                <Box>
-                                    <span>
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth={2.5}  // Bold effect
-                                            stroke="currentColor"
-                                            width="20px"
-                                            height="20px"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-                                            />
-                                        </svg>
-                                    </span>
+                                    </Box>
 
                                 </Box>
+                                <Box>
+                                    <ul style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: 0, fontWeight: "700" }}>
+                                        {amountOut && routePath?.length ? (
+                                            routePath.map((route, index) => (
+                                                <React.Fragment key={index}>
+                                                    <li className="route-item" style={{ listStyle: 'none' }}>
+                                                        <p>{route.symbol}</p>
+                                                    </li>
 
+                                                    {index < (routePath?.length ?? 0) - 1 && (
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="24" height="24"
+                                                            viewBox="0 0 24 24"
+                                                            strokeWidth={2}
+                                                            stroke="currentColor"
+                                                            fill="none"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            style={{ display: 'inline-block', width: "16px", height: "16px", marginBottom: "5px", fontWeight: "700" }}
+                                                        >
+                                                            <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                                        </svg>
+                                                    )}
+                                                </React.Fragment>
+                                            ))
+                                        ) : null}
+                                    </ul>
+
+                                </Box>
                             </Box>
-                            <Box>
-                                <ul style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: 0, fontWeight: "700" }}>
-                                    {amountOut && routePath?.length ? (
-                                        routePath.map((route, index) => (
-                                            <React.Fragment key={index}>
-                                                <li className="route-item" style={{ listStyle: 'none' }}>
-                                                    <p>{route.symbol}</p>
-                                                </li>
-
-                                                {index < (routePath?.length ?? 0) - 1 && (
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        width="24" height="24"
-                                                        viewBox="0 0 24 24"
-                                                        strokeWidth={2}
-                                                        stroke="currentColor"
-                                                        fill="none"
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        style={{ display: 'inline-block', width: "16px", height: "16px", marginBottom: "5px", fontWeight: "700" }}
-                                                    >
-                                                        <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                                                    </svg>
-                                                )}
-                                            </React.Fragment>
-                                        ))
-                                    ) : null}
-                                </ul>
-
-                            </Box>
-
-                        </Box>
-                        <Box className="slippageSec dsls">
-                            {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                            <Box className="slippageSec dsls">
+                                {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
         <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>Slippage Tolerance <PiPencilSimpleBold /></Typography>
         <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
     </Box> */}
-                            <Box sx={{ mt: '25px' }}>
-                                <Button
-                                    variant="contained"
-                                    color="secondary"
-                                    onClick={isActive ? handleSwap : handleClick} // Conditional onClick handler
-                                    disabled={isActive && (amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn))}
-                                >
-                                    {isActive
-                                        ? (userBalance && Number(userBalance) >= Number(amountIn)
-                                            ? "Swap"
-                                            : "Insufficient Balance"
-                                        )
-                                        : "Connect Wallet"
-                                    }
-                                </Button>
+                                <Box sx={{ mt: '25px' }}>
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={isActive ? handleSwap : handleClick} // Conditional onClick handler
+                                        disabled={isActive && (amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn))}
+                                    >
+                                        {isActive
+                                            ? (userBalance && Number(userBalance) >= Number(amountIn)
+                                                ? "Swap"
+                                                : "Insufficient Balance"
+                                            )
+                                            : "Connect Wallet"
+                                        }
+                                    </Button>
+                                </Box>
+
+
                             </Box>
 
 
                         </Box>
 
-                    </Box>
-
-                    <Box className="arrowBox" sx={{ pt: '40px' }}>
-                        <Box className="swapData" sx={{ display: 'flex', alignItems: 'flex-start', margin: '0 auto' }}>
-                            <FaArrowRight onClick={toggleGraph} />
-                        </Box>
-                    </Box>
-
-                    <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
-                        <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                            <img src={token1?.logoURI} alt="circle2" style={{ width: '20px', height: '20px' }} />
-                            <Typography onClick={() => handleOpenToken(1)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: "pointer" }}>
-                                {token1 && token1.symbol.toUpperCase()}
-                                <IoIosArrowDown />
-                            </Typography>
-                            <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }} onClick={() => copyToClipboard(token1?.address?.contract_address)}>
-                                {token1?.symbol !== "PLS" && <PiCopy />}
-                            </Typography>
-                        </Box>
-                        <Box className="inputField">
-                            {amountOutLoading ? (
-                                <CircularProgress size={30} />
-                            ) : (
-                                <Box>
-                                    <input
-                                        type="number"
-                                        placeholder="0.0"
-                                        value={amountOut}
-                                        onChange={handleOutputChange} // Use updated handler
-                                    />
-                                    {!isTestnet && Number(amountOut) > 0 && (
-                                        <Typography
-                                            sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}
-                                        >
-                                            ~{Number(token1Price || 0).toLocaleString(undefined, {
-                                                minimumFractionDigits: 0,
-                                                maximumFractionDigits: 3
-                                            })} USD
-                                        </Typography>
-                                    )}
-                                </Box>
-                            )}
+                        <Box className="arrowBox" sx={{ pt: '40px', mt: "-8rem" }}>
+                            <Box className="swapData" sx={{ display: 'flex', alignItems: 'flex-start', margin: '0 auto' }}>
+                                <FaArrowRight onClick={toggleGraph} />
+                            </Box>
                         </Box>
 
-                    </Box>
+                        <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
+                            <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
+                                <img src={token1?.logoURI} alt="circle2" style={{ width: '20px', height: '20px' }} />
+                                <Typography onClick={() => handleOpenToken(1)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: "pointer" }}>
+                                    {token1 && token1.symbol.toUpperCase()}
+                                    <IoIosArrowDown />
+                                </Typography>
+                                <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }} onClick={() => copyToClipboard(token1?.address?.contract_address)}>
+                                    {token1?.symbol !== "PLS" && <PiCopy />}
+                                </Typography>
+                            </Box>
 
+
+                            <Box className="inputField">
+                                {amountOutLoading ? (
+                                    <CircularProgress size={30} />
+                                ) : (
+                                    <Box>
+                                        <input
+                                            type="number"
+                                            placeholder="0.0"
+                                            value={amountOut}
+                                            onChange={handleOutputChange} // Use updated handler
+                                        />
+                                        {!isTestnet && Number(amountOut) > 0 && (
+                                            <Typography
+                                                sx={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '500' }}
+                                            >
+                                                ~{Number(token1Price || 0).toLocaleString(undefined, {
+                                                    minimumFractionDigits: 0,
+                                                    maximumFractionDigits: 3
+                                                })} USD
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                )}
+                            </Box>
+
+                        </Box>
+                    </Box>
+                    <Badge
+                        className="widgetItem"
+                        color="secondary"
+                        onClick={settingsModal}
+                    >
+                        <IoSettingsOutline style={{ fontSize: '20px' }} /> {/* Adjust icon size */}
+                    </Badge>
 
                     <Box className="slippageSec msls" sx={{ display: "none" }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
@@ -652,7 +692,15 @@ const SwapWidget = () => {
                     </Box>
                 </Box> */}
 
-                {/* <SettingsModal isOpen={isOpen} handleClose={handleClose} theme={theme} /> */}
+                <SettingsModal
+                    isOpen={isOpen}
+                    handleClose={settingsModal}
+                    theme={theme}
+                    onToggleV2={handleToggleV2}
+                    onToggleV3={handleToggleV3}
+                    allowSwapForV2={allowSwapForV2}
+                    allowSwapForV3={allowSwapForV3}
+                />
                 {/* <RecentTransactions open={isOpenRecent} onClose={handleCloseRecent} /> */}
                 <SelectedToken
                     openToken={openToken}

@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import { IoCloseOutline } from 'react-icons/io5'; // Ensure this component is imported
+import { IoCloseOutline } from 'react-icons/io5';
 import CustomTooltip from '../CustomTooltip/CustomTooltip';
 import { BsQuestionCircle } from 'react-icons/bs';
-import { FormControlLabel, FormGroup } from '@mui/material';
+import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 import IOSSwitch from '../IOSSwitch/IOSSwitch';
 import Customcheckbox from '../Customcheckbox/Customcheckbox';
 
@@ -13,9 +13,30 @@ interface CustomizeRoutingProps {
     isOpen: boolean;
     handleCloseCustomize: () => void;
     theme: 'light' | 'dark';
+    allowSwapForV2: boolean;
+    allowSwapForV3: boolean;
+    onToggleV2: (newValue: boolean) => void;
+    onToggleV3: (newValue: boolean) => void;
 }
 
-const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({ isOpen, handleCloseCustomize, theme }) => {
+const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({
+    isOpen,
+    handleCloseCustomize,
+    theme,
+    allowSwapForV2,
+    allowSwapForV3,
+    onToggleV2, onToggleV3
+}) => {
+
+    const handleToggleChange = (type: 'V2' | 'V3') => {
+        if (type === 'V2') {
+            const newValue = !allowSwapForV2;
+            onToggleV2(newValue); // Send updated value to grandparent
+        } else {
+            const newValue = !allowSwapForV3;
+            onToggleV3(newValue); // Send updated value to grandparent
+        }
+    };
 
     const style = {
         position: 'absolute' as 'absolute',
@@ -25,13 +46,13 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({ isOpen, handleClose
         fontWeight: '500',
         transform: 'translate(-50%, -50%)',
         width: 600,
-        bgcolor: theme === 'light' ? 'var(--white)' : 'var(--primary)', // Ensure these variables are defined
+        bgcolor: theme === 'light' ? 'var(--white)' : 'var(--primary)',
         boxShadow: 'rgba(0, 0, 0, 0.24) -40px 40px 80px -8px',
         borderRadius: '14px',
-        color: theme === 'light' ? 'var(--primary)' : 'var(--white)', // Ensure these variables are defined
+        color: theme === 'light' ? 'var(--primary)' : 'var(--white)',
 
-        maxHeight: '80vh', // Prevent modal from being too large
-        overflowY: 'auto', // Enable scrolling if content overflows
+        maxHeight: '80vh',
+        overflowY: 'auto',
     };
 
     return (
@@ -50,9 +71,9 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({ isOpen, handleClose
                         top: '10px',
                         cursor: 'pointer',
                     }}>
-                         <Typography>
-                            
-                         </Typography>
+                        <Typography>
+
+                        </Typography>
                         <Typography>
                             <IoCloseOutline onClick={handleCloseCustomize} size={24} />
                         </Typography>
@@ -97,11 +118,15 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({ isOpen, handleClose
                             </CustomTooltip>
                         </Typography>
                         <FormControlLabel
-                            control={<IOSSwitch />}
-                            label=""
+                            control={
+                                <Switch
+                                    checked={allowSwapForV2}
+                                    onChange={() => handleToggleChange('V2')} // Trigger toggle for V2
+                                />
+                            }
+                            label={`V2 Swap is ${allowSwapForV2 ? 'Enabled' : 'Disabled'}`}
                         />
                     </Box>
-
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                         <Typography
@@ -125,8 +150,13 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({ isOpen, handleClose
                             </CustomTooltip>
                         </Typography>
                         <FormControlLabel
-                            control={<IOSSwitch />}
-                            label=""
+                            control={
+                                <Switch
+                                    checked={allowSwapForV3}
+                                    onChange={() => handleToggleChange('V3')} // Trigger toggle for V3
+                                />
+                            }
+                            label={`V3 Swap is ${allowSwapForV3 ? 'Enabled' : 'Disabled'}`}
                         />
                     </Box>
 

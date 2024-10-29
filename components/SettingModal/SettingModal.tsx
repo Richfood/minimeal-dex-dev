@@ -16,9 +16,13 @@ interface SettingsModalProps {
     isOpen: boolean;
     handleClose: () => void;
     theme: 'light' | 'dark';
+    onToggleV2: (newValue: boolean) => void;
+    onToggleV3: (newValue: boolean) => void;
+    allowSwapForV2: boolean;
+    allowSwapForV3: boolean;
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, theme }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, theme, allowSwapForV2, allowSwapForV3, onToggleV2, onToggleV3 }) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(0);
     const [isExpertModalOpen, setExpertModalOpen] = useState<boolean>(false);
     const [isCustomize, setCustomize] = useState<boolean>(false);
@@ -190,7 +194,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
                         </Box>
 
 
-                        
+
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                             <Typography
                                 sx={{
@@ -201,7 +205,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
                                     alignItems: 'center',
                                 }}
                             >
-                               Flippy sounds
+                                Flippy sounds
                                 <CustomTooltip
                                     title="Bypasses confirmation modals and allows high slippage trades. Use at your own risk."
                                     arrow
@@ -217,7 +221,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
                         </Box>
 
 
-                        
+
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                             <Typography
                                 sx={{
@@ -257,7 +261,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
             </Modal>
 
             <ExpertModeModal isOpen={isExpertModalOpen} handleCloseExpert={closeExpertModal} theme={theme} />
-            <CustomizeRouting isOpen={isCustomize} handleCloseCustomize={closeCustomize} theme={theme} />
+            <CustomizeRouting
+                isOpen={isCustomize}
+                handleCloseCustomize={closeCustomize}
+                theme="light"
+                onToggleV2={onToggleV2}
+                onToggleV3={onToggleV3}
+                allowSwapForV2={allowSwapForV2}
+                allowSwapForV3={allowSwapForV3}
+            />
         </>
     );
 };
