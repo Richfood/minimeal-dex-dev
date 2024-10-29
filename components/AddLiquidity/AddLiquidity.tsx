@@ -49,6 +49,8 @@ interface AddLiquidityLoader {
 const MIN_TICK = -887272;
 const MAX_TICK = 887272;
 
+const RANGES = ["10", "20", "50", "Full"]
+
 const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol : activeProtocol }) => {
   const { palette } = useTheme();
   const [isActive, setIsActive] = useState(true);
@@ -109,10 +111,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   // console.log("🚀 ~ tokenToggleOccured:", tokenToggleOccured)
   const [isSorted, setIsSorted] = useState<boolean>(true);
   const [handlePricesAfterAdjust, setHandlePricesAfterAdjust] = useState<boolean>(false);
-
   const [addLiquidityRunning, setAddLiquidityRunning] = useState(false);
-
   const [slippageTolerance, setSlippageTolerance] = useState<number | null>(1);
+  const [rangeButtonSelected, setRangeButtonSelected] = useState<string | null>(null);
+  console.log("🚀 ~ rangeButtonSelected:", rangeButtonSelected)
+
   console.log("🚀 ~ slippageTolerance:", slippageTolerance)
   const [deadline, setDeadline] = useState("10");
   console.log("🚀 ~ deadline:", deadline)
@@ -786,6 +789,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   },[handlePricesAfterAdjust])
 
   const handleButton = (buttonValue : boolean, fullRangeValue : boolean)=>{
+
+    if(!buttonValue){
+      setRangeButtonSelected(null);
+    }
+
     setIsButton(buttonValue);
     setIsFullRange(fullRangeValue);
   }
@@ -1223,6 +1231,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                     <Box 
                         onClick={()=>{
                           if(!priceCurrent) return;
+
+                          setRangeButtonSelected(RANGES[0]);
                           //console.log("CLicked")
                           setPriceLowerEntered(calculateRange(Number(priceCurrent), -10));
                           setPriceUpperEntered(calculateRange(Number(priceCurrent), 10));
@@ -1241,7 +1251,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                           gap: '10px',
                           borderRadius: '30px',
                           cursor: 'pointer',
-                          color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                          color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',
+                          backgroundColor: rangeButtonSelected === RANGES[0] ? 'var(--cream)' : 'transparent', // Set a highlight color
+                          borderColor: rangeButtonSelected === RANGES[0] ? 'var(--cream)' : palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'                          
                         }}
                       >
                         10%
@@ -1250,6 +1262,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       <Box 
                         onClick={()=>{
                           if(!priceCurrent) return;
+                          setRangeButtonSelected(RANGES[1]);
                           //console.log("CLicked")
                           setPriceLowerEntered(calculateRange(Number(priceCurrent), -20));
                           setPriceUpperEntered(calculateRange(Number(priceCurrent), 20));
@@ -1267,7 +1280,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                           gap: '10px',
                           borderRadius: '30px',
                           cursor: 'pointer',
-                          color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                          color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',
+                          bgcolor: rangeButtonSelected === RANGES[1] ? 'var(--cream)' : 'transparent', // Set a highlight color
+                          borderColor: rangeButtonSelected === RANGES[1] ? 'var(--cream)' : palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'                          
                         }}
                       >
                         20%
@@ -1275,6 +1290,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       <Box 
                         onClick={()=>{
                           if(!priceCurrent) return;
+                          setRangeButtonSelected(RANGES[2]);
                           //console.log("CLicked")
                           setPriceLowerEntered(calculateRange(Number(priceCurrent), -50));
                           setPriceUpperEntered(calculateRange(Number(priceCurrent), 50));
@@ -1292,13 +1308,16 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                           gap: '10px',
                           borderRadius: '30px',
                           cursor: 'pointer',
-                          color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                          color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',
+                          bgcolor: rangeButtonSelected === RANGES[2] ? 'var(--cream)' : 'transparent', // Set a highlight color
+                          borderColor: rangeButtonSelected === RANGES[2] ? 'var(--cream)' : palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'                          
                         }}
                       >
                         50%
                       </Box>
                       <Box 
                         onClick={()=>{
+                          setRangeButtonSelected(RANGES[3]);
                           const newPriceLower = tickToPrice(MIN_TICK, decimalDifference);
                           setPriceLowerEntered(newPriceLower.toString());
                           const newPriceUpper = tickToPrice(MAX_TICK, decimalDifference);
@@ -1318,7 +1337,10 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                           gap: '10px',
                           borderRadius: '30px',
                           cursor: 'pointer',
-                          color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+                          color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',
+                          bgcolor: rangeButtonSelected === RANGES[3] ? 'var(--cream)' : 'transparent', // Set a highlight color
+                          borderColor: rangeButtonSelected === RANGES[3] ? 'var(--cream)' : palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
+
                         }}
                       >
                         Full Range
