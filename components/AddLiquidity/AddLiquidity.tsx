@@ -1032,7 +1032,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                     </Box>
                     <Box className="inputField">
                       <input autoComplete="off" onChange={(e)=>{
-                        setAmountAt1("")
+                        if(activeProtocol === Protocol.V3)
+                          setAmountAt1("")
                         setAmountAt0(e.target.value);
                         handleTokenAmountChange(0, e.target.value)
                       }} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
@@ -1051,7 +1052,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                     </Box>
                     <Box className="inputField">
                       <input autoComplete="off" onChange={(e)=>{
-                        setAmountAt0("")
+                        if(activeProtocol === Protocol.V3)
+                          setAmountAt0("")
                         setAmountAt1(e.target.value);
                         handleTokenAmountChange(1, e.target.value)
                       }} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} 
