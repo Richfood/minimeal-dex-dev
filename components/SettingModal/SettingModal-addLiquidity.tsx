@@ -302,7 +302,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
             </Modal>
 
             <ExpertModeModal isOpen={isExpertModalOpen} handleCloseExpert={closeExpertModal} theme={theme} />
-            <CustomizeRouting isOpen={isCustomize} handleCloseCustomize={closeCustomize} theme={theme} />
+            {/* <CustomizeRouting isOpen={isCustomize} handleCloseCustomize={closeCustomize} theme={theme} /> */}
         </>
     );
 };

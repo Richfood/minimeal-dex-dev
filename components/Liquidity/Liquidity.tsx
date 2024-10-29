@@ -66,7 +66,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
             <Typography sx={{ color: 'var(--cream)', fontSize: '14px', fontWeight: '500' }}>List of your liquidity positions</Typography>
           </Box>
           <Box>
-            <List sx={{ display: 'flex' }}>
+            {/* <List sx={{ display: 'flex' }}>
               <ListItem sx={{ color }} className="widgetItem" disablePadding onClick={handleOpenRecent}>
                 <ListItemButton sx={{ px: '8px' }}>
                   <RxCountdownTimer style={{ width: '24px', height: '24px', color: color }} />
@@ -77,7 +77,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
                   <IoSettingsOutline style={{ width: '24px', height: '24px', color: color }} />
                 </ListItemButton>
               </ListItem>
-            </List>
+            </List> */}
           </Box>
         </Box>
 
@@ -170,7 +170,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
       </Box>
 
       <RecentTransactions open={isOpenRecent} onClose={handleCloseRecent} />
-      <SettingsModal isOpen={isOpen} handleClose={handleClose} theme={theme} />
+      {/* <SettingsModal isOpen={isOpen} handleClose={handleClose} theme={theme} /> */}
       <ImportPool open={openPool} onClose={handleClosePool} /> 
     </>
   );
