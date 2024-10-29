@@ -29,7 +29,7 @@ import Default from '../CustomChart/Default';
 import { getPoolData } from '@/utils/api/getPoolData';
 import { getV2Pair } from '@/utils/api/getV2Pair';
 import { AddLiquidityPoolData, TokenDetails, Protocol } from '@/interfaces';
-import SettingsModal from '../SettingModal/SettingModal';
+import SettingsModal from '../SettingModal/SettingModal-addLiquidity';
 import tokenList from "../../utils/tokenList.json";
 import { calculateV2Amounts } from '@/utils/calculateV2TokenAmounts';
 import { debounce } from '@syncfusion/ej2-base';
@@ -70,8 +70,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const NFPMAddress = addresses.PancakePositionManagerAddress;
   const v2RouterAddress = addresses.PancakeV2RouterAddress;
-  const tempToken0 = tokenList.TokenA;
-  const tempToken1 = tokenList.TokenB;
+  const tempToken0 = tokenList.TokenD;
+  const tempToken1 = tokenList.TokenA;
   const [token0,setToken0] =  useState<TokenDetails | null>(tempToken0);
   const [token1, setToken1] = useState<TokenDetails | null>(tempToken1);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
@@ -89,7 +89,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const [tickUpper, setTickUpper] = useState("");
   const [amount0Min, setAmount0Min] = useState("");
   const [amount1Min, setAmount1Min] = useState("");
-  const [deadline, setDeadline] = useState("");
   const [sqrtPriceX96, setSqrtPriceX96] = useState("");
   const [emulateError, setEmulateError] = useState(false);
   const [amount0ToEmulate, setAmount0ToEmulate] = useState<number | string>("");
@@ -112,6 +111,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const [handlePricesAfterAdjust, setHandlePricesAfterAdjust] = useState<boolean>(false);
 
   const [addLiquidityRunning, setAddLiquidityRunning] = useState(false);
+
+  const [slippageTolerance, setSlippageTolerance] = useState<number | null>(1);
+  console.log("🚀 ~ slippageTolerance:", slippageTolerance)
+  const [deadline, setDeadline] = useState("10");
+  console.log("🚀 ~ deadline:", deadline)
 
   // const renderCount = useRef(0);
 
@@ -216,7 +220,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     setTickUpper("");
     setAmount0Min("");
     setAmount1Min("");
-    setDeadline("");
+    setDeadline("10");
     setSqrtPriceX96("");
     setEmulateError(false);
     setAmount0ToEmulate("");
@@ -334,7 +338,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   };
 
   const handleAddLiquidity = async ()=>{
-    if(!token0 || !token1) return;
+    if(!token0 || !token1 || !slippageTolerance) return;
 
     setAddLiquidityRunning(true);
     try{
@@ -366,6 +370,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       return;
     }
 
+    const unixDeadline = (Math.floor((Date.now() + Number(deadline) * 60 * 1000) / 1000)).toString();
     if(activeProtocol === Protocol.V2){
       try{
         if(token0 && token1 && amount0Desired && amount1Desired){
@@ -394,7 +399,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
             addLiquidityTxHash = await addLiquidityETH(
               Token,
               amountETHDesired,
-              amountTokenDesired
+              amountTokenDesired,
+              unixDeadline,
+              slippageTolerance
             )
           }
           else{
@@ -402,7 +409,9 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
               token0,
               token1,
               amount0Desired,
-              amount1Desired
+              amount1Desired,
+              unixDeadline,
+              slippageTolerance
             )
           }
 
@@ -428,7 +437,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
             amount1Desired,
             amount0Min,
             amount1Min,
-            deadline,
+            unixDeadline,
             sqrtPriceX96,
             fee,
             isFullRange
@@ -499,7 +508,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       return;
     }
 
-    if(!priceLower || !priceUpper || !priceCurrent || !fee || !token1 || !token0 || ((!Number(amount0ToEmulate) && !Number(amount1ToEmulate)))) {
+    if(!priceLower || !priceUpper || !priceCurrent || !fee || !token1 || !token0 || ((!Number(amount0ToEmulate) && !Number(amount1ToEmulate))) || !slippageTolerance) {
       
       if((!Number(amount0ToEmulate) && !Number(amount1ToEmulate))) {
         console.log("🚀 ~ calculate ~ (!Number(amount0ToEmulate) && !Number(amount1ToEmulate)):", (!Number(amount0ToEmulate) && !Number(amount1ToEmulate)))
@@ -519,7 +528,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       amount1ToEmulate.toString(),
       token0,
       token1,
-      isSorted
+      isSorted,
+      slippageTolerance
     );
 
     console.log('HEllo - ,', result);
@@ -534,7 +544,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
           amount1Desired : amount1DesiredEmulate,
           amount0Min : amount0MinEmulate,
           amount1Min : amount1MinEmulate,
-          deadline : deadlineEmulate,
           sqrtPriceX96 : sqrtPriceX96Emulate
         } =  result
 
@@ -570,7 +579,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
         setTickUpper(tickUpperEmulate);
         setAmount0Min(expandIfNeeded(amount0MinEmulate));
         setAmount1Min(expandIfNeeded(amount1MinEmulate));
-        setDeadline(deadlineEmulate);
         setSqrtPriceX96(sqrtPriceX96Emulate);
         // setApprovalAmount0(approvalAmount0ToSet || "");
         // setApprovalAmount1(approvalAmount1ToSet || "");
@@ -802,7 +810,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
             </Typography>
           </Box>
           <Box className="al-right">
-            <Typography
+            {/* <Typography
               sx={{
                 fontSize: '12px',
                 textTransform: 'uppercase',
@@ -813,12 +821,12 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
               }}
             >
               APR
-            </Typography>
+            </Typography> */}
 
             <Box className="al-calc" sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
-              <Box>
+              {/* <Box>
                 <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>0%</Typography>
-              </Box>
+              </Box> */}
               {/* <Box onClick={handleOpen} sx={{ cursor: "pointer" }}>
                 <Typography><CiCalculator2 size={20} style={{ color: palette.text.secondary }} /></Typography>
               </Box>
@@ -1063,7 +1071,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       sx={{ width: '100%' }}
                       disabled={!amount0Desired || !amount1Desired || !token0 || !token1 || addLiquidityRunning}
                     >
-                      {addLiquidityRunning ? <CircularProgress size={30}/> : <>Create Liquidity</>}
+                      {addLiquidityRunning ? <CircularProgress size={25}/> : <>Create Liquidity</>}
                     </Button>
                   </Box>
               ) : (
@@ -1320,7 +1328,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
                     <Box>
                       <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning}>
-                        {addLiquidityRunning ? <CircularProgress size={30}/> : <>Create Liquidity</>}
+                        {addLiquidityRunning ? <CircularProgress size={25}/> : <>Create Liquidity</>}
                       </Button>
                     </Box>
                   </Box>
@@ -1340,7 +1348,15 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
           token1={token1}      /> */}
 
       {/* <RoiCalculator open={open} handleClose={handleClose} /> */}
-      <SettingsModal isOpen={open} handleClose={handleClose} theme={theme} />
+      <SettingsModal 
+        isOpen={open} 
+        handleClose={handleClose} 
+        theme={theme} 
+        slippageTolerance={slippageTolerance} 
+        setSlippageTolerance={setSlippageTolerance}
+        deadline={deadline}
+        setDeadline={setDeadline}
+      />
       <style jsx>{`
         .greyed-out {
           opacity: 0.5;           /* Greyed out effect */

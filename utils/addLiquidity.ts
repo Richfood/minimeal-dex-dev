@@ -21,7 +21,9 @@ const V2_ROUTER_ABI = v2RouterArtifact.abi;
 export async function addLiquidityETH(
     token : TokenDetails,
     amountETHDesired : string,
-    amountTokenDesired : string
+    amountTokenDesired : string,
+    deadline : string,
+    slippageTolerance : number
 ) {
 
     if(!window.ethereum) return;
@@ -29,8 +31,6 @@ export async function addLiquidityETH(
     const newProvider = new ethers.providers.Web3Provider(window.ethereum);
     const newSigner = newProvider.getSigner();
     const newSignerAddress = await newSigner.getAddress()
-
-    const slippageTolerance = 10;
     
     amountTokenDesired = ethers.utils.parseUnits(expandIfNeeded(amountTokenDesired), token.address.decimals).toString();
 
@@ -41,7 +41,6 @@ export async function addLiquidityETH(
 
     const pancakeV2RouterAddress = addresses.PancakeV2RouterAddress;
     const pancakeV2RouterContract = new ethers.Contract(pancakeV2RouterAddress, V2_ROUTER_ABI, newSigner);
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
 
     const addLiquidityEthTx = await pancakeV2RouterContract.addLiquidityETH(
         token.address.contract_address,
@@ -65,14 +64,14 @@ export async function addLiquidityV2(
     token1: TokenDetails,
     amount0Desired: string,
     amount1Desired: string,
+    deadline : string,
+    slippageTolerance : number
 ) {
     if(!window.ethereum) return;
 
     const newProvider = new ethers.providers.Web3Provider(window.ethereum);
     const newSigner = newProvider.getSigner();
     const newSignerAddress = await newSigner.getAddress()
-
-    const slippageTolerance = 10;
 
     amount0Desired = ethers.utils.parseUnits(expandIfNeeded(amount0Desired), token0.address.decimals).toString();
     amount1Desired = ethers.utils.parseUnits(expandIfNeeded(amount1Desired), token1.address.decimals).toString();
@@ -84,7 +83,6 @@ export async function addLiquidityV2(
 
     const pancakeV2RouterAddress = addresses.PancakeV2RouterAddress;
     const pancakeV2RouterContract = new ethers.Contract(pancakeV2RouterAddress, V2_ROUTER_ABI, newSigner);
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
 
     const addLiquidityTx = await pancakeV2RouterContract.addLiquidity(token0.address.contract_address, token1.address.contract_address, amount0Desired, amount1Desired, amount0Min, amount1Min, newSignerAddress, deadline);
     await addLiquidityTx.wait();

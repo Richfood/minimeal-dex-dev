@@ -26,7 +26,7 @@ function emulate(
     token0Details: TokenDetails,
     token1Details: TokenDetails,
     isSorted : boolean,
-    // decimalDifference : number
+    slippageTolerance : number
 ) {
     amount0Entered = amount0Entered === "" ? "0" : amount0Entered;
     amount1Entered = amount1Entered === "" ? "0" : amount1Entered;
@@ -200,8 +200,6 @@ function emulate(
         amount1Min = parseFloat(amount1DesiredFromPosition.toString()).toString();
 
         //console.log(amount0DesiredFromPosition.toString(), amount1DesiredFromPosition.toString());
-
-        const slippageTolerance = 10;
         amount0Min = roundToPrecision((Number(amount0Min) - adjustForSlippage(amount0Min, slippageTolerance)).toFixed(0) , token0.decimals).toString()//(roundToPrecision(amount0Min,6) - roundToPrecision("0.000001",6)).toString(); // Math.pow(10,-token0.decimals+4)
         //console.log("🚀 ~ amount0Min:", amount0Min)
         amount1Min = roundToPrecision((Number(amount1Min) - adjustForSlippage(amount1Min, slippageTolerance)).toFixed(0) , token1.decimals).toString()//(roundToPrecision(amount1Min,6) - roundToPrecision("0.000001",6)).toString();
