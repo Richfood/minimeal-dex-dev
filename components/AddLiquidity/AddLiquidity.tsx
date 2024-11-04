@@ -34,6 +34,8 @@ import tokenList from "../../utils/tokenList.json";
 import { calculateV2Amounts } from '@/utils/calculateV2TokenAmounts';
 import { debounce } from '@syncfusion/ej2-base';
 import { flushSync } from 'react-dom';
+import { useCall } from 'wagmi';
+import { getAllPoolsForTokens } from '@/utils/api/getAllPoolsForTokens';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -200,15 +202,16 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const handlePriceCurrent = ()=>{
     if(fee && priceCurrentEntered && token0 && token1 && Number(priceCurrentEntered) > 0){
-      const tick = priceToTick(priceCurrentEntered, decimalDifference);
-      // console.log("🚀 ~ handlePriceCurrent ~ tick:", tick, priceCurrentEntered);
+      // const tick = priceToTick(priceCurrentEntered, decimalDifference);
+      // // // console.log("🚀 ~ handlePriceCurrent ~ tick:", tick, priceCurrentEntered);
 
       
-      const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
-      const newPrice = tickToPrice(nearestTick, decimalDifference);
+      // const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
+      // const newPrice = tickToPrice(nearestTick, decimalDifference);
 
-      setPriceCurrent(newPrice.toString());
-      setPriceCurrentEntered(newPrice.toString());
+      // setPriceCurrent(newPrice.toString());
+      setPriceCurrent(priceCurrentEntered);
+      // setPriceCurrentEntered(newPrice.toString());
       // console.log("🚀 ~ handlePriceCurrent ~ newPrice:", newPrice); 
     }
     else{
@@ -369,7 +372,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     catch(error){
       setAddLiquidityRunning(false);
       alert("Error approving tokens");
-      //console.log(error)
+      console.log(error)
       return;
     }
 
@@ -610,7 +613,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   //   }, 300),
   //   []
   // );
-  
+
   const handleTokenAmountChange = useCallback(
     debounce(async (amountAtIndex : number, value : string) => {
       if (!token0 || !token1) return;
@@ -705,10 +708,16 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     
       setCurrentV2PoolRatio(pairRatio);
   }
+
+  const fetchAllPoolsData = async()=>{
+    if(!token0 || !token1) return;
+    await getAllPoolsForTokens(token0, token1);
+  }
   //console.log(renderCount.current);
   useEffect(()=>{
 //    renderCount.current++;
     if(token0 && token1){
+      fetchAllPoolsData();
       setDecimalDifference(token1.address.decimals - token0.address.decimals);
       setIsSorted(token0.address.contract_address < token1.address.contract_address);
       handleTokenToggle()
@@ -1132,7 +1141,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       <Box className="SwapWidgetInner" sx={{ mb: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
                         <Box className="inputBox" sx={{ width: '100%' }}>
                           <Box className="inputField">
-                            <input type="number" placeholder='0.0' style={{ textAlign: 'end' }} onBlur={handlePriceCurrent} onChange={(e)=>setPriceCurrentEntered(e.target.value)} value={!priceCurrent ? priceCurrentEntered : priceCurrent}/>
+                            <input type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
+                            onBlur={handlePriceCurrent}
+                            onChange={(e)=>{
+                              setPriceCurrentEntered(e.target.value)
+                            }} value={ priceCurrentEntered }/>
                           </Box>
                         </Box>
                       </Box>
