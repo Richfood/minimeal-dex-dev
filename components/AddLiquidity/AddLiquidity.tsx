@@ -53,6 +53,12 @@ const MAX_TICK = 887272;
 
 const RANGES = ["10", "20", "50", "Full"]
 
+enum PriceRangeError {
+  INVALID,
+  BELOW_RANGE,
+  ABOVE_RANGE
+}
+
 const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol : activeProtocol }) => {
   const { palette } = useTheme();
   const [isActive, setIsActive] = useState(true);
@@ -123,6 +129,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const [pickPercent10000, setPickPercent10000] = useState(0);
   const [pickPercent20000, setPickPercent20000] = useState(0);
 
+  const [priceRangeErrorIndex, setPriceRangeErrorIndex] = useState<PriceRangeError | null>(null);
+
   console.log("🚀 ~ rangeButtonSelected:", rangeButtonSelected)
 
   console.log("🚀 ~ slippageTolerance:", slippageTolerance)
@@ -134,8 +142,24 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const checkRange = ()=>{
     if(!priceUpper || !priceLower || !priceCurrent) return true;
 
-    return Boolean(Number(priceCurrent) < Number(priceUpper) && Number(priceCurrent) > Number(priceLower));
+    console.log("🚀 ~ checkRange ~ priceRangeErrorIndex:", priceRangeErrorIndex)
+
+    if(priceLower >= priceUpper){
+      setPriceRangeErrorIndex(PriceRangeError.INVALID);
+    }
+    else if(priceCurrent <= priceLower){
+      setPriceRangeErrorIndex(PriceRangeError.BELOW_RANGE);
+    }
+    else if(priceCurrent >= priceUpper){
+      setPriceRangeErrorIndex(PriceRangeError.ABOVE_RANGE);
+    }
+    else{
+      setPriceRangeErrorIndex(null);
+    }
+
+    return true;
   }
+    console.log("🚀 ~ priceRangeErrorIndex:", priceRangeErrorIndex)
 
   const calculateRange = (price: number, percentage: number)=>{
     return (price + ((percentage*price)/100)).toString();
@@ -835,6 +859,10 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       //console.log("🚀 ~ handlePricesAfterAdjust:", handlePricesAfterAdjust)
   },[handlePricesAfterAdjust])
 
+  useEffect(()=>{
+    checkRange()
+  },[priceLower,priceUpper,priceCurrent])
+
   const handleButton = (buttonValue : boolean, fullRangeValue : boolean)=>{
 
     if(!buttonValue){
@@ -1062,8 +1090,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                 </Box>
               </Box>
 
-              {checkRange() ?
-
                 <Box className="SwapWidgetInner" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
 
                   <Box sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
@@ -1080,7 +1106,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                     <Box className="inputField">
                       <input autoComplete="off" onChange={(e)=>{
                         if(activeProtocol === Protocol.V3)
-                          setAmountAt1("")
+                        setAmountAt1("")
                         setAmountAt0(e.target.value);
                         handleTokenAmountChange(0, e.target.value)
                       }} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
@@ -1109,13 +1135,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                     </Box>
                   </Box>
                 </Box>
-               : 
-                <Box className="SwapWidgetInner" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
-                    <Typography className="mainTitle" sx={{ color: 'var(--cream)', textAlign: 'start', }}>Invalid range selected. The min price must be lower than the max price.</Typography>
-                  </Box>
-                </Box>
-              }
 
             </Box>
             <Box className="al-inner-right">
@@ -1167,30 +1186,66 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
                     {!currentPoolData ? (
                       <Box>
+                        <Box sx={{ width: 'calc(100% - 30px)', color: 'var(--primary)' }}>
+                          {
+                            priceRangeErrorIndex === PriceRangeError.BELOW_RANGE || priceRangeErrorIndex === PriceRangeError.ABOVE_RANGE ? (
+                              <Typography sx={{ fontWeight: '600' }}>
+                                Your position will not earn fees or be used in trades until the market price moves into your range.
+                              </Typography>
+                            ) : priceRangeErrorIndex === PriceRangeError.INVALID ? (
+                              <Typography sx={{ fontWeight: '600' }}>
+                                Invalid range selected. The min price must be lower than the max price.
+                              </Typography>
+                            ) : null
+                          }
+                        </Box>
                         <Box className="warning-box" sx={{ mb: '15px' }}>
                           <Box sx={{ color: 'var(--secondary)', fontSize: 20 }}>
                             <GoAlertFill />
                           </Box>
-                        <Box sx={{ width: 'calc(100% - 30px)', color: 'var(--primary)' }}>
-                          <Typography>This pool must be initialized before you can add liquidity. To initialize, select a starting price for the pool. Then, enter your liquidity price range and deposit amount. Gas fees will be higher than usual due to the initialization transaction.</Typography>
-                          <Typography sx={{ fontWeight: '600' }}>Fee-on transfer tokens and rebasing tokens are NOT compatible with V3.</Typography>
+                          <Box sx={{ width: 'calc(100% - 30px)', color: 'var(--primary)' }}>
+                            <Typography>This pool must be initialized before you can add liquidity. To initialize, select a starting price for the pool. Then, enter your liquidity price range and deposit amount. Gas fees will be higher than usual due to the initialization transaction.</Typography>
+                            <Typography sx={{ fontWeight: '600' }}>Fee-on transfer tokens and rebasing tokens are NOT compatible with V3.</Typography>
+                          </Box>
                         </Box>
-                      </Box>
-                      <Box className="SwapWidgetInner" sx={{ mb: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
-                        <Box className="inputBox" sx={{ width: '100%' }}>
-                          <Box className="inputField">
-                            <input type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
-                            onBlur={handlePriceCurrent}
-                            onChange={(e)=>{
-                              setPriceCurrentEntered(e.target.value)
-                            }} value={ priceCurrentEntered }/>
+                        <Box className="SwapWidgetInner" sx={{ mb: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
+                          <Box className="inputBox" sx={{ width: '100%' }}>
+                            <Box className="inputField">
+                              <input type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
+                              onBlur={handlePriceCurrent}
+                              onChange={(e)=>{
+                                setPriceCurrentEntered(e.target.value)
+                              }} value={ priceCurrentEntered }/>
+                            </Box>
                           </Box>
                         </Box>
                       </Box>
-                    </Box>
                     ) : (
                       <Box>
         
+                        {priceRangeErrorIndex !== null ? 
+                          <Box className="warning-box" sx={{ mb: '15px' }}>
+                            <Box sx={{ color: 'var(--secondary)', fontSize: 20 }}>
+                              <GoAlertFill />
+                            </Box>
+                            <Box sx={{ width: 'calc(100% - 30px)', color: 'var(--primary)' }}>
+                              {
+                                priceRangeErrorIndex === PriceRangeError.BELOW_RANGE || priceRangeErrorIndex === PriceRangeError.ABOVE_RANGE ? (
+                                  <Typography sx={{ fontWeight: '600' }}>
+                                    Your position will not earn fees or be used in trades until the market price moves into your range.
+                                  </Typography>
+                                ) : priceRangeErrorIndex === PriceRangeError.INVALID ? (
+                                  <Typography sx={{ fontWeight: '600' }}>
+                                    Invalid range selected. The min price must be lower than the max price.
+                                  </Typography>
+                                ) : null
+                              }
+                            </Box>
+                          </Box>
+                          :
+                          <></>
+                        }
+
                         {token0 && token1 ? (
                           <Box sx={{ display: 'flex', gap: '5px', justifyContent: 'center', mb: '15px' }}>
                           <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>Current Price:</Typography>
