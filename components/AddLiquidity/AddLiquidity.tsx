@@ -722,40 +722,50 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       setCurrentV2PoolRatio(pairRatio);
   }
 
-  const fetchAllPoolsData = async()=>{
-    if(!token0 || !token1) return;
+  const fetchAllPoolsData = async () => {
+    if (!token0 || !token1) return;
     const pools = await getAllPoolsForTokens(token0, token1);
-
-    let totalLiquidity = 0;
-    let liq100=0, liq500=0, liq2500=0, liq10000=0, liq20000=0;
-    pools.map((pool : any)=>{
-
-      totalLiquidity += pool.liquidity;
-      switch(Number(pool.feeTier)){
+  
+    let totalLiquidity = BigInt(0);
+    let liq100 = BigInt(0), liq500 = BigInt(0), liq2500 = BigInt(0), liq10000 = BigInt(0), liq20000 = BigInt(0);
+  
+    pools.forEach((pool: any) => {
+      totalLiquidity += BigInt(pool.liquidity);
+  
+      switch (Number(pool.feeTier)) {
         case 100:
-          liq100 = pool.liquidity;
+          liq100 += BigInt(pool.liquidity);
           break;
         case 500:
-          liq500 = pool.liquidity;
+          liq500 += BigInt(pool.liquidity);
           break;
         case 2500:
-          liq2500 = pool.liquidity;
+          liq2500 += BigInt(pool.liquidity);
           break;
         case 10000:
-          liq10000 = pool.liquidity;
+          liq10000 += BigInt(pool.liquidity);
           break;
         case 20000:
-          liq20000 = pool.liquidity;
+          liq20000 += BigInt(pool.liquidity);
           break;
       }
-
-      setPickPercent100(100 * liq100 / totalLiquidity);
-      setPickPercent500(100 * liq500 / totalLiquidity);
-      setPickPercent2500(100 * liq2500 / totalLiquidity);
-      setPickPercent10000(100 * liq10000 / totalLiquidity);
-      setPickPercent20000(100 * liq20000 / totalLiquidity);
-    })
-  }
+    });
+  
+    const toPercentage = (value: bigint, total: bigint): number => {
+      if (total === BigInt(0)) return 0;
+      const scaledValue = value * BigInt(1000); // scale up for 2 decimal places
+      const percentage = scaledValue / total; // integer division
+      return Number((percentage + BigInt(5)) / BigInt(10)); // rounding to the nearest whole number
+    };
+  
+    setPickPercent100(toPercentage(liq100, totalLiquidity));
+    setPickPercent500(toPercentage(liq500, totalLiquidity));
+    setPickPercent2500(toPercentage(liq2500, totalLiquidity));
+    setPickPercent10000(toPercentage(liq10000, totalLiquidity));
+    setPickPercent20000(toPercentage(liq20000, totalLiquidity));
+  };
+  
+  
   //console.log(renderCount.current);
   useEffect(()=>{
 //    renderCount.current++;
