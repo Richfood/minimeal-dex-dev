@@ -92,6 +92,8 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
     const [isTestnet, setIsTestnet] = React.useState<boolean | null>(null);
     const [allowSwapForV2, setAllowSwapForV2] = useState<boolean>(true);
     const [allowSwapForV3, setAllowSwapForV3] = useState<boolean>(true);
+    const [isSwapping, setIsSwapping] = useState<boolean>(false);
+
     useEffect(() => {
         if (!token0) return;
 
@@ -264,11 +266,11 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
     };
 
     const handleSwap = async () => {
-        pageLoading(true); // Start loading indicator
+        setIsSwapping(true); // Start loading indicator
 
         if (!token0 || !token1) {
             console.log("🚀 ~ handleSwap ~ Missing tokens:", token0, token1);
-            pageLoading(false); // Stop loading indicator on error
+            setIsSwapping(false); // Stop loading indicator on error
             return; // Exit early if tokens are missing
         }
 
@@ -291,7 +293,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
             setAmountOut("");
 
         } finally {
-            pageLoading(false); // Stop loading indicator regardless of outcome
+            setIsSwapping(false); // Stop loading indicator regardless of outcome
         }
     };
 
@@ -358,10 +360,13 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
                     setDataForSwap(data.finalRoute);
 
                     if (isAmountIn) {
+                        console.log("🚀 ~ isAmountIn:", isAmountIn)
                         const token1Price = await handlePriceForToken1(value);
                         setToken1Price(token1Price);
                         setAmountOut(value?.toString() || "");
                     } else {
+                        console.log("🚀 ~ isAmountIn:", isAmountIn)
+
                         const token0Price = await handlePriceForToken0(value);
                         setToken0Price(token0Price);
                         setAmountIn(value?.toString() || "");
@@ -405,7 +410,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
             timeoutRef.current = setTimeout(async () => {
                 try {
                     flushSync(() => setAmountInLoading(true)); // Show loading state
-                    await fetchSmartOrderRoute(amountOut, true); // Use latest tokens
+                    await fetchSmartOrderRoute(amountOut, false); // Use latest tokens
                 } finally {
                     flushSync(() => setAmountInLoading(false)); // Hide loading state
                 }
@@ -574,13 +579,11 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
                                         onClick={isActive ? handleSwap : handleClick} // Conditional onClick handler
                                         disabled={isActive && (amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn))}
                                     >
-                                        {isActive
-                                            ? (userBalance && Number(userBalance) >= Number(amountIn)
-                                                ? "Swap"
-                                                : "Insufficient Balance"
-                                            )
-                                            : "Connect Wallet"
-                                        }
+                                        {isSwapping ? (
+                                            <CircularProgress size={24} color="inherit" />
+                                        ) : isActive ? (
+                                            userBalance && Number(userBalance) >= Number(amountIn) ? "Swap" : "Insufficient Balance"
+                                        ) : "Connect Wallet"}
                                     </Button>
                                 </Box>
 

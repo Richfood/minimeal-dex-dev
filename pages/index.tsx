@@ -29,53 +29,43 @@ const IndexPage = () => {
     };
     return (
         <>
-            {loading === false ? (
-                <Box>
-                    <Header />
-                    <Container>
-                        <Box className="swap_graph_sec" sx={{ minHeight: 'calc(100vh - 149px)' }}>
-                            {show && (
-                                <Box
-                                    className={
-                                        theme === 'light'
-                                            ? 'swap_graph_box white_box light-section'
-                                            : 'swap_graph_box white_box dark-section'
-                                    }
-                                >
-                                    <SwapGraph zoomed={zoomed} onClick={handleZoomClick} />
-                                </Box>
-                            )}
+            <Box>
+                <Header />
+                <Container>
+                    <Box className="swap_graph_sec" sx={{ minHeight: 'calc(100vh - 149px)' }}>
+                        {show && (
                             <Box
-                                className="swap_widgets white_box"
-                                sx={{
-                                    mt: '50px',
-                                    maxWidth: '1200px',
-                                    position: 'relative',
-                                    mb: '50px',
-                                    '@media (max-width: 1269px)': {
-                                        maxWidth: 'calc(100% - 40px)',
-                                    },
-                                }}
+                                className={
+                                    theme === 'light'
+                                        ? 'swap_graph_box white_box light-section'
+                                        : 'swap_graph_box white_box dark-section'
+                                }
                             >
-                                <Box>
-                                    <SwapWidget pageLoading={handlePageLoading} />
-                                </Box>
+                                <SwapGraph zoomed={zoomed} onClick={handleZoomClick} />
+                            </Box>
+                        )}
+                        <Box
+                            className="swap_widgets white_box"
+                            sx={{
+                                mt: '50px',
+                                maxWidth: '1200px',
+                                position: 'relative',
+                                mb: '50px',
+                                '@media (max-width: 1269px)': {
+                                    maxWidth: 'calc(100% - 40px)',
+                                },
+                            }}
+                        >
+                            <Box>
+                                <SwapWidget pageLoading={handlePageLoading} />
                             </Box>
                         </Box>
-                    </Container>
-                    <Footer />
-                </Box>
-            ) : <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100vh', // Full-page height
-                }}
-            >
-                <CircularProgress size={200} />
+                    </Box>
+                </Container>
+                <Footer />
             </Box>
-            }
+
+
         </>
     );
 
