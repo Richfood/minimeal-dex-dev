@@ -116,6 +116,13 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   const [addLiquidityRunning, setAddLiquidityRunning] = useState(false);
   const [slippageTolerance, setSlippageTolerance] = useState<number | null>(1);
   const [rangeButtonSelected, setRangeButtonSelected] = useState<string | null>(null);
+
+  const [pickPercent100, setPickPercent100] = useState(0);
+  const [pickPercent500, setPickPercent500] = useState(0);
+  const [pickPercent2500, setPickPercent2500] = useState(0);
+  const [pickPercent10000, setPickPercent10000] = useState(0);
+  const [pickPercent20000, setPickPercent20000] = useState(0);
+
   console.log("🚀 ~ rangeButtonSelected:", rangeButtonSelected)
 
   console.log("🚀 ~ slippageTolerance:", slippageTolerance)
@@ -711,7 +718,37 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const fetchAllPoolsData = async()=>{
     if(!token0 || !token1) return;
-    await getAllPoolsForTokens(token0, token1);
+    const pools = await getAllPoolsForTokens(token0, token1);
+
+    let totalLiquidity = 0;
+    let liq100=0, liq500=0, liq2500=0, liq10000=0, liq20000=0;
+    pools.map((pool : any)=>{
+
+      totalLiquidity += pool.liquidity;
+      switch(Number(pool.feeTier)){
+        case 100:
+          liq100 = pool.liquidity;
+          break;
+        case 500:
+          liq500 = pool.liquidity;
+          break;
+        case 2500:
+          liq2500 = pool.liquidity;
+          break;
+        case 10000:
+          liq10000 = pool.liquidity;
+          break;
+        case 20000:
+          liq20000 = pool.liquidity;
+          break;
+      }
+
+      setPickPercent100(100 * liq100 / totalLiquidity);
+      setPickPercent500(100 * liq500 / totalLiquidity);
+      setPickPercent2500(100 * liq2500 / totalLiquidity);
+      setPickPercent10000(100 * liq10000 / totalLiquidity);
+      setPickPercent20000(100 * liq20000 / totalLiquidity);
+    })
   }
   //console.log(renderCount.current);
   useEffect(()=>{
@@ -741,6 +778,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
         reset();
       }
       else{
+        fetchAllPoolsData();
         setDecimalDifference(token1.address.decimals - token0.address.decimals);
         setIsSorted(token0.address.contract_address < token1.address.contract_address);
       }
@@ -905,7 +943,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                     <Typography sx={{ fontSize: '14px', fontWeight: '500', mb: '15px' }}>
                       V3 LP - {tier} fee tier
                     </Typography>
-                    <Typography
+                    {/* <Typography
                       className='pickData'
                       component="span"
                       sx={{
@@ -919,7 +957,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       }}
                     >
                       {pickData}
-                    </Typography>
+                    </Typography> */}
                   </Box>
                   <Box>
                     <Link onClick={toggleClass} sx={{ textDecoration: 'none', fontSize: '12px', fontWeight: '700', color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)', cursor: 'pointer', display: isActive ? 'none' : 'flex', gap: '5px' }}> More <IoIosArrowDown size={15} /></Link>
@@ -943,7 +981,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                             color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',
                           }}
                         >
-                          Not created
+                          {pickPercent100}% Pick
                         </Typography>
                       </Box>
                       <Box className={`${activeCard === 1 ? 'active active2 ftCards' : 'ftCards'}`} onClick={() => handleFeeChange(1)} sx={{ bgcolor: palette.mode === 'light' ? 'var(--white)' : 'var(--primary)' }}>
@@ -959,7 +997,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                             color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',
                           }}
                         >
-                          Not created
+                          {pickPercent500}% Pick
                         </Typography>
                       </Box>
                       <Box className={`${activeCard === 2 ? 'active active3 ftCards' : 'ftCards'}`} onClick={() => handleFeeChange(2)} sx={{ bgcolor: palette.mode === 'light' ? 'var(--white)' : 'var(--primary)' }}>
@@ -975,7 +1013,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                             color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',
                           }}
                         >
-                          0% Pick
+                          {pickPercent2500}% Pick
                         </Typography>
                       </Box>
                       <Box className={`${activeCard === 3 ? 'active active4 ftCards' : 'ftCards'}`} onClick={() => handleFeeChange(3)} sx={{ bgcolor: palette.mode === 'light' ? 'var(--white)' : 'var(--primary)' }}>
@@ -991,7 +1029,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                             color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',
                           }}
                         >
-                          98% Pick
+                          {pickPercent10000}% Pick
                         </Typography>
                       </Box>
                       <Box className={`${activeCard === 4 ? 'active active5 ftCards' : 'ftCards'}`} onClick={() => handleFeeChange(4)} sx={{ bgcolor: palette.mode === 'light' ? 'var(--white)' : 'var(--primary)' }}>
@@ -1007,7 +1045,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                             color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',
                           }}
                         >
-                          2% Pick
+                          {pickPercent20000}% Pick
                         </Typography>
                       </Box>
                     </Box>
@@ -1168,7 +1206,7 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                         <Box sx={{ textAlign: 'center', minHeight: '200px', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center', }}>
                           <SlGraph size={50} />
                           {/* <Default/> */}
-                          <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>There is no liquidity data.</Typography>
+                          <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>Your position will appear here.</Typography>
                         </Box>
                       </Box>
                       )
