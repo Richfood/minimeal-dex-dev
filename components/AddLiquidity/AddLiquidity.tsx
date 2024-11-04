@@ -697,6 +697,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
       setCurrentPoolData(poolDataFromSubgraph);
       
       let priceCurrentToSet : number | undefined = undefined;
+      let priceLowerToSet : number | undefined = undefined;
+      let priceUpperToSet : number | undefined = undefined;
 
       if(poolDataFromSubgraph){
         if(isSorted){
@@ -705,28 +707,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
         else{
           priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
         }
-        // if(isSorted){
-        //   if(tokenToggleOccured){
-        //     priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
-        //   }
-        //   else{
-        //     priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
-        //   }
-        //   // console.log("🚀 ~ fetchPoolData ~ tokenToggleOccured in if:", tokenToggleOccured)
-        // }
-        // else{
-        //   if(tokenToggleOccured){
-        //     priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
-        //   }
-        //   else{
-        //     priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
-        //   }
-        // }
-
       }
-      // else{
-      //   priceCurrentToSet;
-      // }
+
       setPriceCurrent( priceCurrentToSet !== undefined? priceCurrentToSet.toString() : "")
     }
   };
@@ -1096,44 +1078,67 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                     <Typography className="mainTitle" sx={{ color: 'var(--cream)', textAlign: 'start', }}>DEPOSIT AMOUNT</Typography>
                   </Box>
 
-                  <Box className="inputBox" sx={{ width: '100%', textAlign: 'end' }}>
-                    <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                      <Image src="/images/circle1.svg" alt="circle1" width={20} height={20} />
-                      <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                        {token0 ? token0.name : "Select a Currency"} <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
-                      </Typography>
+                  {priceRangeErrorIndex === null ? (
+                  <>
+                    <Box className="inputBox" sx={{ width: '100%', textAlign: 'end' }}>
+                      <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
+                        <Image src="/images/circle1.svg" alt="circle1" width={20} height={20} />
+                        <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                          {token0 ? token0.name : "Select a Currency"} <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
+                        </Typography>
+                      </Box>
+                      <Box className="inputField">
+                        <input autoComplete="off" onChange={(e)=>{
+                          if(activeProtocol === Protocol.V3)
+                          setAmountAt1("")
+                          setAmountAt0(e.target.value);
+                          handleTokenAmountChange(0, e.target.value)
+                        }} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
+                        value={amountAt0}/>
+                        {/* By default this input takes token amount of token 0. If token toggle has occured, then this also needs to be toggled */}
+                      </Box>
                     </Box>
-                    <Box className="inputField">
-                      <input autoComplete="off" onChange={(e)=>{
-                        if(activeProtocol === Protocol.V3)
-                        setAmountAt1("")
-                        setAmountAt0(e.target.value);
-                        handleTokenAmountChange(0, e.target.value)
-                      }} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
-                      value={amountAt0}/>
-                      {/* By default this input takes token amount of token 0. If token toggle has occured, then this also needs to be toggled */}
-                    </Box>
-                  </Box>
 
 
-                  <Box className="inputBox" sx={{ width: '100%', textAlign: 'end' }}>
-                    <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                      <Image src="/images/circle2.svg" alt="circle2" width={20} height={20} />
-                      <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center' }}>
-                      {token1 ? (token1.name ): "Select a Currency"} <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
-                      </Typography>
+                    <Box className="inputBox" sx={{ width: '100%', textAlign: 'end' }}>
+                      <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
+                        <Image src="/images/circle2.svg" alt="circle2" width={20} height={20} />
+                        <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center' }}>
+                        {token1 ? (token1.name ): "Select a Currency"} <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
+                        </Typography>
+                      </Box>
+                      <Box className="inputField">
+                        <input autoComplete="off" onChange={(e)=>{
+                          if(activeProtocol === Protocol.V3)
+                            setAmountAt0("")
+                          setAmountAt1(e.target.value);
+                          handleTokenAmountChange(1, e.target.value)
+                        }} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} 
+                        value={amountAt1}/>
+                        {/* By default this input takes token amount of token 1. If token toggle has occured, then this also needs to be toggled */}
+                      </Box>
                     </Box>
-                    <Box className="inputField">
-                      <input autoComplete="off" onChange={(e)=>{
-                        if(activeProtocol === Protocol.V3)
-                          setAmountAt0("")
-                        setAmountAt1(e.target.value);
-                        handleTokenAmountChange(1, e.target.value)
-                      }} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} 
-                      value={amountAt1}/>
-                      {/* By default this input takes token amount of token 1. If token toggle has occured, then this also needs to be toggled */}
+                  </>
+                  ) : (
+                    <Box className="warning-box" sx={{ mb: '15px' }}>
+                    <Box sx={{ color: 'var(--secondary)', fontSize: 20 }}>
+                      <GoAlertFill />
+                    </Box>
+                    <Box sx={{ width: 'calc(100% - 30px)', color: 'var(--primary)' }}>
+                      {
+                        priceRangeErrorIndex === PriceRangeError.BELOW_RANGE || priceRangeErrorIndex === PriceRangeError.ABOVE_RANGE ? (
+                          <Typography sx={{ fontWeight: '600' }}>
+                            Your position will not earn fees or be used in trades until the market price moves into your range.
+                          </Typography>
+                        ) : priceRangeErrorIndex === PriceRangeError.INVALID ? (
+                          <Typography sx={{ fontWeight: '600' }}>
+                            Invalid range selected. The min price must be lower than the max price.
+                          </Typography>
+                        ) : null
+                      }
                     </Box>
                   </Box>
+                  )}
                 </Box>
 
             </Box>
@@ -1186,19 +1191,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
                     {!currentPoolData ? (
                       <Box>
-                        <Box sx={{ width: 'calc(100% - 30px)', color: 'var(--primary)' }}>
-                          {
-                            priceRangeErrorIndex === PriceRangeError.BELOW_RANGE || priceRangeErrorIndex === PriceRangeError.ABOVE_RANGE ? (
-                              <Typography sx={{ fontWeight: '600' }}>
-                                Your position will not earn fees or be used in trades until the market price moves into your range.
-                              </Typography>
-                            ) : priceRangeErrorIndex === PriceRangeError.INVALID ? (
-                              <Typography sx={{ fontWeight: '600' }}>
-                                Invalid range selected. The min price must be lower than the max price.
-                              </Typography>
-                            ) : null
-                          }
-                        </Box>
                         <Box className="warning-box" sx={{ mb: '15px' }}>
                           <Box sx={{ color: 'var(--secondary)', fontSize: 20 }}>
                             <GoAlertFill />
@@ -1222,30 +1214,6 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                       </Box>
                     ) : (
                       <Box>
-        
-                        {priceRangeErrorIndex !== null ? 
-                          <Box className="warning-box" sx={{ mb: '15px' }}>
-                            <Box sx={{ color: 'var(--secondary)', fontSize: 20 }}>
-                              <GoAlertFill />
-                            </Box>
-                            <Box sx={{ width: 'calc(100% - 30px)', color: 'var(--primary)' }}>
-                              {
-                                priceRangeErrorIndex === PriceRangeError.BELOW_RANGE || priceRangeErrorIndex === PriceRangeError.ABOVE_RANGE ? (
-                                  <Typography sx={{ fontWeight: '600' }}>
-                                    Your position will not earn fees or be used in trades until the market price moves into your range.
-                                  </Typography>
-                                ) : priceRangeErrorIndex === PriceRangeError.INVALID ? (
-                                  <Typography sx={{ fontWeight: '600' }}>
-                                    Invalid range selected. The min price must be lower than the max price.
-                                  </Typography>
-                                ) : null
-                              }
-                            </Box>
-                          </Box>
-                          :
-                          <></>
-                        }
-
                         {token0 && token1 ? (
                           <Box sx={{ display: 'flex', gap: '5px', justifyContent: 'center', mb: '15px' }}>
                           <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>Current Price:</Typography>
