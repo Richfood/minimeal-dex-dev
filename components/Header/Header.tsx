@@ -22,6 +22,7 @@ const Header = () => {
   const { theme } = useTheme();
   const router = useRouter();
   const [buttonText, setButtonText] = React.useState('Connect Wallet'); // Single useState
+  const [isFirstConnection, setIsFirstConnection] = React.useState(true);
 
   const handleOpenSettings = () => setOpenSettingsModal(true);
   const handleCloseSettings = () => setOpenSettingsModal(false);
@@ -39,17 +40,24 @@ const Header = () => {
 
 
   useEffect(() => {
-    const updateButtonText = () => {
+    const updateButtonText = async () => {
       if (accounts && accounts.length > 0 && isConnected) {
+        if (isFirstConnection && chainId !== 369) { // Check if it's the first connection
+          await metaMask.activate(369); // Connect to mainnet initially
+          setIsFirstConnection(false); // Set to false after initial mainnet connection
+        }
         const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
-        setButtonText(shortenedAddress); // Update with shortened address
+        setButtonText(shortenedAddress);
       } else {
         setButtonText('Connect Wallet');
+        setIsFirstConnection(true); // Set to false after initial mainnet connection
+
       }
     };
 
     updateButtonText();
-  }, [accounts, isConnected]);
+  }, [accounts, isConnected, chainId]);
+
 
 
   const handleClick = () => {
@@ -178,7 +186,7 @@ const Header = () => {
                     borderRadius: '20px',
                     minWidth: '120px',
                     '@media (max-width: 899px)': {
-                      padding: '6px 12px', 
+                      padding: '6px 12px',
                     },
                   }}
                 >

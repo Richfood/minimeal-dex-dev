@@ -472,7 +472,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
 
                             <Box className="inputField">
                                 {amountInLoading ? (
-                                    <CircularProgress size={30} />
+                                    <CircularProgress size={24} />
                                 ) : (
                                     <Box>
                                         <input
@@ -614,7 +614,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
 
                             <Box className="inputField">
                                 {amountOutLoading ? (
-                                    <CircularProgress size={30} />
+                                    <CircularProgress size={24} />
                                 ) : (
                                     <Box>
                                         <input
