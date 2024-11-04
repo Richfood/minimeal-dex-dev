@@ -37,6 +37,8 @@ const Header = () => {
   const handleCloseMenu = () => {
     setAnchorEl(null);
   };
+  const domain = window.location.hostname;
+  console.log("🚀 ~ Header ~ domain:", domain)
 
 
   useEffect(() => {
