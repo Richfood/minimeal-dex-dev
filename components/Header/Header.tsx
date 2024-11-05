@@ -37,12 +37,16 @@ const Header = () => {
   const handleCloseMenu = () => {
     setAnchorEl(null);
   };
-  // const domain = window.location.hostname;
-  // console.log("🚀 ~ Header ~ domain:", domain)
+
+ 
 
 
   useEffect(() => {
     const updateButtonText = async () => {
+      if (typeof window === 'undefined') return 369; // Default to mainnet on server side
+
+      const domain = window.location.hostname;
+      console.log("🚀 ~ Header ~ domain:", domain)
       if (accounts && accounts.length > 0 && isConnected) {
         if (isFirstConnection && chainId !== 369) { // Check if it's the first connection
           await metaMask.activate(369); // Connect to mainnet initially
