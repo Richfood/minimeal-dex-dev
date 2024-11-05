@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, List, ListItem, ListItemButton, Button, Typography, ListItemText, Tooltip, IconButton, Menu, MenuItem } from '@mui/material';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { IoIosArrowDown } from 'react-icons/io';
@@ -13,17 +13,17 @@ import NetworkMenu from './account';
 const { useChainId, useAccounts } = hooks;
 
 const Header = () => {
-  const [openSettingsModal, setOpenSettingsModal] = React.useState(false);
+  const [openSettingsModal, setOpenSettingsModal] = useState(false);
   // const [openWallet, setOpenWallet] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const accounts = useAccounts();
   const isConnected = useAccounts();
   const chainId = useChainId();
   const { theme } = useTheme();
   const router = useRouter();
-  const [buttonText, setButtonText] = React.useState('Connect Wallet'); // Single useState
-
-  const handleOpenSettings = () => setOpenSettingsModal(true);
+  const [buttonText, setButtonText] = useState('Connect Wallet'); // Single useState
+  const [isMainnet, setIsMainnet] = useState<boolean>(true)
+  const handleOpenSettings = () => setOpenSettingsModal(false);
   const handleCloseSettings = () => setOpenSettingsModal(false);
 
   // const handleOpenWallet = () => setOpenWallet(true);
@@ -37,29 +37,30 @@ const Header = () => {
     setAnchorEl(null);
   };
 
- 
+
 
 
   useEffect(() => {
     const updateButtonText = async () => {
-        if (typeof window === 'undefined') return; // Avoid running on the server
+      if (typeof window === 'undefined') return; // Avoid running on the server
 
-        const domain = window.location.hostname;
+      const domain = window.location.hostname;
 
-        if (accounts && accounts.length > 0 && isConnected) {
-            // Check if it's the first connection and domain is dex.sunrewards.io
-            if (domain === 'dex.sunrewards.io' && chainId !== 369) {
-                await metaMask.activate(369); // Connect to the 369 chain (mainnet)
-            }
-            const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
-            setButtonText(shortenedAddress);
-        } else {
-            setButtonText('Connect Wallet');
+      if (accounts && accounts.length > 0 && isConnected) {
+        // Check if it's the first connection and domain is dex.sunrewards.io
+        if (domain === 'dex.sunrewards.io' && chainId !== 369) {
+          setIsMainnet(true)
+          await metaMask.activate(369);
         }
+        const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+        setButtonText(shortenedAddress);
+      } else {
+        setButtonText('Connect Wallet');
+      }
     };
 
     updateButtonText();
-}, [accounts, isConnected, chainId]);
+  }, [accounts, isConnected, chainId]);
 
 
 
@@ -158,7 +159,7 @@ const Header = () => {
                         color: 'var(--white)',
                       }}
                     >
-                      {chainId === 943 ? 'PulseChain Testnet' : 'PulseChain Mainnet'}
+                      {(isMainnet ? 'PulseChain Mainnet' : (chainId === 943 ? 'PulseChain Testnet' : 'PulseChain Mainnet'))}
                       <IoIosArrowDown size={16} />
                     </Typography>
                   </IconButton>
@@ -174,6 +175,7 @@ const Header = () => {
                 networkImages={networkImages}
                 theme={theme}
                 chainId={chainId}
+                isMainnet={isMainnet}
               />
 
               <ListItem disablePadding>
