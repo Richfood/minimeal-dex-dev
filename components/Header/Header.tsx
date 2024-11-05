@@ -23,6 +23,7 @@ const Header = () => {
   const router = useRouter();
   const [buttonText, setButtonText] = useState('Connect Wallet'); // Single useState
   const [isMainnet, setIsMainnet] = useState<boolean>(false)
+  console.log("🚀 ~ Header ~ isMainnet:", isMainnet)
   const handleOpenSettings = () => setOpenSettingsModal(false);
   const handleCloseSettings = () => setOpenSettingsModal(false);
 
@@ -43,16 +44,16 @@ const Header = () => {
   useEffect(() => {
     const updateButtonText = async () => {
       if (typeof window === 'undefined') return; // Avoid running on the server
-
+  
       const domain = window.location.hostname;
-      console.log("🚀 ~ updateButtonText ~ domain:", domain)
-      console.log("🚀 ~ updateButtonText ~ domain === 'dex.sunrewards.io':", domain === 'dex.sunrewards.io')
-
+      console.log("🚀 ~ updateButtonText ~ domain:", domain);
+      console.log("🚀 ~ updateButtonText ~ domain === 'dex.sunrewards.io':", domain === 'dex.sunrewards.io');
+  
       if (accounts && accounts.length > 0 && isConnected) {
-        // Check if it's the first connection and domain is dex.sunrewards.io
+        // If connected and on the specified domain but not on mainnet
         if (domain === 'dex.sunrewards.io' && chainId !== 369) {
-          setIsMainnet(true)
-          await metaMask.activate(369);
+          setIsMainnet(true);
+          await metaMask.activate(369); // Connect to mainnet (369 chain ID)
         }
         const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
         setButtonText(shortenedAddress);
@@ -60,9 +61,10 @@ const Header = () => {
         setButtonText('Connect Wallet');
       }
     };
-
+  
     updateButtonText();
   }, [accounts, isConnected, chainId]);
+  
 
 
 
