@@ -42,9 +42,11 @@ export async function getPositionsData(): Promise<any> {
               }
               token0 {
                 decimals
+                name
               }
               token1 {
                 decimals
+                name
               }
             }
           }

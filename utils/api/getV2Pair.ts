@@ -47,6 +47,7 @@ export async function getV2Pair(token0: TokenDetails, token1: TokenDetails) {
         const reserve1 = reserves._reserve1.toString() / factor1; 
 
         console.log("Reserves:", reserve0, reserve1);
+        console.log("Pair Address:", v2PairAddress);
 
         // Check for division by zero
         if (reserve1 === 0) {

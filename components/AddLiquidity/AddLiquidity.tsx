@@ -80,8 +80,8 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
 
   const NFPMAddress = addresses.PancakePositionManagerAddress;
   const v2RouterAddress = addresses.PancakeV2RouterAddress;
-  const tempToken0 = tokenList.TokenD;
-  const tempToken1 = tokenList.TokenA;
+  const tempToken0 = tokenList.MOCK_USDC;
+  const tempToken1 = tokenList['Wrapped Pulse'];
   const [token0,setToken0] =  useState<TokenDetails | null>(tempToken0);
   const [token1, setToken1] = useState<TokenDetails | null>(tempToken1);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
@@ -387,15 +387,23 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
         await getTokenApproval(token1, addressToApprove, approvalAmount1);
       }
       else{
-        if(token0.symbol !== "PLS"){
-          await getTokenApproval(token0, addressToApprove, approvalAmount0);
-          //console.log("🚀 ~ handleAddLiquidity ~ approvalAmount0:", approvalAmount0)
-          //console.log("🚀 ~ handleAddLiquidity ~ token0.symbol:", token0.symbol)
-        }
-        if(token1.symbol !== "PLS"){
-          await getTokenApproval(token1, addressToApprove, approvalAmount1);
-          //console.log("🚀 ~ handleAddLiquidity ~ approvalAmount1:", approvalAmount1)
-        }
+
+        let _approvalAmount0 = approvalAmount0;
+        let _approvalAmount1 = approvalAmount1;
+
+          if(!isSorted){
+            [_approvalAmount0, _approvalAmount1] = [_approvalAmount1, _approvalAmount0];
+          } 
+
+          if(token0.symbol !== "PLS"){
+            await getTokenApproval(token0, addressToApprove, _approvalAmount0);
+            //console.log("🚀 ~ handleAddLiquidity ~ approvalAmount0:", approvalAmount0)
+            //console.log("🚀 ~ handleAddLiquidity ~ token0.symbol:", token0.symbol)
+          }
+          if(token1.symbol !== "PLS"){
+            await getTokenApproval(token1, addressToApprove, _approvalAmount1);
+            //console.log("🚀 ~ handleAddLiquidity ~ approvalAmount1:", approvalAmount1)
+          }
       }
 
       alert("Tokens Approved!");
@@ -411,6 +419,10 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
     if(activeProtocol === Protocol.V2){
       try{
         if(token0 && token1 && amount0Desired && amount1Desired){
+        console.log("🚀 ~ handleAddLiquidity ~ amount1Desired:", amount1Desired)
+        console.log("🚀 ~ handleAddLiquidity ~ amount0Desired:", amount0Desired)
+        console.log("🚀 ~ handleAddLiquidity ~ token1:", token1)
+        console.log("🚀 ~ handleAddLiquidity ~ token0:", token0)
 
           let addLiquidityTxHash : any;
 
@@ -1263,11 +1275,11 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                         <Typography sx={{ fontWeight: '600' }}>Min Price</Typography>
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Box><FaMinus onClick={()=>{handleButton(false,false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) - 0.0001).toString()); handlePriceLower() }}/></Box>
+                          <Box><FaMinus onClick={()=>{handleButton(false,false);setPriceLowerEntered((Number(priceLowerEntered) - 0.0001).toString()); handlePriceLower() }}/></Box>
                           <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
                             <input type="text" placeholder="0.0" style={{ textAlign: 'center' }} onBlur={handlePriceLower} onChange={(e)=>{handleButton(false,false);setPriceLowerEntered(e.target.value)}} value={isFullRange ? "0" : priceLowerEntered}/>
                           </Box>
-                          <Box><FaPlus onClick={()=>{handleButton(false,false);setPriceLowerEntered((Number(priceLower ? priceLower : priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
+                          <Box><FaPlus onClick={()=>{handleButton(false,false);setPriceLowerEntered((Number(priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
                         </Box>
 
                         {token0 && token1 ? (
@@ -1289,11 +1301,21 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
                         <Typography sx={{ fontWeight: '600' }}>Max Price</Typography>
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Box><FaMinus onClick={()=>{handleButton(false,false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) - 0.0001).toString()); handlePriceUpper()}}/></Box>
+                          <Box><FaMinus onClick={()=>{
+                              handleButton(false,false);
+                              setPriceUpperEntered((Number(priceUpperEntered) - 0.1).toString());
+                              handlePriceUpper()
+                            }}/>
+                          </Box>
                           <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
                             <input type="text" placeholder="0.0" style={{ textAlign: 'center' , fontSize: isFullRange ? '1.5em' : '1em'}} onBlur={handlePriceUpper} onChange={(e)=>{handleButton(false,false);setPriceUpperEntered(e.target.value)}} value={isFullRange ? "∞" : priceUpperEntered}/>
                           </Box>
-                          <Box><FaPlus onClick={()=>{handleButton(false,false);setPriceUpperEntered((Number(priceUpper ? priceUpper : priceUpperEntered) + 0.0001).toString()); handlePriceUpper()}}/></Box>
+                          <Box><FaPlus onClick={()=>{
+                              handleButton(false,false);
+                              setPriceUpperEntered((Number(priceUpperEntered) + 0.1).toString());
+                              handlePriceUpper()
+                            }}/>
+                          </Box>
                         </Box>
 
                         {token0 && token1 ? (

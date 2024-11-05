@@ -11,9 +11,10 @@ import router from 'next/router';
 import ImportPool from '../ImportPool/ImportPool'; 
 import { getPositionsData } from '@/utils/api/getPositionsData';
 import { calculatePositionData } from '@/utils/calculatePositionData';
-import { PositionData, TokenDetails } from '@/interfaces';
+import { V3PositionData, TokenDetails, V2PositionsData } from '@/interfaces';
 
 import tokenList from "@/utils/tokenList.json";
+import { getV2Positions } from '@/utils/api/getV2Positions';
 
 interface LiquidityProps {
   theme: 'light' | 'dark';
@@ -26,8 +27,8 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
   const [isOpenRecent, setIsOpenRecent] = useState(false);
   const [value, setValue] = React.useState('0');
 
-  const [positions, setPositions] = useState<PositionData[]>([]);
-  console.log("🚀 ~ positions:", positions)
+  const [v3Positions, setV3Positions] = useState<V3PositionData[]>([]);
+  const [v2Positions, setV2Positions] = useState<V2PositionsData[]>([]);
 
   const handleOpen = useCallback(() => setIsOpen(true), []);
   const handleClose = () => setIsOpen(false);
@@ -47,13 +48,21 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
 
   useEffect(()=>{
     const runGetPositionsData = async()=>{
-      let newPositions : PositionData[] = await getPositionsData();
 
-      setPositions(newPositions);
+      if(value==="2"){
+        let newPositions : V2PositionsData[] = await getV2Positions();
+        console.log("🚀 ~ runGetPositionsData ~ V2 ~ newPositions:", newPositions)
+        setV2Positions(newPositions)
+      }
+      else{
+        let newPositions : V3PositionData[] = await getPositionsData();
+
+        setV3Positions(newPositions);
+      }
     }
 
     runGetPositionsData();
-  },[])
+  },[value])
 
   const color = theme === 'light' ? 'var(--primary)' : 'var(--cream)';
 
@@ -122,13 +131,12 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
           )}
           {value === '1' && (
             <Box sx={{ py: '15px', textAlign: 'center' }}>
-              {positions ? (
+              {v3Positions ? (
                   <List>{
-                  positions.map((elem)=>{
-                    // console.log("positions map, elem : ", elem);
+                  v3Positions.map((elem)=>{
                     return (
                         <ListItem>
-                          <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{elem.id}</Typography>
+                          <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{elem.token0.name} / {elem.token1.name}</Typography>
                           <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{elem.liquidity}</Typography>
                           <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{calculatePositionData(elem).humanReadableFeesToken0}</Typography>
                         </ListItem>
@@ -143,10 +151,21 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
           )}
           {value === '2' && (
             <Box sx={{ py: '15px', textAlign: 'center' }}>
-              <Typography sx={{ color: 'var(--cream)', fontWeight: '600', mb: '10px' }}>Don't see a pair you joined?</Typography>
-              <Button  onClick={() => router.push('/find')}  sx={{ color: 'var(--cream)', border: '1px solid var(--cream)' }}>
-                Find other LP tokens
-              </Button>
+              {v2Positions ? (
+                  <List>{
+                  v2Positions.map((elem)=>{
+                    return (
+                        <ListItem>
+                          <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{elem.pair.token0.name} / {elem.pair.token1.name}</Typography>
+                          <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{elem.liquidity}</Typography>
+                        </ListItem>
+                    )
+                  })
+                  }
+                  </List>
+                ) : (
+                  <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
+                )}
             </Box>
           )}
         </Box>

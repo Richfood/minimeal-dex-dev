@@ -20,7 +20,7 @@ export interface SwapPoolData {
   feeTier: String,
 }
 
-export interface PositionData {
+export interface V3PositionData {
   id: string;
   liquidity: string;
   feeGrowthInside0LastX128: string;
@@ -45,13 +45,30 @@ export interface PositionData {
   };
   token0: {
     decimals: string;
+    name: string;
   };
   token1: {
     decimals: string;
+    name: string;
   };
 }
 
-
+export interface V2PositionsData {
+  liquidity : string,
+  pair: {
+    token0: {
+        id: string
+        name: string
+    },
+    token1: {
+        id: string,
+        name: string,
+    },
+    totalSupply: string,
+    id: string
+  }
+  timestamp: string
+}
 
 
 export interface TokenDetails {
