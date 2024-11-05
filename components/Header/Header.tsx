@@ -22,7 +22,7 @@ const Header = () => {
   const { theme } = useTheme();
   const router = useRouter();
   const [buttonText, setButtonText] = useState('Connect Wallet'); // Single useState
-  const [isMainnet, setIsMainnet] = useState<boolean>(true)
+  const [isMainnet, setIsMainnet] = useState<boolean>(false)
   const handleOpenSettings = () => setOpenSettingsModal(false);
   const handleCloseSettings = () => setOpenSettingsModal(false);
 
