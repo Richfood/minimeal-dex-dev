@@ -10,7 +10,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { metaMask, hooks } from '../ConnectWallet/connector';
 import NetworkMenu from './account';
-const { useChainId, useAccounts } = hooks;
+const { useChainId, useAccounts, useIsActive } = hooks;
 
 const Header = () => {
   const [openSettingsModal, setOpenSettingsModal] = useState(false);
@@ -21,8 +21,9 @@ const Header = () => {
   const chainId = useChainId();
   const { theme } = useTheme();
   const router = useRouter();
+  const isActive = useIsActive();
   const [buttonText, setButtonText] = useState('Connect Wallet'); // Single useState
-  const [isMainnet, setIsMainnet] = useState<boolean>(false)
+  const [isMainnet, setIsMainnet] = useState<boolean | null>(false)
   console.log("🚀 ~ Header ~ isMainnet:", isMainnet)
   const handleOpenSettings = () => setOpenSettingsModal(false);
   const handleCloseSettings = () => setOpenSettingsModal(false);
@@ -44,27 +45,34 @@ const Header = () => {
   useEffect(() => {
     const updateButtonText = async () => {
       if (typeof window === 'undefined') return; // Avoid running on the server
-  
+
       const domain = window.location.hostname;
       console.log("🚀 ~ updateButtonText ~ domain:", domain);
-      console.log("🚀 ~ updateButtonText ~ domain === 'dex.sunrewards.io':", domain === 'dex.sunrewards.io');
-  
-      if (accounts && accounts.length > 0 && isConnected) {
-        // If connected and on the specified domain but not on mainnet
-        if (domain === 'dex.sunrewards.io' && chainId !== 369) {
-          setIsMainnet(true);
-          await metaMask.activate(369); // Connect to mainnet (369 chain ID)
+
+      // Set `isMainnet` to true if the domain matches, regardless of activation status
+      if (domain === 'dex.sunrewards.io') {
+        setIsMainnet(true);
+
+        // Connect to mainnet (369 chain ID) if not already connected
+        if (isActive && chainId !== 369) {
+          await metaMask.activate(369);
         }
+      }
+
+      // Set button text based on connection status
+      if (accounts && accounts.length > 0 && isConnected) {
         const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
         setButtonText(shortenedAddress);
       } else {
         setButtonText('Connect Wallet');
       }
     };
-  
+
     updateButtonText();
-  }, [accounts, isConnected, chainId]);
-  
+  }, [accounts, isConnected, chainId, isActive]);
+
+
+
 
 
 

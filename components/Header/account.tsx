@@ -10,7 +10,7 @@ interface NetworkMenuProps {
   networkImages: { [key: string]: string };
   theme: 'light' | 'dark';
   chainId: number | undefined;
-  isMainnet: boolean;
+  isMainnet: boolean | null;
 }
 
 export default function NetworkMenu({
