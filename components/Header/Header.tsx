@@ -50,11 +50,11 @@ const Header = () => {
       console.log("🚀 ~ updateButtonText ~ domain:", domain);
 
       // Set `isMainnet` to true if the domain matches, regardless of activation status
-      if (domain === 'dex.sunrewards.io') {
+      if (isActive && domain === 'dex.sunrewards.io') {
         setIsMainnet(true);
 
         // Connect to mainnet (369 chain ID) if not already connected
-        if (isActive && chainId !== 369) {
+        if (chainId !== 369) {
           await metaMask.activate(369);
         }
       }
