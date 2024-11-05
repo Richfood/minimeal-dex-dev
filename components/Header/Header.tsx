@@ -45,6 +45,8 @@ const Header = () => {
       if (typeof window === 'undefined') return; // Avoid running on the server
 
       const domain = window.location.hostname;
+      console.log("🚀 ~ updateButtonText ~ domain:", domain)
+      console.log("🚀 ~ updateButtonText ~ domain === 'dex.sunrewards.io':", domain === 'dex.sunrewards.io')
 
       if (accounts && accounts.length > 0 && isConnected) {
         // Check if it's the first connection and domain is dex.sunrewards.io
