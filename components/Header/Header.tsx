@@ -22,7 +22,6 @@ const Header = () => {
   const { theme } = useTheme();
   const router = useRouter();
   const [buttonText, setButtonText] = React.useState('Connect Wallet'); // Single useState
-  const [isFirstConnection, setIsFirstConnection] = React.useState(true);
 
   const handleOpenSettings = () => setOpenSettingsModal(true);
   const handleCloseSettings = () => setOpenSettingsModal(false);
@@ -43,26 +42,24 @@ const Header = () => {
 
   useEffect(() => {
     const updateButtonText = async () => {
-      if (typeof window === 'undefined') return 369; // Default to mainnet on server side
+        if (typeof window === 'undefined') return; // Avoid running on the server
 
-      const domain = window.location.hostname;
-      console.log("🚀 ~ Header ~ domain:", domain)
-      if (accounts && accounts.length > 0 && isConnected) {
-        if (isFirstConnection && chainId !== 369) { // Check if it's the first connection
-          await metaMask.activate(369); // Connect to mainnet initially
-          setIsFirstConnection(false); // Set to false after initial mainnet connection
+        const domain = window.location.hostname;
+
+        if (accounts && accounts.length > 0 && isConnected) {
+            // Check if it's the first connection and domain is dex.sunrewards.io
+            if (domain === 'dex.sunrewards.io' && chainId !== 369) {
+                await metaMask.activate(369); // Connect to the 369 chain (mainnet)
+            }
+            const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+            setButtonText(shortenedAddress);
+        } else {
+            setButtonText('Connect Wallet');
         }
-        const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
-        setButtonText(shortenedAddress);
-      } else {
-        setButtonText('Connect Wallet');
-        setIsFirstConnection(true); // Set to false after initial mainnet connection
-
-      }
     };
 
     updateButtonText();
-  }, [accounts, isConnected, chainId]);
+}, [accounts, isConnected, chainId]);
 
 
 
