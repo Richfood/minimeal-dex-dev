@@ -1,4 +1,4 @@
-import { PositionData } from "@/interfaces";
+import { V3PositionData } from "@/interfaces";
 import { BigNumber } from "ethers";
 
 function feeGrowthInsideX128(
@@ -30,7 +30,7 @@ function feeGrowthInsideX128(
   }
   
 
-export function calculatePositionData(position : PositionData){
+export function calculatePositionData(position : V3PositionData){
 // console.log("🚀 ~ calculatePositionData ~ position:", position)
 
     // Fetch necessary data: liquidity, feeGrowthInsideLastX128, etc.
