@@ -24,11 +24,11 @@ import famousToken from "../../utils/famousToken.json";
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import { hooks, metaMask } from '../ConnectWallet/connector';
 import tokenList from "../../utils/tokenList.json";
-import { swapV3 } from '@/utils/swapTokens';
+import { swapV3 } from '@/utils/contract-methods/swapTokens';
 import addresses from "@/utils/address.json";
 import { flushSync } from 'react-dom';
 import { getTokenUsdPrice } from "@/utils/api/getTokenUsdPrice"
-import getTokenApproval from '@/utils/getTokenApproval';
+import getTokenApproval from '@/utils/contract-methods/getTokenApproval';
 import { debounce } from '@syncfusion/ej2-base';
 import getUserBalance from '@/utils/api/getUserBalance';
 const { useChainId, useIsActive, useAccounts } = hooks;

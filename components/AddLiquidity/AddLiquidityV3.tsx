@@ -18,8 +18,8 @@ import { SlGraph } from "react-icons/sl";
 import { useRouter } from 'next/router';
 import RoiCalculator from '../RoiCalculator/RoiCalculator'
 import { toast, ToastContainer } from 'react-toastify';
-import getTokenApproval from "../../utils/getTokenApproval";
-import { addLiquidityV3, addLiquidityV2, addLiquidityETH } from '@/utils/addLiquidity';
+import getTokenApproval from "../../utils/contract-methods/getTokenApproval";
+import { addLiquidityV3, addLiquidityV2, addLiquidityETH } from '@/utils/contract-methods/addLiquidity';
 import emulate from '@/utils/emulate';
 import { FeeAmount, nearestUsableTick, TICK_SPACINGS } from '@uniswap/v3-sdk';
 import addresses from "../../utils/address.json";

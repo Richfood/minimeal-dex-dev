@@ -1,6 +1,6 @@
 import { TokenDetails } from "@/interfaces";
 import { ethers } from "ethers";
-const tokenAbi = require("../abis/TokenA.sol/TokenA.json").abi;
+const tokenAbi = require("../../abis/TokenA.sol/TokenA.json").abi;
 
 const getTokenApproval = async (token : TokenDetails, addressToApprove : string, amountToApprove : string)=>{
 

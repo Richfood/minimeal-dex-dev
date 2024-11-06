@@ -1,12 +1,12 @@
 import { ethers } from "ethers";
-import emulate from "./emulate";
+import emulate from "../emulate";
 import { FeeAmount } from "@uniswap/v3-sdk";
 import { TokenDetails } from "@/interfaces";
-import { adjustForSlippage, expandIfNeeded, isNative } from "./generalFunctions";
-import v2RouterArtifact from "../abis/PancakeV2Router.sol/PancakeRouter.json";
-import addresses from "./address.json";
-import nfpmArtifact from "../abis/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
-import mintAbi from "../abis/NonfungiblePositionManager.sol/MintAbi.json";
+import { adjustForSlippage, expandIfNeeded, isNative } from "../generalFunctions";
+import v2RouterArtifact from "../../abis/PancakeV2Router.sol/PancakeRouter.json";
+import addresses from "../address.json";
+import nfpmArtifact from "../../abis/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
+import mintAbi from "../../abis/NonfungiblePositionManager.sol/MintAbi.json";
 
 const nfpmAbi = nfpmArtifact.abi;
 const V2_ROUTER_ABI = v2RouterArtifact.abi;

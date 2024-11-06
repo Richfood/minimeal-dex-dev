@@ -1,10 +1,10 @@
 import { ethers } from "ethers";
 import { FeeAmount } from "@uniswap/v3-sdk";
 import { TokenDetails } from "@/interfaces";
-import { adjustForSlippage, expandIfNeeded } from "./generalFunctions";
-import SmartRouterArtifact from "../abis/SmartRouter.sol/SmartRouter.json";
-import addresses from "./address.json";
-import EXACT_INPUT_ABI from "../abis/SmartRouter.sol/exactInputAbi.json";
+import { adjustForSlippage, expandIfNeeded } from "../generalFunctions";
+import SmartRouterArtifact from "../../abis/SmartRouter.sol/SmartRouter.json";
+import addresses from "../address.json";
+import EXACT_INPUT_ABI from "../../abis/SmartRouter.sol/exactInputAbi.json";
 
 const SMART_ROUTER_ABI = SmartRouterArtifact.abi;
 
