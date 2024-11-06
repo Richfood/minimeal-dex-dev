@@ -23,7 +23,7 @@ import { addLiquidityV3, addLiquidityV2, addLiquidityETH } from '@/utils/addLiqu
 import emulate from '@/utils/emulate';
 import { FeeAmount, nearestUsableTick, TICK_SPACINGS } from '@uniswap/v3-sdk';
 import addresses from "../../utils/address.json";
-import { expandIfNeeded, truncateAddress } from '@/utils/generalFunctions';
+import { expandIfNeeded, isNative, truncateAddress } from '@/utils/generalFunctions';
 import { priceToTick, tickToPrice } from '@/utils/utils';
 import Default from '../CustomChart/Default';
 import { getV2Pair } from '@/utils/api/getV2Pair';
@@ -123,10 +123,10 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
       const addressToApprove = v2RouterAddress;
 
-      if(token0.symbol !== "PLS"){
+      if(isNative(token0)){
         await getTokenApproval(token0, addressToApprove, amount1Desired);
       }
-      if(token1.symbol !== "PLS"){
+      if(isNative(token1)){
         await getTokenApproval(token1, addressToApprove, amount0Desired);
       }
       
@@ -350,7 +350,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                 <Box className="ft_head">
                   <Box sx={{ textAlign: 'start' }}>
                     <Typography sx={{ fontSize: '14px', fontWeight: '500', mb: '15px' }}>
-                      V2 LP - 0.01% Fee
+                      V2 LP - 0.25% Fee
                     </Typography>
                   </Box>
                   <Box>

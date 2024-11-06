@@ -23,7 +23,7 @@ import { addLiquidityV3, addLiquidityV2, addLiquidityETH } from '@/utils/addLiqu
 import emulate from '@/utils/emulate';
 import { FeeAmount, nearestUsableTick, TICK_SPACINGS } from '@uniswap/v3-sdk';
 import addresses from "../../utils/address.json";
-import { expandIfNeeded, truncateAddress } from '@/utils/generalFunctions';
+import { expandIfNeeded, isNative, truncateAddress } from '@/utils/generalFunctions';
 import { priceToTick, tickToPrice } from '@/utils/utils';
 import Default from '../CustomChart/Default';
 import { getPoolData } from '@/utils/api/getPoolData';
@@ -81,7 +81,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const NFPMAddress = addresses.PancakePositionManagerAddress;
   // const v2RouterAddress = addresses.PancakeV2RouterAddress;
   const tempToken0 = tokenList.MOCK_USDC;
-  const tempToken1 = tokenList['Wrapped Pulse'];
+  const tempToken1 = tokenList.Pulse;
   const [token0,setToken0] =  useState<TokenDetails | null>(tempToken0);
   const [token1, setToken1] = useState<TokenDetails | null>(tempToken1);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
@@ -370,8 +370,10 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
       const addressToApprove = NFPMAddress;
 
-      if(activeProtocol === Protocol.V3){
+      if(isNative(token0)){
         await getTokenApproval(token0, addressToApprove, approvalAmount0);
+      }
+      if(isNative(token1)){
         await getTokenApproval(token1, addressToApprove, approvalAmount1);
       }
 

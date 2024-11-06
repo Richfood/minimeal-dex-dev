@@ -1,3 +1,5 @@
+import { TokenDetails } from "@/interfaces";
+
 export const truncateAddress = (address: any): string => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
@@ -33,4 +35,8 @@ export function expandIfNeeded(numStr : string) {
       const [whole, decimal] = base.split('.');
       return '0.' + '0'.repeat(decimalPlaces - 1) + whole.replace('.', '') + (decimal || '');
     }
-  }
+}
+
+export function isNative(token: TokenDetails): boolean{
+  return token.symbol === "PLS";
+}

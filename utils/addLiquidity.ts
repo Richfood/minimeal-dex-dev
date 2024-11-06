@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import emulate from "./emulate";
 import { FeeAmount } from "@uniswap/v3-sdk";
 import { TokenDetails } from "@/interfaces";
-import { adjustForSlippage, expandIfNeeded } from "./generalFunctions";
+import { adjustForSlippage, expandIfNeeded, isNative } from "./generalFunctions";
 import v2RouterArtifact from "../abis/PancakeV2Router.sol/PancakeRouter.json";
 import addresses from "./address.json";
 import nfpmArtifact from "../abis/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
@@ -125,6 +125,11 @@ export async function addLiquidityV3(
         token1 = temp;
     }
 
+    const is0Native = isNative(token0);
+    const is1Native = isNative(token1);
+
+    console.log("Is Native? = ",is0Native, is1Native);
+
     amount0Desired = ethers.utils.parseUnits(expandIfNeeded(amount0Desired), token0.address.decimals).toString();
     // console.log("🚀 ~ amount0Desired:", amount0Desired)
     amount1Desired = ethers.utils.parseUnits(expandIfNeeded(amount1Desired), token1.address.decimals).toString();
@@ -169,9 +174,12 @@ export async function addLiquidityV3(
 
     const combinedData = [createAndInitializePoolIfNecessaryData, mintData, refundETHData];
 
+    const valueForNativeToken = is0Native ? amount0Desired : is1Native ? amount1Desired : 0;
+    const finalValueToPass = ethers.utils.parseEther("1").add(valueForNativeToken);
+
     console.log("Running multicall for add liquidity");
     const tx = await nfpmContract.multicall(combinedData, {
-        value: ethers.utils.parseEther("1"),
+        value: finalValueToPass,
     });
     console.log("Multicall TX = ", tx);
     await tx.wait();
