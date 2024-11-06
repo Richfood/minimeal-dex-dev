@@ -9,7 +9,7 @@ import { TabContext } from '@mui/lab';
 import { FiPlus } from "react-icons/fi";
 import router from 'next/router';
 import ImportPool from '../ImportPool/ImportPool'; 
-import { getPositionsData } from '@/utils/api/getPositionsData';
+import { getV3PositionsData } from '@/utils/api/getV3Positions';
 import { calculatePositionData } from '@/utils/calculatePositionData';
 import { V3PositionData, TokenDetails, V2PositionsData } from '@/interfaces';
 
@@ -55,7 +55,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
         setV2Positions(newPositions)
       }
       else{
-        let newPositions : V3PositionData[] = await getPositionsData();
+        let newPositions : V3PositionData[] = await getV3PositionsData();
 
         setV3Positions(newPositions);
       }

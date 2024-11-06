@@ -3,7 +3,7 @@ import { FeeAmount } from "@uniswap/v3-sdk";
 import {ethers} from "ethers";
 import axios from "axios";
 
-export async function getPositionsData(): Promise<any> {
+export async function getV3PositionsData(): Promise<any> {
   try {
     const newProvider = new ethers.providers.Web3Provider(window.ethereum);
     const newSigner = newProvider.getSigner();
