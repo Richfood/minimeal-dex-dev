@@ -52,7 +52,11 @@ export async function getV2Positions(): Promise<any> {
     }
 
     const positionsData = response.data.data; // Get the first pool
-    const positions = positionsData.userPositionSnapshots;
+    let positions = positionsData.userPositionSnapshots;
+
+    positions = positions.filter((position : any)=>{
+      return position.liquidity !== "0";
+    })
 
     console.log("🚀 ~ V2 positions", positions)
 

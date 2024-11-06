@@ -59,7 +59,7 @@ enum PriceRangeError {
   ABOVE_RANGE
 }
 
-const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol : activeProtocol }) => {
+const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol : activeProtocol }) => {
   const { palette } = useTheme();
   const [isActive, setIsActive] = useState(true);
   const [activeCard, setActiveCard] = useState<number | null>(null);
@@ -1498,4 +1498,4 @@ const AddLiquidity: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtoco
   );
 };
 
-export default AddLiquidity;
+export default AddLiquidityV3;

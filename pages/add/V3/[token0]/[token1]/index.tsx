@@ -1,5 +1,5 @@
 import React from 'react'
-import AddLiquidity from '../../../../../components/AddLiquidity/AddLiquidity'
+import AddLiquidityV3 from '../../../../../components/AddLiquidity/AddLiquidityV3'
 import { Box, Container } from '@mui/material'
 import { useRouter } from 'next/router';
 import Header from '../../../../../components/Header/Header';
@@ -13,7 +13,7 @@ const index = () => {
       <Header />
       <Container>
         <Box className="AddLiquidity" sx={{ minHeight: 'calc(100vh - 149px)', py: '50px' }}>
-          <AddLiquidity  theme={'light'} defaultActiveProtocol={Protocol.V3}/>
+          <AddLiquidityV3  theme={'light'} defaultActiveProtocol={Protocol.V3}/>
         </Box>
       </Container>
       <Footer />
