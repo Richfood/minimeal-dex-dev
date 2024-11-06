@@ -809,7 +809,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                   <Box sx={{display: 'flex',alignItems: 'center',justifyContent: 'center'}}>
                     <HiPlus size={20} />
                   </Box>
-                  <Box onClick={()=>{handleOpenToken(1)}} className="token-pair" sx={{ color: palette.mode === 'light' ? 'var(--black)' : 'var(--white)', bgcolor: palette.mode === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)' }}>
+                  <Box onClick={()=>{handleOpenToken(1)}} className="token-pair" sx={{cursor: 'pointer', color: palette.mode === 'light' ? 'var(--black)' : 'var(--white)', bgcolor: palette.mode === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)' }}>
                     <Box >
                       {token1 ? (
                         <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>{token1.name} {`(${truncateAddress(token1.address.contract_address)})`}</Typography>
@@ -1103,7 +1103,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                 {token0 && token1 ? (
                   <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '30px' }}>
                     <Typography sx={{ fontWeight: '600' }}>Current {token1.name} Price Per {token0.name}:</Typography>
-                    <Typography sx={{ fontWeight: '600' }}>{priceCurrent}</Typography>
+                    <Typography sx={{ fontWeight: '600',color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)' }}>{priceCurrent}</Typography>
                   </Box>
                 ) : (
                   <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '30px' }}>
@@ -1120,7 +1120,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Box><FaMinus onClick={()=>{handleButton(false,false);setPriceLowerEntered((Number(priceLowerEntered) - 0.0001).toString()); handlePriceLower() }}/></Box>
                       <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                        <input type="text" placeholder="0.0" style={{ textAlign: 'center' }} onBlur={handlePriceLower} onChange={(e)=>{handleButton(false,false);setPriceLowerEntered(e.target.value)}} value={isFullRange ? "0" : priceLowerEntered}/>
+                        <input type="text" placeholder="0.0" style={{ textAlign: 'center',color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)' }} onBlur={handlePriceLower} onChange={(e)=>{handleButton(false,false);setPriceLowerEntered(e.target.value)}} value={isFullRange ? "0" : priceLowerEntered}/>
                       </Box>
                       <Box><FaPlus onClick={()=>{handleButton(false,false);setPriceLowerEntered((Number(priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
                     </Box>
@@ -1151,7 +1151,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                         }}/>
                       </Box>
                       <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                        <input type="text" placeholder="0.0" style={{ textAlign: 'center' , fontSize: isFullRange ? '1.5em' : '1em'}} onBlur={handlePriceUpper} onChange={(e)=>{handleButton(false,false);setPriceUpperEntered(e.target.value)}} value={isFullRange ? "∞" : priceUpperEntered}/>
+                        <input type="text" placeholder="0.0" style={{ textAlign: 'center' , color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',fontSize: isFullRange ? '1.5em' : '1em'}} onBlur={handlePriceUpper} onChange={(e)=>{handleButton(false,false);setPriceUpperEntered(e.target.value)}} value={isFullRange ? "∞" : priceUpperEntered}/>
                       </Box>
                       <Box><FaPlus onClick={()=>{
                           handleButton(false,false);
@@ -1180,6 +1180,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
                 <Box className="fullRangeSec" sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', textAlign: 'center', mb: '15px' }}>
                 <Box 
+                 className={rangeButtonSelected === RANGES[0] ? 'liqBtn selected' : 'liqBtn'}
                     onClick={()=>{
                       if(!priceCurrent) return;
 
@@ -1211,6 +1212,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                   </Box>
 
                   <Box 
+                   className={rangeButtonSelected === RANGES[1] ? 'liqBtn selected' : 'liqBtn'}
                     onClick={()=>{
                       if(!priceCurrent) return;
                       setRangeButtonSelected(RANGES[1]);
@@ -1239,6 +1241,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                     20%
                   </Box>
                   <Box 
+                    
+                    className={rangeButtonSelected === RANGES[2] ? 'liqBtn selected' : 'liqBtn'}
                     onClick={()=>{
                       if(!priceCurrent) return;
                       setRangeButtonSelected(RANGES[2]);
@@ -1259,7 +1263,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                       gap: '10px',
                       borderRadius: '30px',
                       cursor: 'pointer',
-                      color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',
+                      color: `${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
                       bgcolor: rangeButtonSelected === RANGES[2] ? 'var(--cream)' : 'transparent', // Set a highlight color
                       borderColor: rangeButtonSelected === RANGES[2] ? 'var(--cream)' : palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'                          
                     }}
@@ -1267,6 +1271,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                     50%
                   </Box>
                   <Box 
+                   className={rangeButtonSelected === RANGES[3] ? 'selected liqBtn' : 'liqBtn'}
                     onClick={()=>{
                       setRangeButtonSelected(RANGES[3]);
                       const newPriceLower = tickToPrice(MIN_TICK, decimalDifference);

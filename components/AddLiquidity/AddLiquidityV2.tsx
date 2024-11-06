@@ -55,7 +55,7 @@ enum PriceRangeError {
 
 const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol : activeProtocol }) => {
   const { palette } = useTheme();
-  const [isActive, setIsActive] = useState(false);
+  const [isActive, setIsActive] = useState(true);
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [pickData, setPickData] = useState<string>('Not created');
   const [circleImages, setCircleImages] = useState<{ circle1: string; circle2: string }>({
@@ -257,7 +257,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
   return (
     <Box className="AddLiquiditySec">
-      <Box className="white_box">
+      <Box className="white_box" sx={{maxWidth: '600px',margin: '0 auto'}}>
         <Box className="al-head" sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Box className="al-left">
             <Typography
@@ -308,9 +308,9 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
         <Box className="al-body" sx={{ p: '30px 0 0 0' }}>
 
-          <Box className="al-inner" sx={{ display: 'flex' }}>
+          <Box className="al-inner" sx={{ display: 'flex',justifyContent: 'center !important' }}>
 
-            <Box className="al-inner-left" sx={{ flex: 1 }}>
+            <Box className="al-inner-left" sx={{ flex: '100% !important' }}>
               <Box sx={{ mb: "15px" }}>
                 <Typography className='mainTitle' sx={{ color: 'var(--cream)' }}>CHOOSE TOKEN PAIR</Typography>
                 <Box className="token-sec">
@@ -365,7 +365,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                 </Box>
               </Box>
 
-              <Box className="SwapWidgetInner" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
+              <Box className="SwapWidgetInner" sx={{ maxWidth: '100% !important', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
 
                   <Box sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
                     <Typography className="mainTitle" sx={{ color: 'var(--cream)', textAlign: 'start', }}>DEPOSIT AMOUNT</Typography>
@@ -401,10 +401,8 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                         value={amount1Desired}/>
                       </Box>
                     </Box>
-                </Box>
-              </Box>
-            <Box className="al-inner-right">
-              <Box>
+
+                    <Box sx={{width: '100%'}}>
                 <Button 
                   onClick={handleAddLiquidity} 
                   variant="contained" 
@@ -415,7 +413,11 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                   {addLiquidityRunning ? <CircularProgress size={25}/> : <>Create Liquidity</>}
                 </Button>
               </Box>
-          </Box>
+
+
+                </Box>
+              </Box>
+            
         </Box>
       </Box>
       {/* <SelectedToken

@@ -454,7 +454,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
         <>
             <Box className="SwapWidgetSec">
                 <Box className="SwapWidgetInner">
-                    <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-evenly",width: '100%' }}>
                         <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
                             <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                                 <img src={token0?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
@@ -470,7 +470,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
                                 </Typography>
                             </Box>
 
-                            <Box className="inputField">
+                            <Box className="inputField" sx={{minHeight: '60px'}}>
                                 {amountInLoading ? (
                                     <CircularProgress size={24} />
                                 ) : (
@@ -612,7 +612,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
                             </Box>
 
 
-                            <Box className="inputField">
+                            <Box className="inputField" sx={{minHeight: '60px'}}>
                                 {amountOutLoading ? (
                                     <CircularProgress size={24} />
                                 ) : (

@@ -1058,6 +1058,10 @@ body.dark-mode .tabsOuter {
   font-size: 14px;
 }
 
+.liqBtn.selected {
+  color: var(--primary);
+}
+
 /******************  ROI CALCULATOR Css  *****************/
 
 /******************  Responsive CSS  *****************/
