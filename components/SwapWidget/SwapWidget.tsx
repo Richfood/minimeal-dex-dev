@@ -453,9 +453,18 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
     return (
         <>
             <Box className="SwapWidgetSec">
-                <Box className="SwapWidgetInner">
-                    <Box sx={{ display: "flex", justifyContent: "space-evenly",width: '100%' }}>
-                        <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
+                <Box className="SwapWidgetInner" sx={{ flexDirection: "column" }}>
+                    <Box sx={{ display: "flex", justifyContent: 'end', width: "100%", mb: "15px", cursor: "pointer" }}>
+                        <Badge
+                            className="widgetItem"
+                            color="secondary"
+                            onClick={settingsModal}
+                        >
+                            <IoSettingsOutline style={{ fontSize: '20px' }} /> {/* Adjust icon size */}
+                        </Badge>
+                    </Box>
+                    <Box sx={{ display: "flex", flexDirection: 'column', gap: '15px', width: '100%' }}>
+                        <Box className="inputBox" >
                             <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                                 <img src={token0?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
                                 <Typography onClick={() => handleOpenToken(0)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
@@ -470,7 +479,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
                                 </Typography>
                             </Box>
 
-                            <Box className="inputField" sx={{minHeight: '60px'}}>
+                            <Box className="inputField" sx={{ minHeight: '60px' }}>
                                 {amountInLoading ? (
                                     <CircularProgress size={24} />
                                 ) : (
@@ -496,110 +505,16 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
                             </Box>
 
 
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    cursor: 'pointer',
-                                    gap: '5px',
-                                    marginTop: "10px",
-                                    justifyContent: "space-between"
-                                }}
-                            >
-                                <Box sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    cursor: 'pointer',
-                                    gap: '5px',
-                                    marginTop: "10px",
-                                }}>
-                                    <Typography sx={{ color: 'var(--primary)', fontWeight: '700' }}>Route</Typography>
-                                    <Box>
-                                        <span>
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                strokeWidth={2.5}  // Bold effect
-                                                stroke="currentColor"
-                                                width="20px"
-                                                height="20px"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-                                                />
-                                            </svg>
-                                        </span>
-
-                                    </Box>
-
-                                </Box>
-                                <Box>
-                                    <ul style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: 0, fontWeight: "700" }}>
-                                        {amountOut && routePath?.length ? (
-                                            routePath.map((route, index) => (
-                                                <React.Fragment key={index}>
-                                                    <li className="route-item" style={{ listStyle: 'none' }}>
-                                                        <p>{route.symbol}</p>
-                                                    </li>
-
-                                                    {index < (routePath?.length ?? 0) - 1 && (
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            width="24" height="24"
-                                                            viewBox="0 0 24 24"
-                                                            strokeWidth={2}
-                                                            stroke="currentColor"
-                                                            fill="none"
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            style={{ display: 'inline-block', width: "16px", height: "16px", marginBottom: "5px", fontWeight: "700" }}
-                                                        >
-                                                            <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                                                        </svg>
-                                                    )}
-                                                </React.Fragment>
-                                            ))
-                                        ) : null}
-                                    </ul>
-
-                                </Box>
-                            </Box>
-                            <Box className="slippageSec dsls">
-                                {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>Slippage Tolerance <PiPencilSimpleBold /></Typography>
-        <Typography sx={{ fontSize: '14px', fontWeight: '700' }}>0.5%</Typography>
-    </Box> */}
-                                <Box sx={{ mt: '25px' }}>
-                                    <Button
-                                        variant="contained"
-                                        color="secondary"
-                                        onClick={isActive ? handleSwap : handleClick} // Conditional onClick handler
-                                        disabled={isActive && (amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn))}
-                                    >
-                                        {isSwapping ? (
-                                            <CircularProgress size={24} color="inherit" />
-                                        ) : isActive ? (
-                                            userBalance && Number(userBalance) >= Number(amountIn) ? "Swap" : "Insufficient Balance"
-                                        ) : "Connect Wallet"}
-                                    </Button>
-                                </Box>
-
-
-                            </Box>
-
 
                         </Box>
 
-                        <Box className="arrowBox" sx={{ pt: '40px', mt: "-8rem" }}>
+                        <Box className="arrowBox" >
                             <Box className="swapData" sx={{ display: 'flex', alignItems: 'flex-start', margin: '0 auto' }}>
                                 <FaArrowRight onClick={toggleGraph} />
                             </Box>
                         </Box>
 
-                        <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
+                        <Box className="inputBox" >
                             <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                                 <img src={token1?.logoURI} alt="circle2" style={{ width: '20px', height: '20px' }} />
                                 <Typography onClick={() => handleOpenToken(1)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: "pointer" }}>
@@ -612,7 +527,7 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
                             </Box>
 
 
-                            <Box className="inputField" sx={{minHeight: '60px'}}>
+                            <Box className="inputField" sx={{ minHeight: '60px' }}>
                                 {amountOutLoading ? (
                                     <CircularProgress size={24} />
                                 ) : (
@@ -639,14 +554,97 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
 
                         </Box>
                     </Box>
-                    <Badge
-                        className="widgetItem"
-                        color="secondary"
-                        onClick={settingsModal}
-                    >
-                        <IoSettingsOutline style={{ fontSize: '20px' }} /> {/* Adjust icon size */}
-                    </Badge>
 
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            gap: '5px',
+                            marginTop: "15px",
+                            width:'100%',
+                            justifyContent: "space-between"
+                        }}
+                    >
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            gap: '5px',
+                           
+                        }}>
+                            <Typography sx={{ color: 'var(--primary)', fontWeight: '700' }}>Route</Typography>
+                            <Box>
+                                <span>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={2.5}  // Bold effect
+                                        stroke="currentColor"
+                                        width="20px"
+                                        height="20px"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+                                        />
+                                    </svg>
+                                </span>
+
+                            </Box>
+
+                        </Box>
+                        <Box>
+                            <ul style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: 0, margin: '0',fontWeight: "700" }}>
+                                {amountOut && routePath?.length ? (
+                                    routePath.map((route, index) => (
+                                        <React.Fragment key={index}>
+                                            <li className="route-item" style={{ listStyle: 'none' }}>
+                                                <Typography>{route.symbol}</Typography>
+                                            </li>
+
+                                            {index < (routePath?.length ?? 0) - 1 && (
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24" height="24"
+                                                    viewBox="0 0 24 24"
+                                                    strokeWidth={2}
+                                                    stroke="currentColor"
+                                                    fill="none"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    style={{ display: 'inline-block', width: "16px", height: "16px", marginBottom: "5px", fontWeight: "700" }}
+                                                >
+                                                    <path d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                                </svg>
+                                            )}
+                                        </React.Fragment>
+                                    ))
+                                ) : null}
+                            </ul>
+
+                        </Box>
+                    </Box>
+
+                    <Box className="slippageSec dsls" sx={{ width: '100%' }}>
+
+                        <Button
+                            sx={{ width: '100%' }}
+                            variant="contained"
+                            color="secondary"
+                            onClick={isActive ? handleSwap : handleClick} // Conditional onClick handler
+                            disabled={isActive && (amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn))}
+                        >
+                            {isSwapping ? (
+                                <CircularProgress size={24} color="inherit" />
+                            ) : isActive ? (
+                                userBalance && Number(userBalance) >= Number(amountIn) ? "Swap" : "Insufficient Balance"
+                            ) : "Connect Wallet"}
+                        </Button>
+
+                    </Box>
                     <Box className="slippageSec msls" sx={{ display: "none" }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                             <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>Slippage Tolerance <PiPencilSimpleBold /></Typography>
@@ -658,42 +656,42 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
                     </Box>
                 </Box>
                 {/* <Box className="SwapWidgetBox">
-                    <Box className="SwapWidgetBoxTitle">
-                        <Typography variant="h4" className='sec_title'>Swap</Typography>
-                        <Typography sx={{ fontSize: '12px', mb: '20px' }}>Trade Token in an instant</Typography>
-                    </Box>
-                    <Box className={`widgetList ${activeItem ? 'active' : ''}`}>
-                        <List>
-                            <ListItem className={`widgetItem piechartIcon ${activeItem === 'chart' ? 'active' : ''}`} onClick={() => handleItemClick('chart')} disablePadding>
-                                <ListItemButton>
-                                    <PiChartBar />
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem className="widgetItem" disablePadding>
-                                <ListItemButton onClick={handleOpen}>
-                                    <BsFire />
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem className="widgetItem" disablePadding>
-                                <ListItemButton onClick={handleOpen}>
-                                    <Badge color="secondary" variant="dot">
-                                        <IoSettingsOutline />
-                                    </Badge>
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem onClick={handleOpenRecent} className="widgetItem" disablePadding>
-                                <ListItemButton>
-                                    <RxCountdownTimer />
-                                </ListItemButton>
-                            </ListItem>
-                            <ListItem className="widgetItem" disablePadding>
-                                <ListItemButton>
-                                    <GrRefresh />
-                                </ListItemButton>
-                            </ListItem>
-                        </List>
-                    </Box>
-                </Box> */}
+<Box className="SwapWidgetBoxTitle">
+<Typography variant="h4" className='sec_title'>Swap</Typography>
+<Typography sx={{ fontSize: '12px', mb: '20px' }}>Trade Token in an instant</Typography>
+</Box>
+<Box className={`widgetList ${activeItem ? 'active' : ''}`}>
+<List>
+<ListItem className={`widgetItem piechartIcon ${activeItem === 'chart' ? 'active' : ''}`} onClick={() => handleItemClick('chart')} disablePadding>
+<ListItemButton>
+<PiChartBar />
+</ListItemButton>
+</ListItem>
+<ListItem className="widgetItem" disablePadding>
+<ListItemButton onClick={handleOpen}>
+<BsFire />
+</ListItemButton>
+</ListItem>
+<ListItem className="widgetItem" disablePadding>
+<ListItemButton onClick={handleOpen}>
+<Badge color="secondary" variant="dot">
+<IoSettingsOutline />
+</Badge>
+</ListItemButton>
+</ListItem>
+<ListItem onClick={handleOpenRecent} className="widgetItem" disablePadding>
+<ListItemButton>
+<RxCountdownTimer />
+</ListItemButton>
+</ListItem>
+<ListItem className="widgetItem" disablePadding>
+<ListItemButton>
+<GrRefresh />
+</ListItemButton>
+</ListItem>
+</List>
+</Box>
+</Box> */}
 
                 <SettingsModal
                     isOpen={isOpen}

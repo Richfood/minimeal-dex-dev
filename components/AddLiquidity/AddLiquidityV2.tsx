@@ -123,10 +123,10 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
       const addressToApprove = v2RouterAddress;
 
-      if(isNative(token0)){
+      if(!isNative(token0)){
         await getTokenApproval(token0, addressToApprove, amount1Desired);
       }
-      if(isNative(token1)){
+      if(!isNative(token1)){
         await getTokenApproval(token1, addressToApprove, amount0Desired);
       }
       
@@ -360,7 +360,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                 </Box>
                 <Box className="ftcardBoxOuter" sx={{ display: isActive ? "block" : "none" }}>
                   <Box className="fiFooter" sx={{ display: 'block', mt: '30px' }}>
-                    <Typography onClick={toggleV2Class} sx={{ fontSize: '16px', fontWeight: '600', cursor: 'pointer' }}>Add V3 Liquidity</Typography>
+                    <Link onClick={toggleV2Class} sx={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer',p:"8px 16px",borderRadius: "30px", background: 'transparent',border: '1px solid var(--primary)', color: 'var(--primary)',textDecoration: 'none' }}>Add V3 Liquidity</Link>
                   </Box>
                 </Box>
               </Box>
@@ -400,6 +400,12 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                         }} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} 
                         value={amount1Desired}/>
                       </Box>
+                    </Box>
+
+
+                    <Box sx={{display: "flex",justifyContent:'space-between' , width: '100%'}}>
+                      <Typography sx={{fontSize: '14px'}}>Price:</Typography>
+                      <Typography sx={{fontSize: '14px'}}>24534323</Typography>
                     </Box>
 
                     <Box sx={{width: '100%'}}>

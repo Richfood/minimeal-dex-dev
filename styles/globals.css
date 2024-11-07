@@ -330,13 +330,9 @@ input::-webkit-inner-spin-button {
   align-items: center;
   justify-content: center;
   color: var(--white);
+  transform: rotate(90deg);
 }
 
-.arrowBox {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
 
 .SwapWidgetBox {
   padding: 20px;
@@ -421,7 +417,7 @@ body.dark-mode .widgetList ul svg {
 }
 
 .slippageSec {
-  width: 437px;
+ 
   margin-top: 15px;
 }
 
@@ -1191,11 +1187,6 @@ body.dark-mode .tabsOuter {
     width: 100%;
   }
 
-  .arrowBox {
-    padding: 0;
-    width: 100%;
-    transform: rotate(90deg);
-  }
 
   .slippageSec.dsls {
     display: none;

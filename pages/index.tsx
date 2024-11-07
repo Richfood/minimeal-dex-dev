@@ -48,7 +48,8 @@ const IndexPage = () => {
                             className="swap_widgets white_box"
                             sx={{
                                 mt: '50px',
-                                maxWidth: '1200px',
+                                maxWidth: '400px',
+                                margin: '0 auto',
                                 position: 'relative',
                                 mb: '50px',
                                 '@media (max-width: 1269px)': {

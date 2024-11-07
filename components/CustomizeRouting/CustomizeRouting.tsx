@@ -108,7 +108,6 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({
                         >
                             9mm Swap V3
 
-
                             <CustomTooltip
                                 title="Bypasses confirmation modals and allows high slippage trades. Use at your own risk."
                                 arrow
@@ -118,13 +117,15 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({
                             </CustomTooltip>
                         </Typography>
                         <FormControlLabel
+                        
                             control={
-                                <Switch
+                                <IOSSwitch
                                     checked={allowSwapForV2}
                                     onChange={() => handleToggleChange('V2')} // Trigger toggle for V2
                                 />
+                             
                             }
-                            label={`V2 Swap is ${allowSwapForV2 ? 'Enabled' : 'Disabled'}`}
+                            // label={`V2 Swap is ${allowSwapForV2 ? 'Enabled' : 'Disabled'}`}
                         />
                     </Box>
 
@@ -151,7 +152,7 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({
                         </Typography>
                         <FormControlLabel
                             control={
-                                <Switch
+                                <IOSSwitch
                                     checked={allowSwapForV3}
                                     onChange={() => handleToggleChange('V3')} // Trigger toggle for V3
                                 />

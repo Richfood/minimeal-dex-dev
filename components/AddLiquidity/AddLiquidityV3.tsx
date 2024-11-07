@@ -370,10 +370,10 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
       const addressToApprove = NFPMAddress;
 
-      if(isNative(token0)){
+      if(!isNative(token0)){
         await getTokenApproval(token0, addressToApprove, approvalAmount0);
       }
-      if(isNative(token1)){
+      if(!isNative(token1)){
         await getTokenApproval(token1, addressToApprove, approvalAmount1);
       }
 
