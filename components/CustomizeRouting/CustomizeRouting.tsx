@@ -125,7 +125,7 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({
                                 />
                              
                             }
-                            // label={`V2 Swap is ${allowSwapForV2 ? 'Enabled' : 'Disabled'}`}
+                            label={`V2 Swap is ${allowSwapForV2 ? 'Enabled' : 'Disabled'}`}
                         />
                     </Box>
 
