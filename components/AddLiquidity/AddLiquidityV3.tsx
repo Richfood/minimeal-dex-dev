@@ -20,7 +20,7 @@ import RoiCalculator from '../RoiCalculator/RoiCalculator'
 import { toast, ToastContainer } from 'react-toastify';
 import getTokenApproval from "../../utils/contract-methods/getTokenApproval";
 import { addLiquidityV3, addLiquidityV2, addLiquidityETH } from '@/utils/contract-methods/addLiquidity';
-import emulate from '@/utils/emulate';
+import emulate from '@/utils/emulate-addLiquidity';
 import { FeeAmount, nearestUsableTick, TICK_SPACINGS } from '@uniswap/v3-sdk';
 import addresses from "../../utils/address.json";
 import { expandIfNeeded, isNative, truncateAddress } from '@/utils/generalFunctions';
@@ -39,13 +39,13 @@ import { getAllPoolsForTokens } from '@/utils/api/getAllPoolsForTokens';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
-  defaultActiveProtocol : Protocol;
+  defaultActiveProtocol: Protocol;
 }
 
 interface AddLiquidityLoader {
-  tokenApproval0 : boolean,
-  tokenApproval1 : boolean,
-  addLiquidity : boolean
+  tokenApproval0: boolean,
+  tokenApproval1: boolean,
+  addLiquidity: boolean
 }
 
 const MIN_TICK = -887272;
@@ -59,7 +59,7 @@ enum PriceRangeError {
   ABOVE_RANGE
 }
 
-const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol : activeProtocol }) => {
+const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol: activeProtocol }) => {
   const { palette } = useTheme();
   const [isActive, setIsActive] = useState(true);
   const [activeCard, setActiveCard] = useState<number | null>(null);
@@ -80,10 +80,10 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
   const NFPMAddress = addresses.PancakePositionManagerAddress;
   // const v2RouterAddress = addresses.PancakeV2RouterAddress;
-  const tempToken0 = tokenList.MOCK_USDC;
-  const tempToken1 = tokenList.Pulse;
-  const [token0,setToken0] =  useState<TokenDetails | null>(tempToken0);
-  const [token1, setToken1] = useState<TokenDetails | null>(tempToken1);
+  // const tempToken0 = tokenList.MOCK_USDC;
+  // const tempToken1 = tokenList.Pulse;
+  const [token0, setToken0] = useState<TokenDetails | null>(null);
+  const [token1, setToken1] = useState<TokenDetails | null>(null);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
   const [isFullRange, setIsFullRange] = useState(false);
   const [isButton, setIsButton] = useState(false);
@@ -137,62 +137,61 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [deadline, setDeadline] = useState("10");
   console.log("🚀 ~ deadline:", deadline)
 
-  // const renderCount = useRef(0);
 
-  const checkRange = ()=>{
-    if(!priceUpper || !priceLower || !priceCurrent) return true;
+  const checkRange = () => {
+    if (!priceUpper || !priceLower || !priceCurrent) return true;
 
     console.log("🚀 ~ checkRange ~ priceRangeErrorIndex:", priceRangeErrorIndex)
 
-    if(priceLower >= priceUpper){
+    if (priceLower >= priceUpper) {
       setPriceRangeErrorIndex(PriceRangeError.INVALID);
     }
-    else if(priceCurrent <= priceLower){
+    else if (priceCurrent <= priceLower) {
       setPriceRangeErrorIndex(PriceRangeError.BELOW_RANGE);
     }
-    else if(priceCurrent >= priceUpper){
+    else if (priceCurrent >= priceUpper) {
       setPriceRangeErrorIndex(PriceRangeError.ABOVE_RANGE);
     }
-    else{
+    else {
       setPriceRangeErrorIndex(null);
     }
 
     return true;
   }
-    console.log("🚀 ~ priceRangeErrorIndex:", priceRangeErrorIndex)
+  console.log("🚀 ~ priceRangeErrorIndex:", priceRangeErrorIndex)
 
-  const calculateRange = (price: number, percentage: number)=>{
-    return (price + ((percentage*price)/100)).toString();
+  const calculateRange = (price: number, percentage: number) => {
+    return (price + ((percentage * price) / 100)).toString();
   }
 
-  const adjustPricesForTokenToggle = ()=>{
+  const adjustPricesForTokenToggle = () => {
 
     // console.log("Adjust Price RUn");
-    if(token0 && token1){
-      
+    if (token0 && token1) {
+
       const tempToken = token0;
       setToken0(token1);
       setToken1(tempToken);
 
-      if(Number(priceLower)){
-        const newPriceUpper = (1/Number(priceLower)).toString();
+      if (Number(priceLower)) {
+        const newPriceUpper = (1 / Number(priceLower)).toString();
         setPriceUpperEntered(newPriceUpper);
         // setPriceUpper(newPriceUpper);
       }
 
-      if(Number(priceUpper)){
-      const newPriceLower = (1/Number(priceUpper)).toString();
+      if (Number(priceUpper)) {
+        const newPriceLower = (1 / Number(priceUpper)).toString();
         setPriceLowerEntered(newPriceLower);
         // setPriceLower(newPriceLower);
       }
 
-      if(Number(priceCurrent)){
-      const newPriceCurrent = (1/Number(priceCurrent)).toString();
+      if (Number(priceCurrent)) {
+        const newPriceCurrent = (1 / Number(priceCurrent)).toString();
         setPriceCurrentEntered(newPriceCurrent);
         // setPriceCurrent(newPriceCurrent);
       }
 
-      if(decimalDifference){
+      if (decimalDifference) {
         setDecimalDifference(-1 * decimalDifference);
       }
 
@@ -200,8 +199,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     }
   }
 
-  const handlePriceLower = ()=>{
-    if(fee && priceLowerEntered && token0 && token1 && Number(priceLowerEntered) > 0){
+  const handlePriceLower = () => {
+    if (fee && priceLowerEntered && token0 && token1 && Number(priceLowerEntered) > 0) {
       const tick = priceToTick(priceLowerEntered, decimalDifference);
       const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
       const newPrice = tickToPrice(nearestTick, decimalDifference);
@@ -211,13 +210,13 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
       // console.log("🚀 ~ handlePriceLower ~ newPrice:", newPrice)
     }
-    else{
+    else {
       setPriceLower("");
     }
   }
 
-  const handlePriceUpper = ()=>{
-    if(fee && priceUpperEntered && token0 && token1 && Number(priceUpperEntered) > 0){
+  const handlePriceUpper = () => {
+    if (fee && priceUpperEntered && token0 && token1 && Number(priceUpperEntered) > 0) {
       const tick = priceToTick(priceUpperEntered, decimalDifference);
       const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
       const newPrice = tickToPrice(nearestTick, decimalDifference);
@@ -226,17 +225,17 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
       setPriceUpperEntered(newPrice.toString());
       // console.log("🚀 ~ handlePriceUpper ~ newPrice:", newPrice) 
     }
-    else{
+    else {
       setPriceUpper("");
     }
   }
 
-  const handlePriceCurrent = ()=>{
-    if(fee && priceCurrentEntered && token0 && token1 && Number(priceCurrentEntered) > 0){
+  const handlePriceCurrent = () => {
+    if (fee && priceCurrentEntered && token0 && token1 && Number(priceCurrentEntered) > 0) {
       // const tick = priceToTick(priceCurrentEntered, decimalDifference);
       // // // console.log("🚀 ~ handlePriceCurrent ~ tick:", tick, priceCurrentEntered);
 
-      
+
       // const nearestTick = nearestUsableTick(tick, TICK_SPACINGS[fee])
       // const newPrice = tickToPrice(nearestTick, decimalDifference);
 
@@ -245,12 +244,12 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
       // setPriceCurrentEntered(newPrice.toString());
       // console.log("🚀 ~ handlePriceCurrent ~ newPrice:", newPrice); 
     }
-    else{
+    else {
       setPriceCurrent("");
     }
   }
 
-  const reset = ()=>{
+  const reset = () => {
     setApprovalAmount0("");
     setApprovalAmount1("");
     setTickLower("");
@@ -271,16 +270,16 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     setPriceUpperEntered("");
     setPriceCurrentEntered("");
 
-    handleButton(false,false);
+    handleButton(false, false);
 
     setAmountAt0("");
     setAmountAt1("");
     // setIsFullRange(false);
   }
 
-  const sortTokens = ()=>{
-    if(token0 && token1){
-      if(token0.address.contract_address > token1.address.contract_address){
+  const sortTokens = () => {
+    if (token0 && token1) {
+      if (token0.address.contract_address > token1.address.contract_address) {
         const temp = token0;
         setToken0(token1);
         setToken1(temp);
@@ -295,28 +294,28 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     const tierDate = ["0.01%", '0.05%', "0.25%", "1%", "2%"];
     setTier(tierDate[index]);
 
-    switch(index){
+    switch (index) {
       case (0):
         setFee(FeeAmount.LOWEST);
         break;
-      
-      case(1):
+
+      case (1):
         setFee(FeeAmount.LOW);
         break;
 
-      case(2):
+      case (2):
         setFee(FeeAmount.MEDIUM);
         break;
 
-      case(3):
+      case (3):
         setFee(FeeAmount.HIGH);
         break;
 
-      case(4):
+      case (4):
         setFee(FeeAmount.HIGHEST);
         break;
 
-      default :
+      default:
         setFee(FeeAmount.LOWEST);
     }
 
@@ -348,7 +347,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     router.replace(`/add/V2/${token0?.address.contract_address || "token"}/${token1?.address.contract_address || "token"}`);
   }
 
-  const handleOpenToken = useCallback((tokenNumber : number) => {
+  const handleOpenToken = useCallback((tokenNumber: number) => {
     setTokenBeingChosen(tokenNumber);
     setOpenToken(prev => !prev);
   }, []);
@@ -362,24 +361,24 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     router.back();
   };
 
-  const handleAddLiquidity = async ()=>{
-    if(!token0 || !token1 || !slippageTolerance) return;
+  const handleAddLiquidity = async () => {
+    if (!token0 || !token1 || !slippageTolerance) return;
 
     setAddLiquidityRunning(true);
-    try{
+    try {
 
       const addressToApprove = NFPMAddress;
 
-      if(!isNative(token0)){
+      if (!isNative(token0)) {
         await getTokenApproval(token0, addressToApprove, approvalAmount0);
       }
-      if(!isNative(token1)){
+      if (!isNative(token1)) {
         await getTokenApproval(token1, addressToApprove, approvalAmount1);
       }
 
       alert("Tokens Approved!");
     }
-    catch(error){
+    catch (error) {
       setAddLiquidityRunning(false);
       alert("Error approving tokens");
       console.log(error)
@@ -387,45 +386,45 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     }
 
     const unixDeadline = (Math.floor((Date.now() + Number(deadline) * 60 * 1000) / 1000)).toString();
-      try{
-        if(fee && token0 && token1){
-          const addLiquidityTxHash = await addLiquidityV3(
-            NFPMAddress,
-            token0,
-            token1,
-            tickLower,
-            tickUpper,
-            amount0Desired,
-            amount1Desired,
-            amount0Min,
-            amount1Min,
-            unixDeadline,
-            sqrtPriceX96,
-            fee,
-            isFullRange
-          )
+    try {
+      if (fee && token0 && token1) {
+        const addLiquidityTxHash = await addLiquidityV3(
+          NFPMAddress,
+          token0,
+          token1,
+          tickLower,
+          tickUpper,
+          amount0Desired,
+          amount1Desired,
+          amount0Min,
+          amount1Min,
+          unixDeadline,
+          sqrtPriceX96,
+          fee,
+          isFullRange
+        )
 
-          alert(`Liquidity added. tx hash : ${addLiquidityTxHash} `)
-        }
+        alert(`Liquidity added. tx hash : ${addLiquidityTxHash} `)
       }
-      catch(error){
-        //console.log("Error adding liquidity", error);
-        setAddLiquidityRunning(false);
-        alert(`Error adding liquidity`);
-      }
+    }
+    catch (error) {
+      //console.log("Error adding liquidity", error);
+      setAddLiquidityRunning(false);
+      alert(`Error adding liquidity`);
+    }
     setAddLiquidityRunning(false);
   }
 
-  const handleGettingPoolData = async ()=>{
-      await fetchPoolData();
+  const handleGettingPoolData = async () => {
+    await fetchPoolData();
   }
 
-  const calculate = async ()=>{
+  const calculate = async () => {
     console.log("calculate run");
 
-    if(!priceLower || !priceUpper || !priceCurrent || !fee || !token1 || !token0 || ((!Number(amount0ToEmulate) && !Number(amount1ToEmulate))) || !slippageTolerance) {
-      
-      if((!Number(amount0ToEmulate) && !Number(amount1ToEmulate))) {
+    if (!priceLower || !priceUpper || !priceCurrent || !fee || !token1 || !token0 || ((!Number(amount0ToEmulate) && !Number(amount1ToEmulate))) || !slippageTolerance) {
+
+      if ((!Number(amount0ToEmulate) && !Number(amount1ToEmulate))) {
         console.log("🚀 ~ calculate ~ (!Number(amount0ToEmulate) && !Number(amount1ToEmulate)):", (!Number(amount0ToEmulate) && !Number(amount1ToEmulate)))
         setAmount0Desired("");
         setAmount1Desired("");
@@ -435,7 +434,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
     //console.log("Running emulate");
     const result = emulate(
-      priceLower, 
+      priceLower,
       priceUpper,
       priceCurrent,
       fee,
@@ -449,26 +448,26 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
     console.log('HEllo - ,', result);
 
-    if(result){
+    if (result) {
       setEmulateError(false);
-      if(result.amount0Desired !== "0" && result.amount1Desired !== "0"){
-        let {        
-          tickLower : tickLowerEmulate,
-          tickUpper : tickUpperEmulate,
-          amount0Desired : amount0DesiredEmulate,
-          amount1Desired : amount1DesiredEmulate,
-          amount0Min : amount0MinEmulate,
-          amount1Min : amount1MinEmulate,
-          sqrtPriceX96 : sqrtPriceX96Emulate
-        } =  result
+      if (result.amount0Desired !== "0" && result.amount1Desired !== "0") {
+        let {
+          tickLower: tickLowerEmulate,
+          tickUpper: tickUpperEmulate,
+          amount0Desired: amount0DesiredEmulate,
+          amount1Desired: amount1DesiredEmulate,
+          amount0Min: amount0MinEmulate,
+          amount1Min: amount1MinEmulate,
+          sqrtPriceX96: sqrtPriceX96Emulate
+        } = result
 
         let amountAt0ToSet = "";
         let amountAt1ToSet = "";
 
         console.log("🚀 ~ calculate ~ tokenToggleOccured:", tokenToggleOccured)
-          console.log("🚀 ~ calculate ~ isSorted:", isSorted)
+        console.log("🚀 ~ calculate ~ isSorted:", isSorted)
         // if((isSorted && !tokenToggleOccured) || (!isSorted && tokenToggleOccured)){
-        if(isSorted){
+        if (isSorted) {
           console.log("in if")
           amountAt0ToSet = amount0DesiredEmulate;
           amountAt1ToSet = amount1DesiredEmulate;
@@ -476,7 +475,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
           setApprovalAmount0(amount0DesiredEmulate);
           setApprovalAmount1(amount1DesiredEmulate);
         }
-        else{
+        else {
           console.log("in else")
           amountAt0ToSet = amount1DesiredEmulate;
           amountAt1ToSet = amount0DesiredEmulate;
@@ -510,7 +509,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
         // console.log("🚀 ~ calculate ~ amountAt0ToSet:", amountAt0ToSet)
       }
     }
-    else{
+    else {
       setAmount0Desired("");
       setAmount1Desired("");
       setEmulateError(true);
@@ -524,9 +523,9 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   // );
 
   const handleTokenAmountChange = useCallback(
-    debounce(async (amountAtIndex : number, value : string) => {
+    debounce(async (amountAtIndex: number, value: string) => {
       if (!token0 || !token1) return;
-  
+
       if (!value) {
         flushSync(() => {
           setAmountAt0("");
@@ -536,10 +535,10 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
         });
         return;
       }
-  
+
       let amountAt0ToEmulate = "";
       let amountAt1ToEmulate = "";
-  
+
       if (amountAtIndex === 0) {
         amountAt0ToEmulate = value;
         amountAt1ToEmulate = "0";
@@ -547,7 +546,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
         amountAt0ToEmulate = "0";
         amountAt1ToEmulate = value;
       }
-  
+
       if (isSorted) {
         flushSync(() => {
           setAmount0ToEmulate(amountAt0ToEmulate);
@@ -562,9 +561,9 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     }, 1000),
     [token0, token1, isSorted]
   );
-  
 
-  const handleTokenToggle = ()=>{
+
+  const handleTokenToggle = () => {
     setTokenToggleOccured(!tokenToggleOccured);
   }
 
@@ -573,34 +572,34 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     if (token0 && token1 && fee) {
       const poolDataFromSubgraph: AddLiquidityPoolData = await getPoolData(token0, token1, fee);
       setCurrentPoolData(poolDataFromSubgraph);
-      
-      let priceCurrentToSet : number | undefined = undefined;
-      let priceLowerToSet : number | undefined = undefined;
-      let priceUpperToSet : number | undefined = undefined;
 
-      if(poolDataFromSubgraph){
-        if(isSorted){
+      let priceCurrentToSet: number | undefined = undefined;
+      let priceLowerToSet: number | undefined = undefined;
+      let priceUpperToSet: number | undefined = undefined;
+
+      if (poolDataFromSubgraph) {
+        if (isSorted) {
           priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
-        }        
-        else{
+        }
+        else {
           priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
         }
       }
 
-      setPriceCurrent( priceCurrentToSet !== undefined? priceCurrentToSet.toString() : "")
+      setPriceCurrent(priceCurrentToSet !== undefined ? priceCurrentToSet.toString() : "")
     }
   };
 
   const fetchAllPoolsData = async () => {
     if (!token0 || !token1) return;
     const pools = await getAllPoolsForTokens(token0, token1);
-  
+
     let totalLiquidity = BigInt(0);
     let liq100 = BigInt(0), liq500 = BigInt(0), liq2500 = BigInt(0), liq10000 = BigInt(0), liq20000 = BigInt(0);
-  
+
     pools?.forEach((pool: any) => {
       totalLiquidity += BigInt(pool.liquidity);
-  
+
       switch (Number(pool.feeTier)) {
         case 100:
           liq100 += BigInt(pool.liquidity);
@@ -619,114 +618,114 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
           break;
       }
     });
-  
+
     const toPercentage = (value: bigint, total: bigint): number => {
       if (total === BigInt(0)) return 0;
       const scaledValue = value * BigInt(1000); // scale up for 2 decimal places
       const percentage = scaledValue / total; // integer division
       return Number((percentage + BigInt(5)) / BigInt(10)); // rounding to the nearest whole number
     };
-  
+
     setPickPercent100(toPercentage(liq100, totalLiquidity));
     setPickPercent500(toPercentage(liq500, totalLiquidity));
     setPickPercent2500(toPercentage(liq2500, totalLiquidity));
     setPickPercent10000(toPercentage(liq10000, totalLiquidity));
     setPickPercent20000(toPercentage(liq20000, totalLiquidity));
   };
-  
-  
+
+
   //console.log(renderCount.current);
-  useEffect(()=>{
-//    renderCount.current++;
-    if(token0 && token1){
+  useEffect(() => {
+    //    renderCount.current++;
+    if (token0 && token1) {
       fetchAllPoolsData();
       setDecimalDifference(token1.address.decimals - token0.address.decimals);
       setIsSorted(token0.address.contract_address < token1.address.contract_address);
       handleTokenToggle()
     }
-  },[])
+  }, [])
 
   useEffect(() => {
-      if(token0 && token1){
-        handleGettingPoolData();
-        calculate();
-      }
-      //console.log("🚀 ~ [fee]:")
+    if (token0 && token1) {
+      handleGettingPoolData();
+      calculate();
+    }
+    //console.log("🚀 ~ [fee]:")
   }, [fee]);
 
-  useEffect(()=>{
-      calculate();
-  },[priceLower,priceUpper, priceCurrent, amount0ToEmulate, amount1ToEmulate])
+  useEffect(() => {
+    calculate();
+  }, [priceLower, priceUpper, priceCurrent, amount0ToEmulate, amount1ToEmulate])
 
-  useEffect(()=>{
-      if(!token0 || !token1){
-        reset();
-      }
-      else{
-        fetchAllPoolsData();
-        setDecimalDifference(token1.address.decimals - token0.address.decimals);
-        setIsSorted(token0.address.contract_address < token1.address.contract_address);
-      }
-      //console.log("🚀 ~ token0, token1:")
-  },[token0, token1])
-
-  useEffect(()=>{
-      if(priceLowerEntered){
-        if(isButton){
-          setIsButton(false);
-          handlePriceLower();
-        }
-      }
-      //console.log("🚀 ~ priceLowerEntered:")
-  },[priceLowerEntered])
-  
-  useEffect(()=>{
-      if(priceUpperEntered){
-        // setPriceUpper("");
-        if(isButton){
-          setIsButton(false);
-          handlePriceUpper();
-        }
-        // //console.log("🚀 ~ useEffect ~ priceUpperEntered:", priceUpperEntered)
-      }
-      //console.log("🚀 ~ priceUpperEntered:")
-  },[priceUpperEntered])
-
-  useEffect(()=>{
-      if(priceCurrentEntered){
-        // setPriceCurrent("");
-        if(isButton)
-          handlePriceCurrent();
-        // //console.log("🚀 ~ useEffect ~ priceCurrentEntered:", priceCurrentEntered)
-      }
-      //console.log("🚀 ~ priceCurrentEntered:")
-  },[priceCurrentEntered])
-
-  useEffect(()=>{
+  useEffect(() => {
+    if (!token0 || !token1) {
       reset();
-      handleGettingPoolData();
-      //console.log("🚀 ~ activeProtocol:", activeProtocol)
-  },[activeProtocol])
+    }
+    else {
+      fetchAllPoolsData();
+      setDecimalDifference(token1.address.decimals - token0.address.decimals);
+      setIsSorted(token0.address.contract_address < token1.address.contract_address);
+    }
+    //console.log("🚀 ~ token0, token1:")
+  }, [token0, token1])
 
-  useEffect(()=>{
-      adjustPricesForTokenToggle();
-      //console.log("🚀 ~ tokenToggleOccured:", tokenToggleOccured)
-  },[tokenToggleOccured])
+  useEffect(() => {
+    if (priceLowerEntered) {
+      if (isButton) {
+        setIsButton(false);
+        handlePriceLower();
+      }
+    }
+    //console.log("🚀 ~ priceLowerEntered:")
+  }, [priceLowerEntered])
 
-  useEffect(()=>{
-      handlePriceCurrent();
-      handlePriceLower();
-      handlePriceUpper();
-      //console.log("🚀 ~ handlePricesAfterAdjust:", handlePricesAfterAdjust)
-  },[handlePricesAfterAdjust])
+  useEffect(() => {
+    if (priceUpperEntered) {
+      // setPriceUpper("");
+      if (isButton) {
+        setIsButton(false);
+        handlePriceUpper();
+      }
+      // //console.log("🚀 ~ useEffect ~ priceUpperEntered:", priceUpperEntered)
+    }
+    //console.log("🚀 ~ priceUpperEntered:")
+  }, [priceUpperEntered])
 
-  useEffect(()=>{
+  useEffect(() => {
+    if (priceCurrentEntered) {
+      // setPriceCurrent("");
+      if (isButton)
+        handlePriceCurrent();
+      // //console.log("🚀 ~ useEffect ~ priceCurrentEntered:", priceCurrentEntered)
+    }
+    //console.log("🚀 ~ priceCurrentEntered:")
+  }, [priceCurrentEntered])
+
+  useEffect(() => {
+    reset();
+    handleGettingPoolData();
+    //console.log("🚀 ~ activeProtocol:", activeProtocol)
+  }, [activeProtocol])
+
+  useEffect(() => {
+    adjustPricesForTokenToggle();
+    //console.log("🚀 ~ tokenToggleOccured:", tokenToggleOccured)
+  }, [tokenToggleOccured])
+
+  useEffect(() => {
+    handlePriceCurrent();
+    handlePriceLower();
+    handlePriceUpper();
+    //console.log("🚀 ~ handlePricesAfterAdjust:", handlePricesAfterAdjust)
+  }, [handlePricesAfterAdjust])
+
+  useEffect(() => {
     checkRange()
-  },[priceLower,priceUpper,priceCurrent])
+  }, [priceLower, priceUpper, priceCurrent])
 
-  const handleButton = (buttonValue : boolean, fullRangeValue : boolean)=>{
+  const handleButton = (buttonValue: boolean, fullRangeValue: boolean) => {
 
-    if(!buttonValue){
+    if (!buttonValue) {
       setRangeButtonSelected(null);
     }
 
@@ -793,11 +792,11 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
               <Box sx={{ mb: "15px" }}>
                 <Typography className='mainTitle' sx={{ color: 'var(--cream)' }}>CHOOSE TOKEN PAIR</Typography>
                 <Box className="token-sec">
-                  <Box className="token-pair" onClick={()=>{handleOpenToken(0)}} sx={{ cursor: 'pointer', color: palette.mode === 'light' ? 'var(--black)' : 'var(--white)', bgcolor: palette.mode === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)' }}>
+                  <Box className="token-pair" onClick={() => { handleOpenToken(0) }} sx={{ cursor: 'pointer', color: palette.mode === 'light' ? 'var(--black)' : 'var(--white)', bgcolor: palette.mode === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)' }}>
                     <Box >
                       {token0 ? (
                         <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>{token0.name} {`(${truncateAddress(token0.address.contract_address)})`}</Typography>
-                      ):(
+                      ) : (
                         <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>Select Token</Typography>
                       )
                       }
@@ -806,14 +805,14 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                       <IoIosArrowDown size={17} />
                     </Box>
                   </Box>
-                  <Box sx={{display: 'flex',alignItems: 'center',justifyContent: 'center'}}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <HiPlus size={20} />
                   </Box>
-                  <Box onClick={()=>{handleOpenToken(1)}} className="token-pair" sx={{cursor: 'pointer', color: palette.mode === 'light' ? 'var(--black)' : 'var(--white)', bgcolor: palette.mode === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)' }}>
+                  <Box onClick={() => { handleOpenToken(1) }} className="token-pair" sx={{ cursor: 'pointer', color: palette.mode === 'light' ? 'var(--black)' : 'var(--white)', bgcolor: palette.mode === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)' }}>
                     <Box >
                       {token1 ? (
                         <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>{token1.name} {`(${truncateAddress(token1.address.contract_address)})`}</Typography>
-                      ):(
+                      ) : (
                         <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>Select Token</Typography>
                       )
                       }
@@ -950,13 +949,13 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                 </Box>
               </Box>
 
-                <Box className="SwapWidgetInner" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
+              <Box className="SwapWidgetInner" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
-                    <Typography className="mainTitle" sx={{ color: 'var(--cream)', textAlign: 'start', }}>DEPOSIT AMOUNT</Typography>
-                  </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
+                  <Typography className="mainTitle" sx={{ color: 'var(--cream)', textAlign: 'start', }}>DEPOSIT AMOUNT</Typography>
+                </Box>
 
-                  {priceRangeErrorIndex === null ? (
+                {priceRangeErrorIndex === null ? (
                   <>
                     <Box className="inputBox" sx={{ width: '100%', textAlign: 'end' }}>
                       <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
@@ -966,13 +965,13 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                         </Typography>
                       </Box>
                       <Box className="inputField">
-                        <input autoComplete="off" onChange={(e)=>{
-                          if(activeProtocol === Protocol.V3)
-                          setAmountAt1("")
+                        <input autoComplete="off" onChange={(e) => {
+                          if (activeProtocol === Protocol.V3)
+                            setAmountAt1("")
                           setAmountAt0(e.target.value);
                           handleTokenAmountChange(0, e.target.value)
-                        }} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
-                        value={amountAt0}/>
+                        }} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }}
+                          value={amountAt0} />
                         {/* By default this input takes token amount of token 0. If token toggle has occured, then this also needs to be toggled */}
                       </Box>
                     </Box>
@@ -982,23 +981,23 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                       <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                         <Image src="/images/circle2.svg" alt="circle2" width={20} height={20} />
                         <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center' }}>
-                        {token1 ? (token1.name ): "Select a Currency"} <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
+                          {token1 ? (token1.name) : "Select a Currency"} <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
                         </Typography>
                       </Box>
                       <Box className="inputField">
-                        <input autoComplete="off" onChange={(e)=>{
-                          if(activeProtocol === Protocol.V3)
+                        <input autoComplete="off" onChange={(e) => {
+                          if (activeProtocol === Protocol.V3)
                             setAmountAt0("")
                           setAmountAt1(e.target.value);
                           handleTokenAmountChange(1, e.target.value)
-                        }} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }} 
-                        value={amountAt1}/>
+                        }} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }}
+                          value={amountAt1} />
                         {/* By default this input takes token amount of token 1. If token toggle has occured, then this also needs to be toggled */}
                       </Box>
                     </Box>
                   </>
-                  ) : (
-                    <Box className="warning-box" sx={{ mb: '15px' }}>
+                ) : (
+                  <Box className="warning-box" sx={{ mb: '15px' }}>
                     <Box sx={{ color: 'var(--secondary)', fontSize: 20 }}>
                       <GoAlertFill />
                     </Box>
@@ -1016,8 +1015,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                       }
                     </Box>
                   </Box>
-                  )}
-                </Box>
+                )}
+              </Box>
 
             </Box>
             <Box className="al-inner-right">
@@ -1034,7 +1033,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                       color: 'var(--cream)'
                     }}>View prices in</Typography>
                     <Typography
-                    onClick={handleTokenToggle}
+                      onClick={handleTokenToggle}
                       className='pickData'
                       component="span"
                       sx={{
@@ -1068,11 +1067,11 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                     <Box className="SwapWidgetInner" sx={{ mb: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'column', gap: '15px' }}>
                       <Box className="inputBox" sx={{ width: '100%' }}>
                         <Box className="inputField">
-                          <input type="number" placeholder='0.0' style={{ textAlign: 'end' }} 
-                          onBlur={handlePriceCurrent}
-                          onChange={(e)=>{
-                            setPriceCurrentEntered(e.target.value)
-                          }} value={ priceCurrentEntered }/>
+                          <input type="number" placeholder='0.0' style={{ textAlign: 'end' }}
+                            onBlur={handlePriceCurrent}
+                            onChange={(e) => {
+                              setPriceCurrentEntered(e.target.value)
+                            }} value={priceCurrentEntered} />
                         </Box>
                       </Box>
                     </Box>
@@ -1081,29 +1080,29 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                   <Box>
                     {token0 && token1 ? (
                       <Box sx={{ display: 'flex', gap: '5px', justifyContent: 'center', mb: '15px' }}>
-                      <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>Current Price:</Typography>
-                      <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{priceCurrent}</Typography>
-                      <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{token1.name} Per {token0.name}</Typography>
-                    </Box>
+                        <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>Current Price:</Typography>
+                        <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{priceCurrent}</Typography>
+                        <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{token1.name} Per {token0.name}</Typography>
+                      </Box>
                     ) : (
                       <Box sx={{ display: 'flex', gap: '5px', justifyContent: 'center', mb: '15px' }}>
-                      <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>Select Currency</Typography>
-                    </Box>
+                        <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>Select Currency</Typography>
+                      </Box>
                     )}
-                            
+
                     <Box sx={{ textAlign: 'center', minHeight: '200px', display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center', }}>
                       <SlGraph size={50} />
                       {/* <Default/> */}
                       <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>Your position will appear here.</Typography>
                     </Box>
                   </Box>
-                  )
-                }      
+                )
+                }
 
                 {token0 && token1 ? (
                   <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '30px' }}>
                     <Typography sx={{ fontWeight: '600' }}>Current {token1.name} Price Per {token0.name}:</Typography>
-                    <Typography sx={{ fontWeight: '600',color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)' }}>{priceCurrent}</Typography>
+                    <Typography sx={{ fontWeight: '600', color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)' }}>{priceCurrent}</Typography>
                   </Box>
                 ) : (
                   <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '30px' }}>
@@ -1118,11 +1117,11 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                     <Typography sx={{ fontWeight: '600' }}>Min Price</Typography>
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box><FaMinus onClick={()=>{handleButton(false,false);setPriceLowerEntered((Number(priceLowerEntered) - 0.0001).toString()); handlePriceLower() }}/></Box>
+                      <Box><FaMinus onClick={() => { handleButton(false, false); setPriceLowerEntered((Number(priceLowerEntered) - 0.0001).toString()); handlePriceLower() }} /></Box>
                       <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                        <input type="text" placeholder="0.0" style={{ textAlign: 'center',color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)' }} onBlur={handlePriceLower} onChange={(e)=>{handleButton(false,false);setPriceLowerEntered(e.target.value)}} value={isFullRange ? "0" : priceLowerEntered}/>
+                        <input type="text" placeholder="0.0" style={{ textAlign: 'center', color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)' }} onBlur={handlePriceLower} onChange={(e) => { handleButton(false, false); setPriceLowerEntered(e.target.value) }} value={isFullRange ? "0" : priceLowerEntered} />
                       </Box>
-                      <Box><FaPlus onClick={()=>{handleButton(false,false);setPriceLowerEntered((Number(priceLowerEntered) + 0.0001).toString()); handlePriceLower()}}/></Box>
+                      <Box><FaPlus onClick={() => { handleButton(false, false); setPriceLowerEntered((Number(priceLowerEntered) + 0.0001).toString()); handlePriceLower() }} /></Box>
                     </Box>
 
                     {token0 && token1 ? (
@@ -1144,20 +1143,20 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                     <Typography sx={{ fontWeight: '600' }}>Max Price</Typography>
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box><FaMinus onClick={()=>{
-                          handleButton(false,false);
-                          setPriceUpperEntered((Number(priceUpperEntered) - 0.1).toString());
-                          handlePriceUpper()
-                        }}/>
+                      <Box><FaMinus onClick={() => {
+                        handleButton(false, false);
+                        setPriceUpperEntered((Number(priceUpperEntered) - 0.1).toString());
+                        handlePriceUpper()
+                      }} />
                       </Box>
                       <Box className="inputBox" sx={{ width: '100%', my: '15px' }}>
-                        <input type="text" placeholder="0.0" style={{ textAlign: 'center' , color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',fontSize: isFullRange ? '1.5em' : '1em'}} onBlur={handlePriceUpper} onChange={(e)=>{handleButton(false,false);setPriceUpperEntered(e.target.value)}} value={isFullRange ? "∞" : priceUpperEntered}/>
+                        <input type="text" placeholder="0.0" style={{ textAlign: 'center', color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)', fontSize: isFullRange ? '1.5em' : '1em' }} onBlur={handlePriceUpper} onChange={(e) => { handleButton(false, false); setPriceUpperEntered(e.target.value) }} value={isFullRange ? "∞" : priceUpperEntered} />
                       </Box>
-                      <Box><FaPlus onClick={()=>{
-                          handleButton(false,false);
-                          setPriceUpperEntered((Number(priceUpperEntered) + 0.1).toString());
-                          handlePriceUpper()
-                        }}/>
+                      <Box><FaPlus onClick={() => {
+                        handleButton(false, false);
+                        setPriceUpperEntered((Number(priceUpperEntered) + 0.1).toString());
+                        handlePriceUpper()
+                      }} />
                       </Box>
                     </Box>
 
@@ -1179,10 +1178,10 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
 
                 <Box className="fullRangeSec" sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', textAlign: 'center', mb: '15px' }}>
-                <Box 
-                 className={rangeButtonSelected === RANGES[0] ? 'liqBtn selected' : 'liqBtn'}
-                    onClick={()=>{
-                      if(!priceCurrent) return;
+                  <Box
+                    className={rangeButtonSelected === RANGES[0] ? 'liqBtn selected' : 'liqBtn'}
+                    onClick={() => {
+                      if (!priceCurrent) return;
 
                       setRangeButtonSelected(RANGES[0]);
                       //console.log("CLicked")
@@ -1205,16 +1204,16 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                       cursor: 'pointer',
                       color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',
                       backgroundColor: rangeButtonSelected === RANGES[0] ? 'var(--cream)' : 'transparent', // Set a highlight color
-                      borderColor: rangeButtonSelected === RANGES[0] ? 'var(--cream)' : palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'                          
+                      borderColor: rangeButtonSelected === RANGES[0] ? 'var(--cream)' : palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
                     }}
                   >
                     10%
                   </Box>
 
-                  <Box 
-                   className={rangeButtonSelected === RANGES[1] ? 'liqBtn selected' : 'liqBtn'}
-                    onClick={()=>{
-                      if(!priceCurrent) return;
+                  <Box
+                    className={rangeButtonSelected === RANGES[1] ? 'liqBtn selected' : 'liqBtn'}
+                    onClick={() => {
+                      if (!priceCurrent) return;
                       setRangeButtonSelected(RANGES[1]);
                       //console.log("CLicked")
                       setPriceLowerEntered(calculateRange(Number(priceCurrent), -20));
@@ -1235,16 +1234,16 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                       cursor: 'pointer',
                       color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)',
                       bgcolor: rangeButtonSelected === RANGES[1] ? 'var(--cream)' : 'transparent', // Set a highlight color
-                      borderColor: rangeButtonSelected === RANGES[1] ? 'var(--cream)' : palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'                          
+                      borderColor: rangeButtonSelected === RANGES[1] ? 'var(--cream)' : palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
                     }}
                   >
                     20%
                   </Box>
-                  <Box 
-                    
+                  <Box
+
                     className={rangeButtonSelected === RANGES[2] ? 'liqBtn selected' : 'liqBtn'}
-                    onClick={()=>{
-                      if(!priceCurrent) return;
+                    onClick={() => {
+                      if (!priceCurrent) return;
                       setRangeButtonSelected(RANGES[2]);
                       //console.log("CLicked")
                       setPriceLowerEntered(calculateRange(Number(priceCurrent), -50));
@@ -1265,14 +1264,14 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                       cursor: 'pointer',
                       color: `${palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
                       bgcolor: rangeButtonSelected === RANGES[2] ? 'var(--cream)' : 'transparent', // Set a highlight color
-                      borderColor: rangeButtonSelected === RANGES[2] ? 'var(--cream)' : palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'                          
+                      borderColor: rangeButtonSelected === RANGES[2] ? 'var(--cream)' : palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)'
                     }}
                   >
                     50%
                   </Box>
-                  <Box 
-                   className={rangeButtonSelected === RANGES[3] ? 'selected liqBtn' : 'liqBtn'}
-                    onClick={()=>{
+                  <Box
+                    className={rangeButtonSelected === RANGES[3] ? 'selected liqBtn' : 'liqBtn'}
+                    onClick={() => {
                       setRangeButtonSelected(RANGES[3]);
                       const newPriceLower = tickToPrice(MIN_TICK, decimalDifference);
                       setPriceLowerEntered(newPriceLower.toString());
@@ -1306,14 +1305,14 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
                 <Box>
                   <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning}>
-                    {addLiquidityRunning ? <CircularProgress size={25}/> : <>Create Liquidity</>}
+                    {addLiquidityRunning ? <CircularProgress size={25} /> : <>Create Liquidity</>}
                   </Button>
                 </Box>
               </Box>
+            </Box>
           </Box>
         </Box>
-      </Box>
-      {/* <SelectedToken
+        {/* <SelectedToken
           openToken={openToken}
           handleCloseToken={handleCloseToken}
           mode={theme} // Ensure `theme` is passed correctly
@@ -1324,23 +1323,23 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
           token0={token0} 
           token1={token1}      /> */}
 
-      {/* <RoiCalculator open={open} handleClose={handleClose} /> */}
-      <SettingsModal 
-        isOpen={open} 
-        handleClose={handleClose} 
-        theme={theme} 
-        slippageTolerance={slippageTolerance} 
-        setSlippageTolerance={setSlippageTolerance}
-        deadline={deadline}
-        setDeadline={setDeadline}
-      />
-      <style jsx>{`
+        {/* <RoiCalculator open={open} handleClose={handleClose} /> */}
+        <SettingsModal
+          isOpen={open}
+          handleClose={handleClose}
+          theme={theme}
+          slippageTolerance={slippageTolerance}
+          setSlippageTolerance={setSlippageTolerance}
+          deadline={deadline}
+          setDeadline={setDeadline}
+        />
+        <style jsx>{`
         .greyed-out {
           opacity: 0.5;           /* Greyed out effect */
           pointer-events: none;   /* Disable interaction */
         }
       `}</style>
-    </Box>
+      </Box>
     </Box>
   );
 };

@@ -20,7 +20,7 @@ import RoiCalculator from '../RoiCalculator/RoiCalculator'
 import { toast, ToastContainer } from 'react-toastify';
 import getTokenApproval from "../../utils/contract-methods/getTokenApproval";
 import { addLiquidityV3, addLiquidityV2, addLiquidityETH } from '@/utils/contract-methods/addLiquidity';
-import emulate from '@/utils/emulate';
+import emulate from '@/utils/emulate-addLiquidity';
 import { FeeAmount, nearestUsableTick, TICK_SPACINGS } from '@uniswap/v3-sdk';
 import addresses from "../../utils/address.json";
 import { expandIfNeeded, isNative, truncateAddress } from '@/utils/generalFunctions';

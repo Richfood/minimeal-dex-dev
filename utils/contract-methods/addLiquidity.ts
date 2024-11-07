@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import emulate from "../emulate";
+import emulate from "../emulate-addLiquidity";
 import { FeeAmount } from "@uniswap/v3-sdk";
 import { TokenDetails } from "@/interfaces";
 import { adjustForSlippage, expandIfNeeded, isNative } from "../generalFunctions";
