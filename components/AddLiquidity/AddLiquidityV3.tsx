@@ -36,6 +36,10 @@ import { debounce } from '@syncfusion/ej2-base';
 import { flushSync } from 'react-dom';
 import { useCall } from 'wagmi';
 import { getAllPoolsForTokens } from '@/utils/api/getAllPoolsForTokens';
+import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
+import famousToken from "../../utils/famousToken.json";
+const { useChainId, useIsActive, useAccounts } = hooks;
+import { hooks, metaMask } from '../ConnectWallet/connector';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -128,6 +132,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [pickPercent2500, setPickPercent2500] = useState(0);
   const [pickPercent10000, setPickPercent10000] = useState(0);
   const [pickPercent20000, setPickPercent20000] = useState(0);
+  const [isTestnet, setIsTestnet] = React.useState<boolean | null>(null);
+  const chainId = useChainId();
 
   const [priceRangeErrorIndex, setPriceRangeErrorIndex] = useState<PriceRangeError | null>(null);
 
@@ -136,7 +142,18 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   console.log("🚀 ~ slippageTolerance:", slippageTolerance)
   const [deadline, setDeadline] = useState("10");
   console.log("🚀 ~ deadline:", deadline)
+  useEffect(() => {
+    const isTestnet = chainId === 943;
+    setIsTestnet(isTestnet)
+    console.log("🚀 ~ useEffect ~ isTestnet:", isTestnet)
 
+    const tokenData = isTestnet ? famousTokenTestnet : famousToken;
+
+    if (tokenData.length > 0) {
+      setToken0(tokenData[9]);
+      setToken1(tokenData[10]);
+    }
+  }, [chainId]);
 
   const checkRange = () => {
     if (!priceUpper || !priceLower || !priceCurrent) return true;
@@ -348,8 +365,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   }
 
   const handleOpenToken = useCallback((tokenNumber: number) => {
-    setTokenBeingChosen(tokenNumber);
-    setOpenToken(prev => !prev);
+    setTokenBeingChosen(tokenNumber)
+    setOpenToken(prev => !prev)
   }, []);
 
   const handleCloseToken = () => setOpenToken(false);
@@ -733,6 +750,35 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     setIsFullRange(fullRangeValue);
   }
 
+  const copyToClipboard = (text: string | undefined) => {
+    console.log("🚀 ~ copyToClipboard ~ text:", text)
+    if (!text || text.trim() === "") {
+      alert("Empty address");
+    }
+    else {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          alert("Address copied to clipboard!");
+        }).catch(err => {
+          console.error("Failed to copy text to clipboard", err);
+        });
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand("copy");
+          alert("Address copied to clipboard!");
+        } catch (err) {
+          console.error("Failed to copy text to clipboard", err);
+        }
+        document.body.removeChild(textArea);
+      }
+    }
+
+  };
+
   return (
     <Box className="AddLiquiditySec">
       <Box className="white_box">
@@ -793,13 +839,15 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                 <Typography className='mainTitle' sx={{ color: 'var(--cream)' }}>CHOOSE TOKEN PAIR</Typography>
                 <Box className="token-sec">
                   <Box className="token-pair" onClick={() => { handleOpenToken(0) }} sx={{ cursor: 'pointer', color: palette.mode === 'light' ? 'var(--black)' : 'var(--white)', bgcolor: palette.mode === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)' }}>
-                    <Box >
-                      {token0 ? (
-                        <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>{token0.name} {`(${truncateAddress(token0.address.contract_address)})`}</Typography>
-                      ) : (
-                        <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>Select Token</Typography>
-                      )
-                      }
+                    <Box>
+                      {token0 && (
+                        <Box sx={{ display: "flex", gap: "5px" }}>
+                          <img src={token0?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
+                          <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer', marginTop: "2px" }}>
+                            {token0.symbol}</Typography>
+                        </Box>
+
+                      )}
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <IoIosArrowDown size={17} />
@@ -809,13 +857,15 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                     <HiPlus size={20} />
                   </Box>
                   <Box onClick={() => { handleOpenToken(1) }} className="token-pair" sx={{ cursor: 'pointer', color: palette.mode === 'light' ? 'var(--black)' : 'var(--white)', bgcolor: palette.mode === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)' }}>
-                    <Box >
-                      {token1 ? (
-                        <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>{token1.name} {`(${truncateAddress(token1.address.contract_address)})`}</Typography>
-                      ) : (
-                        <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>Select Token</Typography>
-                      )
-                      }
+                    <Box>
+                      {token1 && (
+                        <Box sx={{ display: "flex", gap: "5px" }}>
+                          <img src={token1?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
+                          <Typography sx={{ fontSize: '14px', fontWeight: '700', cursor: 'pointer', marginTop: "2px" }}>
+                            {token1.symbol}</Typography>
+                        </Box>
+
+                      )}
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <IoIosArrowDown size={17} />
@@ -959,9 +1009,12 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                   <>
                     <Box className="inputBox" sx={{ width: '100%', textAlign: 'end' }}>
                       <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                        <Image src="/images/circle1.svg" alt="circle1" width={20} height={20} />
-                        <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                          {token0 ? token0.name : "Select a Currency"} <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
+                        <img src={token0?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
+                        <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                          onClick={() => copyToClipboard(token0?.address?.contract_address)}
+
+                        >
+                          {token0 && token0.symbol} <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
                         </Typography>
                       </Box>
                       <Box className="inputField">
@@ -979,9 +1032,12 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
                     <Box className="inputBox" sx={{ width: '100%', textAlign: 'end' }}>
                       <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
-                        <Image src="/images/circle2.svg" alt="circle2" width={20} height={20} />
-                        <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center' }}>
-                          {token1 ? (token1.name) : "Select a Currency"} <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
+                        <img src={token1?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
+                        <Typography sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center' }}
+                          onClick={() => copyToClipboard(token1?.address?.contract_address)}
+
+                        >
+                          {token1 && (token1.symbol)} <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
                         </Typography>
                       </Box>
                       <Box className="inputField">
@@ -1082,7 +1138,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                       <Box sx={{ display: 'flex', gap: '5px', justifyContent: 'center', mb: '15px' }}>
                         <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>Current Price:</Typography>
                         <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{priceCurrent}</Typography>
-                        <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{token1.name} Per {token0.name}</Typography>
+                        <Typography sx={{ color: 'var(--cream)', fontSize: '12px' }}>{token1.symbol} Per {token0.symbol}</Typography>
                       </Box>
                     ) : (
                       <Box sx={{ display: 'flex', gap: '5px', justifyContent: 'center', mb: '15px' }}>
@@ -1101,7 +1157,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
                 {token0 && token1 ? (
                   <Box sx={{ display: 'flex', gap: '15px', justifyContent: 'space-between', mb: '30px' }}>
-                    <Typography sx={{ fontWeight: '600' }}>Current {token1.name} Price Per {token0.name}:</Typography>
+                    <Typography sx={{ fontWeight: '600' }}>Current {token1.symbol} Price Per {token0.symbol}:</Typography>
                     <Typography sx={{ fontWeight: '600', color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)' }}>{priceCurrent}</Typography>
                   </Box>
                 ) : (
@@ -1312,16 +1368,17 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
             </Box>
           </Box>
         </Box>
-        {/* <SelectedToken
+        <SelectedToken
           openToken={openToken}
           handleCloseToken={handleCloseToken}
-          mode={theme} // Ensure `theme` is passed correctly
+          mode={theme}
           setToken0={setToken0}
           setToken1={setToken1}
           tokenNumber={tokenBeingChosen}
-          description='' 
-          token0={token0} 
-          token1={token1}      /> */}
+          description=''
+          token0={token0}
+          token1={token1}
+        />
 
         {/* <RoiCalculator open={open} handleClose={handleClose} /> */}
         <SettingsModal
