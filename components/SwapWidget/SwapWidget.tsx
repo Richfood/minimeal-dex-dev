@@ -32,6 +32,7 @@ import getTokenApproval from '@/utils/contract-methods/getTokenApproval';
 import { debounce } from '@syncfusion/ej2-base';
 import getUserBalance from '@/utils/api/getUserBalance';
 const { useChainId, useIsActive, useAccounts } = hooks;
+import { swapExactTokensForTokens } from '@/utils/swapV2exacttokensfortokens';
 
 const fetchCoinUSDPrice = async (tokenAddress?: string) => {
     if (!tokenAddress) {
@@ -49,11 +50,7 @@ const fetchCoinUSDPrice = async (tokenAddress?: string) => {
     }
 };
 
-interface SwapWidgetProps {
-    pageLoading: (isLoading: boolean) => void; // Expecting a function, not a boolean
-}
-
-const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
+const SwapWidget = () => {
     // const [activeIndex, setActiveIndex] = useState<number | null>(0);
     // const [activeItem, setActiveItem] = useState<string | null>(null);
     const [isOpen, setIsOpen] = useState(false);
@@ -279,7 +276,8 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
             await getTokenApproval(token0, smartRouterAddress, amountIn);
 
             // Execute the swap after approval
-            await swapV3(token0, dataForSwap, amountIn, slippageTolerance);
+            await swapExactTokensForTokens(token0, token1, amountIn, slippageTolerance, amountOut, routePath)
+            // await swapV3(token0, dataForSwap, amountIn, slippageTolerance);
 
             // Reset input/output values after swap
             setAmountIn("");
@@ -324,33 +322,34 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
                 return;
             }
 
-            let protocol: Protocol; // Declare protocol as a single Protocol type
+            // let protocol: Protocol; // Declare protocol as a single Protocol type
 
             // Determine which protocol(s) are enabled
-            if (allowSwapForV2 && allowSwapForV3) {
-                // Both V2 and V3 are enabled
-                protocol = Protocol.V3; // Choose one protocol (you can decide which one to prefer)
-                // Optionally handle the V3 case separately in the API call if needed
-            } else if (allowSwapForV2) {
-                // Only V2 is enabled
-                protocol = Protocol.V2; // Assign only V2 protocol
-            } else if (allowSwapForV3) {
-                // Only V3 is enabled
-                protocol = Protocol.V3; // Assign only V3 protocol
-            } else {
-                // Both are disabled, exit the function
-                return;
-            }
+            // if (allowSwapForV2 && allowSwapForV3) {
+            //     // Both V2 and V3 are enabled
+            //     protocol = Protocol.V3; // Choose one protocol (you can decide which one to prefer)
+            //     // Optionally handle the V3 case separately in the API call if needed
+            // } else if (allowSwapForV2) {
+            //     // Only V2 is enabled
+            //     protocol = Protocol.V2; // Assign only V2 protocol
+            // } else if (allowSwapForV3) {
+            //     // Only V3 is enabled
+            //     protocol = Protocol.V3; // Assign only V3 protocol
+            // } else {
+            //     // Both are disabled, exit the function
+            //     return;
+            // }
 
             const tradeType = isAmountIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT;
 
             try {
+                const protocol = Protocol.V2;
                 // Always pass the selected protocol as a tuple (array with one element)
                 const { data, value } = await getSmartOrderRoute(
                     token0,
                     token1,
                     tokenAmount,
-                    [protocol], // Wrap the selected protocol in an array
+                    [protocol],
                     tradeType
                 );
 
@@ -380,9 +379,6 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
         },
         [token0, token1, allowSwapForV2, allowSwapForV3, setRoutePath, setDataForSwap, setToken1Price, setAmountOut, setToken0Price, setAmountIn] // Ensure allowSwapForV2 and allowSwapForV3 are dependencies
     );
-
-
-
 
     const handleAmountInChange = useCallback(
         (amountIn: string) => {
@@ -448,11 +444,10 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
 
     };
 
-
-
     return (
         <>
             <Box className="SwapWidgetSec">
+<<<<<<< Updated upstream
                 <Box className="SwapWidgetInner" sx={{ flexDirection: "column" }}>
                     <Box sx={{ display: "flex", justifyContent: 'end', width: "100%", mb: "15px", cursor: "pointer" }}>
                         <Badge
@@ -465,6 +460,11 @@ const SwapWidget: React.FC<SwapWidgetProps> = ({ pageLoading }) => {
                     </Box>
                     <Box sx={{ display: "flex", flexDirection: 'column', gap: '15px', width: '100%' }}>
                         <Box className="inputBox" >
+=======
+                <Box className="SwapWidgetInner">
+                    <Box sx={{ display: "flex", justifyContent: "space-evenly", width: '100%' }}>
+                        <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
+>>>>>>> Stashed changes
                             <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                                 <img src={token0?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
                                 <Typography onClick={() => handleOpenToken(0)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>

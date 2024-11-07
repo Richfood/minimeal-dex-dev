@@ -15,7 +15,7 @@ export async function getSmartOrderRoute(
     inputToken: TokenDetails,
     outputToken: TokenDetails,
     amountToTrade: string,
-    protocol: [Protocol],
+    protocol: Protocol[],
     tradeType: TradeType
 ) {
     const url = "http://localhost:3001/smart-order-router/getPath";

@@ -57,6 +57,7 @@ export async function swapV3(
     console.log(pathArray);
 
     const path = ethers.utils.solidityPack(dataTypeArray, pathArray);
+    console.log("🚀 ~ path:", path)
     console.log(path);
 
     amountIn = ethers.utils.parseUnits(expandIfNeeded(amountIn), token.address.decimals).toString();
