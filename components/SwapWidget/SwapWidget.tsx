@@ -343,13 +343,13 @@ const SwapWidget = () => {
             const tradeType = isAmountIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT;
 
             try {
-                const protocol = Protocol.V2;
+                const protocol = [Protocol.V2,Protocol.V3];
                 // Always pass the selected protocol as a tuple (array with one element)
                 const { data, value } = await getSmartOrderRoute(
                     token0,
                     token1,
                     tokenAmount,
-                    [protocol],
+                    protocol,
                     tradeType
                 );
 
@@ -447,7 +447,6 @@ const SwapWidget = () => {
     return (
         <>
             <Box className="SwapWidgetSec">
-<<<<<<< Updated upstream
                 <Box className="SwapWidgetInner" sx={{ flexDirection: "column" }}>
                     <Box sx={{ display: "flex", justifyContent: 'end', width: "100%", mb: "15px", cursor: "pointer" }}>
                         <Badge
@@ -460,11 +459,6 @@ const SwapWidget = () => {
                     </Box>
                     <Box sx={{ display: "flex", flexDirection: 'column', gap: '15px', width: '100%' }}>
                         <Box className="inputBox" >
-=======
-                <Box className="SwapWidgetInner">
-                    <Box sx={{ display: "flex", justifyContent: "space-evenly", width: '100%' }}>
-                        <Box className="inputBox" sx={{ width: 'calc(50% - 48px)' }}>
->>>>>>> Stashed changes
                             <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
                                 <img src={token0?.logoURI} alt="logoURI" style={{ width: '20px', height: '20px' }} />
                                 <Typography onClick={() => handleOpenToken(0)} sx={{ fontSize: '14px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
