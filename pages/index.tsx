@@ -58,7 +58,7 @@ const IndexPage = () => {
                             }}
                         >
                             <Box>
-                                <SwapWidget pageLoading={handlePageLoading} />
+                                <SwapWidget />
                             </Box>
                         </Box>
                     </Box>
