@@ -191,8 +191,8 @@ function emulate(
         });
 
         // Calculate mint amounts
-        const slippageTolerancePercent = new Percent(slippageTolerance, 100);
-        const { amount0: amount0DesiredFromPosition, amount1: amount1DesiredFromPosition } = position.mintAmountsWithSlippage(slippageTolerancePercent);
+        // const slippageTolerancePercent = new Percent(slippageTolerance, 100);
+        const { amount0: amount0DesiredFromPosition, amount1: amount1DesiredFromPosition } = position.mintAmounts;
 
         //console.log(amount0DesiredFromPosition.toString(), amount1DesiredFromPosition.toString());
 
@@ -201,9 +201,9 @@ function emulate(
         amount1Min = parseFloat(amount1DesiredFromPosition.toString()).toString();
 
         //console.log(amount0DesiredFromPosition.toString(), amount1DesiredFromPosition.toString());
-        amount0Min = roundToPrecision((Number(amount0Min)).toFixed(0) , token0.decimals).toString()//(roundToPrecision(amount0Min,6) - roundToPrecision("0.000001",6)).toString(); // Math.pow(10,-token0.decimals+4)
+        amount0Min = roundToPrecision((Number(amount0Min) - adjustForSlippage(amount0Min, slippageTolerance)).toFixed(0) , token0.decimals).toString()//(roundToPrecision(amount0Min,6) - roundToPrecision("0.000001",6)).toString(); // Math.pow(10,-token0.decimals+4)
         //console.log("🚀 ~ amount0Min:", amount0Min)
-        amount1Min = roundToPrecision((Number(amount1Min)).toFixed(0), token1.decimals).toString()//(roundToPrecision(amount1Min,6) - roundToPrecision("0.000001",6)).toString();
+        amount1Min = roundToPrecision((Number(amount1Min) - adjustForSlippage(amount1Min, slippageTolerance)).toFixed(0) , token1.decimals).toString()//(roundToPrecision(amount1Min,6) - roundToPrecision("0.000001",6)).toString();
         //console.log("🚀 ~ amount1Min:", amount1Min)
 
         amount0Min = ethers.utils.formatUnits(amount0Min,token0.decimals);

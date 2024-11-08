@@ -87,7 +87,9 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   // const tempToken0 = tokenList.MOCK_USDC;
   // const tempToken1 = tokenList.Pulse;
   const [token0, setToken0] = useState<TokenDetails | null>(null);
+  console.log("🚀 ~ token0:", token0)
   const [token1, setToken1] = useState<TokenDetails | null>(null);
+  console.log("🚀 ~ token1:", token1)
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
   const [isFullRange, setIsFullRange] = useState(false);
   const [isButton, setIsButton] = useState(false);
@@ -668,7 +670,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
       calculate();
     }
     //console.log("🚀 ~ [fee]:")
-  }, [fee]);
+  }, [fee,token0,token1]);
 
   useEffect(() => {
     calculate();
@@ -994,7 +996,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                   </Box>
 
                   <Box className="fiFooter" sx={{ display: 'block', mt: '30px' }}>
-                    <Typography onClick={toggleV2Class} sx={{ fontSize: '16px', fontWeight: '600', cursor: 'pointer' }}>Add V2 Liquidity</Typography>
+                    <Typography onClick={toggleV2Class} sx={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer',p:"8px 16px",borderRadius: "30px", background: 'transparent',border: '1px solid var(--primary)', color: 'var(--primary)',textDecoration: 'none' }}>Add V2 Liquidity</Typography>
                   </Box>
                 </Box>
               </Box>
