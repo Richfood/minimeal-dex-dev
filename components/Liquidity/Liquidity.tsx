@@ -8,17 +8,20 @@ import Customcheckbox from '../Customcheckbox/Customcheckbox';
 import { TabContext } from '@mui/lab';
 import { FiPlus } from "react-icons/fi";
 import router from 'next/router';
-import ImportPool from '../ImportPool/ImportPool'; 
+import ImportPool from '../ImportPool/ImportPool';
 import { getV3PositionsData } from '@/utils/api/getV3Positions';
 import { calculatePositionData } from '@/utils/calculatePositionData';
 import { V3PositionData, TokenDetails, V2PositionsData } from '@/interfaces';
 
 import tokenList from "@/utils/tokenList.json";
 import { getV2Positions } from '@/utils/api/getV2Positions';
+import postionDataV2 from "@/utils/positionsDataV2.json";
+import postionDataV3 from "@/utils/positionsDataV3.json";
+
 
 interface LiquidityProps {
   theme: 'light' | 'dark';
-  onToggle?: () => void; 
+  onToggle?: () => void;
 }
 
 const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
@@ -46,23 +49,23 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
     setValue(newValue);
   };
 
-  useEffect(()=>{
-    const runGetPositionsData = async()=>{
+  useEffect(() => {
+    const runGetPositionsData = async () => {
 
-      if(value==="2"){
-        let newPositions : V2PositionsData[] = await getV2Positions();
+      if (value === "2") {
+        let newPositions: V2PositionsData[] = await getV2Positions();
         console.log("🚀 ~ runGetPositionsData ~ V2 ~ newPositions:", newPositions)
         setV2Positions(newPositions)
       }
-      else{
-        let newPositions : V3PositionData[] = await getV3PositionsData();
+      else {
+        let newPositions: V3PositionData[] = await getV3PositionsData();
 
         setV3Positions(newPositions);
       }
     }
 
     runGetPositionsData();
-  },[value])
+  }, [value])
 
   const color = theme === 'light' ? 'var(--primary)' : 'var(--cream)';
 
@@ -132,55 +135,55 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
           {value === '1' && (
             <Box sx={{ py: '15px', textAlign: 'center' }}>
               {v3Positions ? (
-                  <List>{
-                  v3Positions.map((elem)=>{
+                <List>{
+                  postionDataV3.map((elem) => {
                     return (
-                        <ListItem>
-                          <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{elem.token0.name} / {elem.token1.name}</Typography>
-                          <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{elem.liquidity}</Typography>
-                          <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{calculatePositionData(elem).humanReadableFeesToken0}</Typography>
-                        </ListItem>
+                      <ListItem>
+                        <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2 }}>{elem.token0.name} / {elem.token1.name}</Typography>
+                        <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2 }}>{elem.liquidity}</Typography>
+                        <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2 }}>{calculatePositionData(elem).humanReadableFeesToken0}</Typography>
+                      </ListItem>
                     )
                   })
-                  }
-                  </List>
-                ) : (
-                  <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
-                )}
+                }
+                </List>
+              ) : (
+                <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
+              )}
             </Box>
           )}
           {value === '2' && (
             <Box sx={{ py: '15px', textAlign: 'center' }}>
               {v2Positions ? (
-                  <List>{
-                  v2Positions.map((elem)=>{
+                <List>{
+                  postionDataV2.map((elem: any) => {
                     return (
-                        <ListItem>
-                          <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{elem.pair.token0.name} / {elem.pair.token1.name}</Typography>
-                          <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2}}>{elem.liquidity}</Typography>
-                        </ListItem>
+                      <ListItem>
+                        <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2 }}>{elem.pair.token0.name} / {elem.pair.token1.name}</Typography>
+                        <Typography sx={{ fontSize: '12px', color: 'var(--cream)', mr: 2 }}>{elem.liquidity}</Typography>
+                      </ListItem>
                     )
                   })
-                  }
-                  </List>
-                ) : (
-                  <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
-                )}
+                }
+                </List>
+              ) : (
+                <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
+              )}
             </Box>
           )}
         </Box>
 
         <Box sx={{ py: '15px', textAlign: 'center' }}>
-          <Button 
+          <Button
             onClick={() => {
               const pathVal = value === '2' ? "V2" : "V3";
               let path = `/add/${pathVal}/${startToken0.address.contract_address}/${startToken1.address.contract_address}`//`/add/${pathVal}/token/token`;
-              
+
               // path = (value === '2' ? 'V2/' : 'V3/') + path;
               router.push(path)
-            }} 
-            variant="contained" 
-            color="secondary" 
+            }}
+            variant="contained"
+            color="secondary"
             sx={{ width: '100%', gap: '5px' }}
           >
             <FiPlus style={{ width: '20px', height: '20px' }} /> Add Liquidity
@@ -190,7 +193,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
 
       <RecentTransactions open={isOpenRecent} onClose={handleCloseRecent} />
       {/* <SettingsModal isOpen={isOpen} handleClose={handleClose} theme={theme} /> */}
-      <ImportPool open={openPool} onClose={handleClosePool} /> 
+      <ImportPool open={openPool} onClose={handleClosePool} />
     </>
   );
 }

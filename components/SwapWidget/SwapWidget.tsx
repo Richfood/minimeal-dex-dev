@@ -495,11 +495,11 @@ const SwapWidget = () => {
 
                         </Box>
 
-                        <Box className="arrowBox" >
+                        {/* <Box className="arrowBox" >
                             <Box className="swapData" sx={{ display: 'flex', alignItems: 'flex-start', margin: '0 auto' }}>
                                 <FaArrowRight onClick={toggleGraph} />
                             </Box>
-                        </Box>
+                        </Box> */}
 
                         <Box className="inputBox" >
                             <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
