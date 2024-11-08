@@ -123,13 +123,17 @@ const Header = () => {
 
           <Box className={styles.header_right}>
             <List>
-              <ListItem disablePadding>
+              {/* <ListItem disablePadding>
                 <ListItemButton sx={{ p: '5px' }} onClick={handleOpenSettings}>
                   <IoSettingsOutline style={{ width: '24px', height: '24px', color: '#fff' }} />
                 </ListItemButton>
-              </ListItem>
+              </ListItem> */}
 
-              <ListItem sx={{ display: { md: 'block', xs: 'none' } }} disablePadding>
+              <ListItem sx={{
+                display: {
+                  md: 'block', xs: 'none',padding:"8px"
+                }
+              }} disablePadding>
                 <Tooltip title="Account settings">
                   <IconButton
                     sx={{
@@ -179,7 +183,7 @@ const Header = () => {
               // isMainnet={isMainnet}
               />
 
-              <ListItem sx={{ display: { md: 'block', xs: 'none' } }} disablePadding>
+              <ListItem sx={{ display: { md: 'block', xs: 'none', padding:"8px" } }} disablePadding>
                 <Button
                   variant="contained"
                   color="primary"
@@ -240,7 +244,7 @@ const Header = () => {
               networkImages={networkImages}
               theme={theme}
               chainId={chainId}
-              // isMainnet={isMainnet}
+            // isMainnet={isMainnet}
             />
 
             <Tooltip title="Account settings">
