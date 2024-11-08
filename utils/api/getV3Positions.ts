@@ -9,7 +9,8 @@ export async function getV3PositionsData(): Promise<any> {
     const newSigner = newProvider.getSigner();
     const userAddress = await newSigner.getAddress();
 
-      const subgraphUrl = "http://localhost:8000/subgraphs/name/pulsetest-error";
+      const subgraphUrl = process.env.NEXT_PUBLIC_V3_SUBGRAPH_API;
+      console.log("🚀 ~ getV3PositionsData ~ subgraphUrl:", subgraphUrl)
       const query = `
         query {
           positions(
@@ -53,7 +54,7 @@ export async function getV3PositionsData(): Promise<any> {
       `;
     
     const response = await axios.post(
-      subgraphUrl,
+      subgraphUrl || "",
       {
         query, // Ensure it's correctly passed as a JSON object
       },

@@ -9,7 +9,7 @@ export async function getV2Positions(): Promise<any> {
     const newSigner = newProvider.getSigner();
     const userAddress = await newSigner.getAddress();
 
-      const subgraphUrl = "http://127.0.0.1:8000/subgraphs/name/subgraph-v2";
+      const subgraphUrl = process.env.NEXT_PUBLIC_V2_SUBGRAPH_API;
       const query = `
         query {
             userPositionSnapshots(
@@ -36,7 +36,7 @@ export async function getV2Positions(): Promise<any> {
       `;
     
     const response = await axios.post(
-      subgraphUrl,
+      subgraphUrl || "",
       {
         query, // Ensure it's correctly passed as a JSON object
       },

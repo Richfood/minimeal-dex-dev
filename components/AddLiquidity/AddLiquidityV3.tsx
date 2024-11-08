@@ -670,7 +670,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
       calculate();
     }
     //console.log("🚀 ~ [fee]:")
-  }, [fee,token0,token1]);
+  }, [fee]);
 
   useEffect(() => {
     calculate();

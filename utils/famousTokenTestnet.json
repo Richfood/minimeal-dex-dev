@@ -108,5 +108,65 @@
         },
         "symbol": "STBL",
         "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xAE1D4cDe040524321C87b923636E5Ad564147225.png"
+    },
+    {
+        "chainId": 943,
+        "name": "TokenA",
+        "symbol": "TKA",
+        "address": {
+            "contract_address": "0x8B0b8FDed3f3A572eaFAd9468572646b908B567b",
+            "decimals": 18
+        },
+        "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png"
+    },
+    {
+        "chainId": 943,
+        "name": "TokenB",
+        "symbol": "TKB",
+        "address": {
+            "contract_address": "0x8c7A15d7f758e7770cE0bdEA578710B445Aacf95",
+            "decimals": 18
+        },
+        "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png"
+    },
+    {
+        "chainId": 943,
+        "name": "TokenC",
+        "symbol": "TKC",
+        "address": {
+            "contract_address": "0xFbE79fE82C559CB62FEF61aa5195f519c2426ec1",
+            "decimals": 6
+        },
+        "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png"
+    },
+    {
+        "chainId": 943,
+        "name": "TokenD",
+        "symbol": "TKD",
+        "address": {
+            "contract_address": "0x794D6e757b4FE78Fd3e088eebd1A121deB3BFAf6",
+            "decimals": 6
+        },
+        "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png"
+    },
+    {
+        "chainId": 943,
+        "name": "TokenE",
+        "symbol": "TKE",
+        "address": {
+            "contract_address": "0xCe487FFe58d1AF5f9E27c7F8535657096aab5511",
+            "decimals": 6
+        },
+        "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png"
+    },
+    {
+        "chainId": 943,
+        "name": "MOCK_USDC",
+        "symbol": "MUSDC",
+        "address": {
+            "contract_address": "0x4b117ca040efb2eae373b3cbb93e240cb3194bda",
+            "decimals": 6
+        },
+        "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png"
     }
 ]

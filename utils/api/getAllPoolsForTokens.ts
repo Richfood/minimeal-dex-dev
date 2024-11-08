@@ -2,6 +2,7 @@ import { TokenDetails } from "@/interfaces";
 import { FeeAmount } from "@uniswap/v3-sdk";
 import axios from "axios";
 
+
 export async function getAllPoolsForTokens(token0 : TokenDetails, token1 : TokenDetails): Promise<any> {
 
     if(!token0 || !token1) return;
@@ -12,7 +13,7 @@ export async function getAllPoolsForTokens(token0 : TokenDetails, token1 : Token
       token1 = tempToken;
     }
 
-    const subgraphUrl = "http://localhost:8000/subgraphs/name/pulsetest-error";
+    const subgraphUrl = process.env.NEXT_PUBLIC_V3_SUBGRAPH_API;
     const query = `
         query {
             pools(
@@ -31,7 +32,7 @@ export async function getAllPoolsForTokens(token0 : TokenDetails, token1 : Token
   
     try {
       const response = await axios.post(
-        subgraphUrl,
+        subgraphUrl || "",
         {
           query, // Ensure it's correctly passed as a JSON object
         },

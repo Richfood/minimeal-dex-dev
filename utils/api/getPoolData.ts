@@ -12,7 +12,7 @@ export async function getPoolData(token0 : TokenDetails, token1 : TokenDetails, 
       token1 = tempToken;
     }
 
-    const subgraphUrl = "http://localhost:8000/subgraphs/name/pulsetest-error";
+    const subgraphUrl = process.env.NEXT_PUBLIC_V3_SUBGRAPH_API;
     const query = `
       query {
         pools(
@@ -38,7 +38,7 @@ export async function getPoolData(token0 : TokenDetails, token1 : TokenDetails, 
   
     try {
       const response = await axios.post(
-        subgraphUrl,
+        subgraphUrl || "",
         {
           query, // Ensure it's correctly passed as a JSON object
         },
