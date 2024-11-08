@@ -20,16 +20,16 @@ interface SettingsModalProps {
     onToggleV3: (newValue: boolean) => void;
     allowSwapForV2: boolean;
     allowSwapForV3: boolean;
+    slippageTolerance: number | null;
+    setSlippageTolerance: React.Dispatch<React.SetStateAction<number | null>>;
+    deadline: string;
+    setDeadline: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, theme, allowSwapForV2, allowSwapForV3, onToggleV2, onToggleV3 }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, theme, allowSwapForV2, allowSwapForV3, onToggleV2, onToggleV3, slippageTolerance, setSlippageTolerance, deadline, setDeadline }) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(0);
     const [isExpertModalOpen, setExpertModalOpen] = useState<boolean>(false);
     const [isCustomize, setCustomize] = useState<boolean>(false);
-
-    const slipToggleClass = (index: number) => {
-        setActiveIndex(index === activeIndex ? null : index);
-    };
 
     const openExpertModal = () => setExpertModalOpen(true);
     const closeExpertModal = () => setExpertModalOpen(false);
@@ -53,6 +53,28 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
         overflowY: 'auto',
     };
 
+
+    const handleCustomSlippageTolerance = (value: string) => {
+        setActiveIndex(3);
+
+        if (!value) {
+            setSlippageTolerance(null);
+        }
+        else if (Number(value) > 100) {
+            setSlippageTolerance(100);
+        }
+        else if (Number(value) < 0) {
+            setSlippageTolerance(0);
+        }
+        else {
+            setSlippageTolerance(Number(value));
+        }
+    }
+
+    const slipToggleClass = (index: number) => {
+        setActiveIndex(index === activeIndex ? null : index);
+    };
+
     return (
         <>
             <Modal
@@ -67,7 +89,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
                             Settings
                         </Typography>
                         <IoCloseOutline
-                            onClick={handleClose}
+                            onClick={() => {
+                                if (slippageTolerance === null) {
+                                    setSlippageTolerance(1);
+                                    setActiveIndex(2);
+                                }
+                                handleClose();
+                            }}
                             size={24}
                             style={{ position: 'absolute', right: '10px', top: '5px', cursor: 'pointer' }}
                             aria-label="Close settings modal"
@@ -112,7 +140,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
                                 <Box key={value} className="Slippage_items">
                                     <Button
                                         className={activeIndex === index ? 'active' : ''}
-                                        onClick={() => slipToggleClass(index)}
+                                        onClick={() => {
+                                            setSlippageTolerance(value);
+                                            slipToggleClass(index)
+                                        }}
                                         sx={{
                                             bgcolor: theme === 'light' ? '#F7F0DF' : '#1f4e4e',
                                             color: theme === 'light' ? 'var(--primary)' : 'var(--white)',
@@ -129,6 +160,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
                                     type="number"
                                     placeholder="2.00"
                                     className={theme === 'light' ? 'lightInput' : 'darkInput'}
+                                    onChange={(e) => handleCustomSlippageTolerance(e.target.value)}
+                                    value={activeIndex === 3 && slippageTolerance !== null ? slippageTolerance : ""}
+                                    style={{
+                                        border: activeIndex === 3 ? '2px solid #006633' : '1px solid #ccc', // Adjust color and thickness
+                                        borderRadius: '50px' // Optional: adds rounded corners
+                                    }}
                                 />
                                 <Typography sx={{ fontSize: '18px', fontWeight: '700' }}>%</Typography>
                             </Box>
@@ -164,6 +201,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
                                     type="number"
                                     placeholder="2.00"
                                     className={theme === 'light' ? 'lightInput' : 'darkInput'}
+                                    value={deadline}
+                                    onChange={(e) => {
+                                        if (Number(e.target.value) < 0)
+                                            setDeadline("10");
+                                        else
+                                            setDeadline(e.target.value)
+                                    }}
                                 />
                             </Box>
                         </Box>

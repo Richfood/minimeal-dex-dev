@@ -133,11 +133,11 @@ const Header = () => {
 
           <Box className={styles.header_right}>
             <List>
-              <ListItem disablePadding>
+              {/* <ListItem disablePadding>
                 <ListItemButton sx={{ p: '5px' }} onClick={handleOpenSettings}>
                   <IoSettingsOutline style={{ width: '24px', height: '24px', color: '#fff' }} />
                 </ListItemButton>
-              </ListItem>
+              </ListItem> */}
 
               <ListItem disablePadding>
                 <Tooltip title="Account settings">

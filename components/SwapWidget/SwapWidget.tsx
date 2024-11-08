@@ -76,20 +76,17 @@ const SwapWidget = () => {
     const isActive = useIsActive();
     const accounts = useAccounts();
     const isConnected = useAccounts();
-    const [address, setAddress] = React.useState<string | null>(null);
-    const [buttonText, setButtonText] = React.useState<string | null>(null);
-    const [slippageTolerance, setSlippageTolerance] = useState(0.5);
+    // const [address, setAddress] = React.useState<string | null>(null);
+    const [slippageTolerance, setSlippageTolerance] = useState<number | null>(1);
+    console.log("🚀 ~ SwapWidget ~ slippageTolerance:", slippageTolerance)
     const [userBalance, setUserBalance] = useState<string | null>(null);
-    const [prevTokens, setPrevTokens] = useState<{ token0: TokenDetails | null; token1: TokenDetails | null }>({
-        token0: null,
-        token1: null,
-    });
-    console.log("🚀 ~ SwapWidget ~ prevTokens:", prevTokens)
     const smartRouterAddress = addresses.SmartRouterAddress;
     const [isTestnet, setIsTestnet] = React.useState<boolean | null>(null);
     const [allowSwapForV2, setAllowSwapForV2] = useState<boolean>(true);
     const [allowSwapForV3, setAllowSwapForV3] = useState<boolean>(true);
     const [isSwapping, setIsSwapping] = useState<boolean>(false);
+    const [deadline, setDeadline] = useState("10");
+    console.log("🚀 ~ SwapWidget ~ deadline:", deadline)
 
     useEffect(() => {
         if (!token0) return;
@@ -124,21 +121,17 @@ const SwapWidget = () => {
         setOpenToken(prev => !prev)
     }, []);
 
-    useEffect(() => {
-        const updateAddressAndButtonText = async () => {
-            if (accounts && accounts.length > 0 && isConnected) {
-                // Shorten the address for display (e.g., 0x123...789)
-                const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
-                setAddress(shortenedAddress);
-            }
-            setButtonText(isConnected ? address : 'Connect Wallet');
+    // useEffect(() => {
+    //     const updateAddressAndButtonText = async () => {
+    //         if (accounts && accounts.length > 0 && isConnected) {
+    //             // Shorten the address for display (e.g., 0x123...789)
+    //             const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+    //             setAddress(shortenedAddress);
+    //         }
+    //     };
 
-
-            // Update the button text based on connection status
-        };
-
-        updateAddressAndButtonText();
-    }, [accounts, isConnected]);
+    //     updateAddressAndButtonText();
+    // }, [accounts, isConnected]);
 
     // Using useRef to maintain a consistent timeout reference across renders
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -276,8 +269,8 @@ const SwapWidget = () => {
             await getTokenApproval(token0, smartRouterAddress, amountIn);
 
             // Execute the swap after approval
-            await swapExactTokensForTokens(token0, token1, amountIn, slippageTolerance, amountOut, routePath)
-            // await swapV3(token0, dataForSwap, amountIn, slippageTolerance);
+            // await swapExactTokensForTokens(token0, token1, amountIn, slippageTolerance, amountOut, routePath)
+            await swapV3(token0, dataForSwap, amountIn, slippageTolerance);
 
             // Reset input/output values after swap
             setAmountIn("");
@@ -343,7 +336,7 @@ const SwapWidget = () => {
             const tradeType = isAmountIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT;
 
             try {
-                const protocol = [Protocol.V2,Protocol.V3];
+                const protocol = [Protocol.V2, Protocol.V3];
                 // Always pass the selected protocol as a tuple (array with one element)
                 const { data, value } = await getSmartOrderRoute(
                     token0,
@@ -556,7 +549,7 @@ const SwapWidget = () => {
                             cursor: 'pointer',
                             gap: '5px',
                             marginTop: "15px",
-                            width:'100%',
+                            width: '100%',
                             justifyContent: "space-between"
                         }}
                     >
@@ -565,7 +558,7 @@ const SwapWidget = () => {
                             alignItems: 'center',
                             cursor: 'pointer',
                             gap: '5px',
-                           
+
                         }}>
                             <Typography sx={{ color: 'var(--primary)', fontWeight: '700' }}>Route</Typography>
                             <Box>
@@ -591,7 +584,7 @@ const SwapWidget = () => {
 
                         </Box>
                         <Box>
-                            <ul style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: 0, margin: '0',fontWeight: "700" }}>
+                            <ul style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: 0, margin: '0', fontWeight: "700" }}>
                                 {amountOut && routePath?.length ? (
                                     routePath.map((route, index) => (
                                         <React.Fragment key={index}>
@@ -695,7 +688,13 @@ const SwapWidget = () => {
                     onToggleV3={handleToggleV3}
                     allowSwapForV2={allowSwapForV2}
                     allowSwapForV3={allowSwapForV3}
+                    slippageTolerance={slippageTolerance}
+                    setSlippageTolerance={setSlippageTolerance}
+                    deadline={deadline}
+                    setDeadline={setDeadline}
                 />
+
+
                 {/* <RecentTransactions open={isOpenRecent} onClose={handleCloseRecent} /> */}
                 <SelectedToken
                     openToken={openToken}

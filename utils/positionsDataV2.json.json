@@ -1,0 +1,146 @@
+[
+    {
+        "liquidity": "0.000002",
+        "pair": {
+            "token0": {
+                "id": "0x4b117ca040efe7758522b1e2bdf3bfc915c1aedc",
+                "name": "MOCK_USDC"
+            },
+            "token1": {
+                "id": "0x70499adebb11efd915e3b69e700c331778628707",
+                "name": "Wrapped Pulse"
+            },
+            "totalSupply": "0.000033999999999",
+            "id": "0xe0c2a91f60916bc21566c755641f302aca597773"
+        },
+        "timestamp": "1728902549"
+    },
+    {
+        "liquidity": "0.000005",
+        "pair": {
+            "token0": {
+                "id": "0x4b117ca040efe7758522b1e2bdf3bfc915c1aedc",
+                "name": "MOCK_USDC"
+            },
+            "token1": {
+                "id": "0x70499adebb11efd915e3b69e700c331778628707",
+                "name": "Wrapped Pulse"
+            },
+            "totalSupply": "0.000033999999999",
+            "id": "0xe0c2a91f60916bc21566c755641f302aca597773"
+        },
+        "timestamp": "1728656729"
+    },
+    {
+        "liquidity": "0.000000000087993317",
+        "pair": {
+            "token0": {
+                "id": "0x4b117ca040efe7758522b1e2bdf3bfc915c1aedc",
+                "name": "MOCK_USDC"
+            },
+            "token1": {
+                "id": "0xfbe79fe82c559cb62fef61aa5195f519c2426ec1",
+                "name": "Token C"
+            },
+            "totalSupply": "0.000000000087993317",
+            "id": "0x6a15b02e7124b3d9da7f201b2adcca1d88d8d8d0"
+        },
+        "timestamp": "1728656339"
+    },
+    {
+        "liquidity": "0.000005",
+        "pair": {
+            "token0": {
+                "id": "0x4b117ca040efe7758522b1e2bdf3bfc915c1aedc",
+                "name": "MOCK_USDC"
+            },
+            "token1": {
+                "id": "0x70499adebb11efd915e3b69e700c331778628707",
+                "name": "Wrapped Pulse"
+            },
+            "totalSupply": "0.000033999999999",
+            "id": "0xe0c2a91f60916bc21566c755641f302aca597773"
+        },
+        "timestamp": "1728567789"
+    },
+    {
+        "liquidity": "0.000002",
+        "pair": {
+            "token0": {
+                "id": "0x4b117ca040efe7758522b1e2bdf3bfc915c1aedc",
+                "name": "MOCK_USDC"
+            },
+            "token1": {
+                "id": "0x70499adebb11efd915e3b69e700c331778628707",
+                "name": "Wrapped Pulse"
+            },
+            "totalSupply": "0.000033999999999",
+            "id": "0xe0c2a91f60916bc21566c755641f302aca597773"
+        },
+        "timestamp": "1728563189"
+    },
+    {
+        "liquidity": "0.00001",
+        "pair": {
+            "token0": {
+                "id": "0x4b117ca040efe7758522b1e2bdf3bfc915c1aedc",
+                "name": "MOCK_USDC"
+            },
+            "token1": {
+                "id": "0x70499adebb11efd915e3b69e700c331778628707",
+                "name": "Wrapped Pulse"
+            },
+            "totalSupply": "0.000033999999999",
+            "id": "0xe0c2a91f60916bc21566c755641f302aca597773"
+        },
+        "timestamp": "1728563029"
+    },
+    {
+        "liquidity": "0.000009999999999",
+        "pair": {
+            "token0": {
+                "id": "0x4b117ca040efe7758522b1e2bdf3bfc915c1aedc",
+                "name": "MOCK_USDC"
+            },
+            "token1": {
+                "id": "0x70499adebb11efd915e3b69e700c331778628707",
+                "name": "Wrapped Pulse"
+            },
+            "totalSupply": "0.000033999999999",
+            "id": "0xe0c2a91f60916bc21566c755641f302aca597773"
+        },
+        "timestamp": "1728562829"
+    },
+    {
+        "liquidity": "7.74596669241483277",
+        "pair": {
+            "token0": {
+                "id": "0x70499adebb11efd915e3b69e700c331778628707",
+                "name": "Wrapped Pulse"
+            },
+            "token1": {
+                "id": "0x8c7a15d7f758e7770ce0bdea578710b445aacf95",
+                "name": "Token B"
+            },
+            "totalSupply": "7.74596669241483277",
+            "id": "0xf77a3d07db7c917bfbbc278f78ac51992656bb76"
+        },
+        "timestamp": "1722418289"
+    },
+    {
+        "liquidity": "99.999999999999999",
+        "pair": {
+            "token0": {
+                "id": "0x8b0b8fded3f3a572eafad9468572646b908b567b",
+                "name": "Token A"
+            },
+            "token1": {
+                "id": "0x8c7a15d7f758e7770ce0bdea578710b445aacf95",
+                "name": "Token B"
+            },
+            "totalSupply": "99.999999999999999",
+            "id": "0xded6b62166664674e3723e1e83c5ccd05aaa5a64"
+        },
+        "timestamp": "1722411069"
+    }
+]

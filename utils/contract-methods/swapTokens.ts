@@ -11,14 +11,14 @@ const SMART_ROUTER_ABI = SmartRouterArtifact.abi;
 interface PoolData {
     token0: { address: any; };
     token1: { address: any; };
-    fee: any; 
+    fee: any;
 };
 
 export async function swapV3(
-    token : TokenDetails,
+    token: TokenDetails,
     data: any,
     amountIn: string,
-    slippageTolerance : number
+    slippageTolerance: number | null
 ) {
 
     if (!window.ethereum) return;
@@ -30,9 +30,9 @@ export async function swapV3(
 
     const pools = data.route.pools
     const tokenPath = data.tokenPath;
-    const pathArray : any[] = [];
-    const dataTypeArray : string[] = [];
-    let index=0;
+    const pathArray: any[] = [];
+    const dataTypeArray: string[] = [];
+    let index = 0;
 
     pools.forEach((pool: PoolData) => {
         const tokenIn = tokenPath[index].address;
@@ -40,16 +40,16 @@ export async function swapV3(
         let token1 = pool.token1.address;
         const fee = pool.fee;
 
-        if(tokenIn == token1)
-            [token0,token1] = [token1,token0];
+        if (tokenIn == token1)
+            [token0, token1] = [token1, token0];
 
-        if(index==0){
-            pathArray.push(token0,fee,token1);
-            dataTypeArray.push('address','uint24','address');
+        if (index == 0) {
+            pathArray.push(token0, fee, token1);
+            dataTypeArray.push('address', 'uint24', 'address');
         }
-        else{
-            pathArray.push(fee,token1);
-            dataTypeArray.push('uint24','address');
+        else {
+            pathArray.push(fee, token1);
+            dataTypeArray.push('uint24', 'address');
         }
         index++;
     });
@@ -74,22 +74,31 @@ export async function swapV3(
     // let path = {};
     let recipient = newSignerAddress;
 
-    let amountOutMinimum = (Number(amountIn) - Math.round(adjustForSlippage(amountIn, slippageTolerance))).toString();
+    if (amountIn !== null && slippageTolerance !== null) {
+        let amountOutMinimum = (
+            Number(amountIn) - Math.round(adjustForSlippage(amountIn, slippageTolerance))
+        ).toString();
+        console.log("🚀 ~ slippageTolerance:", slippageTolerance)
+        console.log("🚀 ~ amountOutMinimum:", amountOutMinimum)
+        console.log("🚀 ~ amountIn:", amountIn)
+        console.log("🚀 ~ recipient:", recipient)
+        console.log("🚀 ~ path:", path)
 
-    console.log("🚀 ~ slippageTolerance:", slippageTolerance)
-    console.log("🚀 ~ amountOutMinimum:", amountOutMinimum)
-    console.log("🚀 ~ amountIn:", amountIn)
-    console.log("🚀 ~ recipient:", recipient)
-    console.log("🚀 ~ path:", path)
-
-    const exactInput = new ethers.utils.Interface(EXACT_INPUT_ABI);
-    const exactInputData = exactInput.encodeFunctionData("exactInput",[[path, recipient, amountIn, amountOutMinimum]]);
+        const exactInput = new ethers.utils.Interface(EXACT_INPUT_ABI);
+        const exactInputData = exactInput.encodeFunctionData("exactInput", [[path, recipient, amountIn, amountOutMinimum]]);
 
 
-    const combinedData = [exactInputData, refundETHData];
+        const combinedData = [exactInputData, refundETHData];
 
-    const SmartRouterContractExactInputMulticallTx = await SmartRouterContract["multicall(uint256,bytes[])"](deadline,combinedData, { value: ethers.utils.parseEther("1") });
+        const SmartRouterContractExactInputMulticallTx = await SmartRouterContract["multicall(uint256,bytes[])"](deadline, combinedData, { value: ethers.utils.parseEther("1") });
 
-    console.log("Running swap... Tx Details : ", SmartRouterContractExactInputMulticallTx);
-    await SmartRouterContractExactInputMulticallTx.wait();
+        console.log("Running swap... Tx Details : ", SmartRouterContractExactInputMulticallTx);
+        await SmartRouterContractExactInputMulticallTx.wait();
+    } else {
+        console.warn("amountIn or slippageTolerance is null");
+        // Handle the case where amountIn or slippageTolerance is null
+        return;
+    }
+
+
 }

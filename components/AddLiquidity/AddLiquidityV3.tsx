@@ -134,7 +134,6 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [pickPercent2500, setPickPercent2500] = useState(0);
   const [pickPercent10000, setPickPercent10000] = useState(0);
   const [pickPercent20000, setPickPercent20000] = useState(0);
-  const [isTestnet, setIsTestnet] = React.useState<boolean | null>(null);
   const chainId = useChainId();
 
   const [priceRangeErrorIndex, setPriceRangeErrorIndex] = useState<PriceRangeError | null>(null);
@@ -146,7 +145,6 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   console.log("🚀 ~ deadline:", deadline)
   useEffect(() => {
     const isTestnet = chainId === 943;
-    setIsTestnet(isTestnet)
     console.log("🚀 ~ useEffect ~ isTestnet:", isTestnet)
 
     const tokenData = isTestnet ? famousTokenTestnet : famousToken;
@@ -1383,6 +1381,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
         />
 
         {/* <RoiCalculator open={open} handleClose={handleClose} /> */}
+       {/* not need toggling of V2 and V3 */}
         <SettingsModal
           isOpen={open}
           handleClose={handleClose}
