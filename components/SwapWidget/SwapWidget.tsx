@@ -61,8 +61,8 @@ const SwapWidget = () => {
     const [activeCurrency, setActiveCurrency] = useState<'PLS/9MM' | '9MM/PLS'>('PLS/9MM');
     // const [series, setSeries] = useState<{ name: string; data: { x: number; y: number; }[] }[]>([]);
     const chainId = useChainId();
-    const [token0, setToken0] = useState<TokenDetails | null>(tokenList.TokenC);
-    const [token1, setToken1] = useState<TokenDetails | null>(tokenList.TokenD);
+    const [token0, setToken0] = useState<TokenDetails | null>(null);
+    const [token1, setToken1] = useState<TokenDetails | null>(null);
     const [token0Price, setToken0Price] = useState<string | null>("0");
     const [token1Price, setToken1Price] = useState<string | null>("0");
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
@@ -110,10 +110,10 @@ const SwapWidget = () => {
 
         const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
-        // if (tokenData.length > 0) {
-        //     setToken0(tokenData[0]);
-        //     setToken1(tokenData[1]);
-        // }
+        if (tokenData.length > 0) {
+            setToken0(tokenData[9]);
+            setToken1(tokenData[10]);
+        }
     }, [chainId]);
 
     const handleOpenToken = useCallback((tokenNumber: number) => {
@@ -441,7 +441,10 @@ const SwapWidget = () => {
         <>
             <Box className="SwapWidgetSec">
                 <Box className="SwapWidgetInner" sx={{ flexDirection: "column" }}>
-                    <Box sx={{ display: "flex", justifyContent: 'end', width: "100%", mb: "15px", cursor: "pointer" }}>
+                    <Box sx={{ display: "flex", justifyContent: 'space-between', width: "100%", mb: "15px", cursor: "pointer" }}>
+                        <Typography sx={{ fontSize: '30px', fontWeight: '700', lineHeight: 'normal', display: 'flex', alignItems: 'center', cursor: 'pointer', marginTop: "-8px" }}>
+                            Swap
+                        </Typography>
                         <Badge
                             className="widgetItem"
                             color="secondary"
@@ -495,11 +498,11 @@ const SwapWidget = () => {
 
                         </Box>
 
-                        {/* <Box className="arrowBox" >
+                        <Box className="arrowBox" >
                             <Box className="swapData" sx={{ display: 'flex', alignItems: 'flex-start', margin: '0 auto' }}>
                                 <FaArrowRight onClick={toggleGraph} />
                             </Box>
-                        </Box> */}
+                        </Box>
 
                         <Box className="inputBox" >
                             <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mb: '10px' }}>
@@ -560,8 +563,8 @@ const SwapWidget = () => {
                             gap: '5px',
 
                         }}>
-                            <Typography sx={{ color: 'var(--primary)', fontWeight: '700' }}>Route</Typography>
-                            <Box>
+                            {routePath && <Typography sx={{ color: 'var(--primary)', fontWeight: '700' }}>Route</Typography>}
+                            {/* <Box>
                                 <span>
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -580,7 +583,7 @@ const SwapWidget = () => {
                                     </svg>
                                 </span>
 
-                            </Box>
+                            </Box> */}
 
                         </Box>
                         <Box>
@@ -621,15 +624,23 @@ const SwapWidget = () => {
                             sx={{ width: '100%' }}
                             variant="contained"
                             color="secondary"
-                            onClick={isActive ? handleSwap : handleClick} // Conditional onClick handler
-                            disabled={isActive && (amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn))}
+                            onClick={isActive && userBalance && Number(userBalance) >= Number(amountIn) ? handleSwap : handleClick}
+                            disabled={
+                                (isActive && (amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn) || !amountIn || !amountOut))
+                            }
                         >
                             {isSwapping ? (
                                 <CircularProgress size={24} color="inherit" />
-                            ) : isActive ? (
-                                userBalance && Number(userBalance) >= Number(amountIn) ? "Swap" : "Insufficient Balance"
-                            ) : "Connect Wallet"}
+                            ) : !isActive ? (
+                                "Connect Wallet"
+                            ) : userBalance && Number(userBalance) >= Number(amountIn) && amountIn && amountOut ? (
+                                "Swap"
+                            ) : (
+                                "Insufficient Balance"
+                            )}
                         </Button>
+
+
 
                     </Box>
                     <Box className="slippageSec msls" sx={{ display: "none" }}>

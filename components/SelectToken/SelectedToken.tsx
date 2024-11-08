@@ -312,7 +312,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                     })}
 
                                     {/* Mapping over coinData */}
-                                    {tokensOfLiquidity?.map((token: TokenDetails) => {
+                                    {/* {tokensOfLiquidity?.map((token: TokenDetails) => {
                                         // Select the relevant token based on tokenNumber
                                         const selectedToken = tokenNumber === 0 ? token0 : token1;
 
@@ -358,7 +358,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                                 </Box>
                                             </ListItem>
                                         );
-                                    })}
+                                    })} */}
                                 </List>
                             </Box>
 

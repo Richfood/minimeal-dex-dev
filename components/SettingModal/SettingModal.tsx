@@ -212,7 +212,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
                             </Box>
                         </Box>
 
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                        {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                             <Typography
                                 sx={{
                                     fontSize: '14px',
@@ -290,7 +290,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
                                 control={<IOSSwitch onChange={openExpertModal} />}
                                 label=""
                             />
-                        </Box>
+                        </Box> */}
 
                         <Box sx={{ textAlign: 'center', mt: 4 }}>
                             <Typography

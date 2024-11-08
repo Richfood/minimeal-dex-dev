@@ -10,7 +10,7 @@ interface NetworkMenuProps {
   networkImages: { [key: string]: string };
   theme: 'light' | 'dark';
   chainId: number | undefined;
-  isMainnet: boolean | null;
+  isMainnet?: boolean | null;
 }
 
 export default function NetworkMenu({
@@ -43,7 +43,7 @@ export default function NetworkMenu({
 
   return (
     <>
-      {!isMainnet && (<Menu
+      (<Menu
         anchorEl={anchorEl}
         id="network-menu"
         open={openMenu}
@@ -93,7 +93,6 @@ export default function NetworkMenu({
           <Image src={networkImages.PulseChain} width={24} height={24} alt="Testnet" /> Testnet
         </MenuItem>
       </Menu>)
-      }
     </>
   );
 }

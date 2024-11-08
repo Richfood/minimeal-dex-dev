@@ -117,15 +117,16 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({
                             </CustomTooltip>
                         </Typography>
                         <FormControlLabel
-                        
+
                             control={
                                 <IOSSwitch
                                     checked={allowSwapForV2}
                                     onChange={() => handleToggleChange('V2')} // Trigger toggle for V2
                                 />
-                             
+
                             }
-                            label={`V2 Swap is ${allowSwapForV2 ? 'Enabled' : 'Disabled'}`}
+                            label="" // Set label to an empty string or simply omit the `label` prop
+
                         />
                     </Box>
 
@@ -157,11 +158,12 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({
                                     onChange={() => handleToggleChange('V3')} // Trigger toggle for V3
                                 />
                             }
-                            label={`V3 Swap is ${allowSwapForV3 ? 'Enabled' : 'Disabled'}`}
+                            label="" // Set label to an empty string or simply omit the `label` prop
+
                         />
                     </Box>
 
-                    <Box>
+                    {/* <Box>
                         <Typography
                             sx={{
                                 fontSize: '12px',
@@ -228,7 +230,7 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({
                                 }
                             />
                         </FormGroup>
-                    </Box>
+                    </Box> */}
 
 
                 </Box>

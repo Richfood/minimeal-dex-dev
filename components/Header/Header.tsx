@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, List, ListItem, ListItemButton, Button, Typography, ListItemText, Tooltip, IconButton, Menu, MenuItem } from '@mui/material';
-import { IoSettingsOutline } from 'react-icons/io5';
+import { Box, List, ListItem, ListItemButton, Button, Typography, ListItemText, Tooltip, IconButton, Menu, MenuItem, Drawer } from '@mui/material';
+import { IoSettingsOutline, IoMenu } from 'react-icons/io5';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useTheme } from '../ThemeContext';
 import styles from './header.module.css';
@@ -14,22 +14,19 @@ const { useChainId, useAccounts, useIsActive } = hooks;
 
 const Header = () => {
   const [openSettingsModal, setOpenSettingsModal] = useState(false);
-  // const [openWallet, setOpenWallet] = React.useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // State for mobile menu
   const accounts = useAccounts();
   const isConnected = useAccounts();
   const chainId = useChainId();
   const { theme } = useTheme();
   const router = useRouter();
   const isActive = useIsActive();
-  const [buttonText, setButtonText] = useState('Connect Wallet'); // Single useState
-  const [isMainnet, setIsMainnet] = useState<boolean | null>(false)
-  console.log("🚀 ~ Header ~ isMainnet:", isMainnet)
-  const handleOpenSettings = () => setOpenSettingsModal(false);
-  const handleCloseSettings = () => setOpenSettingsModal(false);
+  const [buttonText, setButtonText] = useState('Connect Wallet');
+  // const [isMainnet, setIsMainnet] = useState<boolean | null>(true);
 
-  // const handleOpenWallet = () => setOpenWallet(true);
-  // const handleCloseWallet = () => setOpenWallet(false);
+  const handleOpenSettings = () => setOpenSettingsModal(true);
+  const handleCloseSettings = () => setOpenSettingsModal(false);
 
   const handleClickMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -39,27 +36,23 @@ const Header = () => {
     setAnchorEl(null);
   };
 
-
-
+  const handleToggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   useEffect(() => {
     const updateButtonText = async () => {
-      if (typeof window === 'undefined') return; // Avoid running on the server
+      if (typeof window === 'undefined') return;
 
       const domain = window.location.hostname;
-      console.log("🚀 ~ updateButtonText ~ domain:", domain);
 
-      // Set `isMainnet` to true if the domain matches, regardless of activation status
-      if (domain === 'dex.sunrewards.io') {
-        setIsMainnet(true);
+      // if (domain === 'dex.sunrewards.io') {
+      // setIsMainnet(true);
+      // if (isActive && chainId !== 369) {
+      //   await metaMask.activate(369);
+      // }
+      // }
 
-        // Connect to mainnet (369 chain ID) if not already connected
-        if (isActive && chainId !== 369) {
-          await metaMask.activate(369);
-        }
-      }
-
-      // Set button text based on connection status
       if (accounts && accounts.length > 0 && isConnected) {
         const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
         setButtonText(shortenedAddress);
@@ -71,16 +64,8 @@ const Header = () => {
     updateButtonText();
   }, [accounts, isConnected, chainId, isActive]);
 
-
-
-
-
-
   const handleClick = () => {
     if (isConnected) {
-      console.log("🚀 ~ handleClick ~ isConnected:", isConnected);
-
-      // Check if deactivate is available before calling it
       if (metaMask.deactivate) {
         metaMask.deactivate?.();
       } else {
@@ -99,6 +84,11 @@ const Header = () => {
     BASE: '/images/base.png',
   };
 
+  const mobileMenuItems = [
+    { text: 'Trade', onClick: () => router.push('/') },
+    { text: 'Liquidity', onClick: () => router.push('/liquidity') },
+  ];
+
   return (
     <>
       <Box sx={{ bgcolor: '#173D3D' }} className={styles.header_desktop}>
@@ -110,7 +100,7 @@ const Header = () => {
               </Link>
             </Box>
             <List className='leftLinkList'>
-              <ListItem disablePadding>
+              <ListItem sx={{ display: { md: 'block', xs: "none" } }} disablePadding>
                 <ListItemButton
                   component="a"
                   onClick={() => router.push('/')}
@@ -119,7 +109,7 @@ const Header = () => {
                   <ListItemText primary="Trade" />
                 </ListItemButton>
               </ListItem>
-              <ListItem disablePadding>
+              <ListItem sx={{ display: { md: 'block', xs: "none" } }} disablePadding>
                 <ListItemButton
                   component="a"
                   onClick={() => router.push('/liquidity')}
@@ -133,13 +123,13 @@ const Header = () => {
 
           <Box className={styles.header_right}>
             <List>
-              {/* <ListItem disablePadding>
+              <ListItem disablePadding>
                 <ListItemButton sx={{ p: '5px' }} onClick={handleOpenSettings}>
                   <IoSettingsOutline style={{ width: '24px', height: '24px', color: '#fff' }} />
                 </ListItemButton>
-              </ListItem> */}
+              </ListItem>
 
-              <ListItem disablePadding>
+              <ListItem sx={{ display: { md: 'block', xs: 'none' } }} disablePadding>
                 <Tooltip title="Account settings">
                   <IconButton
                     sx={{
@@ -171,13 +161,12 @@ const Header = () => {
                         color: 'var(--white)',
                       }}
                     >
-                      {(isMainnet ? 'PulseChain Mainnet' : (chainId === 943 ? 'PulseChain Testnet' : 'PulseChain Mainnet'))}
+                      {(chainId === 943 ? 'PulseChain Testnet' : 'PulseChain Mainnet')}
                       <IoIosArrowDown size={16} />
                     </Typography>
                   </IconButton>
                 </Tooltip>
               </ListItem>
-
 
               <NetworkMenu
                 anchorEl={anchorEl}
@@ -187,10 +176,10 @@ const Header = () => {
                 networkImages={networkImages}
                 theme={theme}
                 chainId={chainId}
-                isMainnet={isMainnet}
+              // isMainnet={isMainnet}
               />
 
-              <ListItem disablePadding>
+              <ListItem sx={{ display: { md: 'block', xs: 'none' } }} disablePadding>
                 <Button
                   variant="contained"
                   color="primary"
@@ -220,13 +209,112 @@ const Header = () => {
                     {buttonText}
                   </Typography>
                 </Button>
+              </ListItem>
 
+              <ListItem sx={{ display: { md: 'none', sm: 'block' } }} disablePadding >
+                <IconButton onClick={handleToggleMobileMenu}>
+                  <IoMenu style={{ color: '#fff', fontSize: '24px' }} />
+                </IconButton>
               </ListItem>
             </List>
           </Box>
         </Box>
 
         <AppSettingsModal open={openSettingsModal} onClose={handleCloseSettings} />
+
+        <Drawer anchor="right" open={mobileMenuOpen} onClose={handleToggleMobileMenu}>
+          <Box sx={{ width: 250, px: '15px', height: '100%', py: '30px' }} role="presentation" onClick={handleToggleMobileMenu} onKeyDown={handleToggleMobileMenu}>
+            <List sx={{ p: '0' }}>
+              {mobileMenuItems.map((item) => (
+                <ListItem sx={{ p: '0', mb: '15px' }} button key={item.text} onClick={item.onClick}>
+                  <ListItemText sx={{ fontSize: '16px', fontWeight: "600" }} primary={item.text} />
+                </ListItem>
+              ))}
+            </List>
+
+            <NetworkMenu
+              anchorEl={anchorEl}
+              openMenu={openMenu}
+              handleCloseMenu={handleCloseMenu}
+              metaMask={metaMask}
+              networkImages={networkImages}
+              theme={theme}
+              chainId={chainId}
+              // isMainnet={isMainnet}
+            />
+
+            <Tooltip title="Account settings">
+              <IconButton
+                sx={{
+                  borderRadius: '30px',
+                  width: '100%',
+                  mb: '15px',
+                  bgcolor: 'var(--secondary-dark)',
+                  display: 'flex',
+                  gap: '10px',
+                  '&:hover': { bgcolor: 'var(--secondary-dark)' },
+                  alignItems: 'center',
+                }}
+                size="small"
+                onClick={handleClickMenu}
+                aria-controls={openMenu ? 'network-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={openMenu ? 'true' : undefined}
+              >
+                <Image
+                  src={networkImages['PulseChain']}
+                  width={24}
+                  height={24}
+                  alt="Profile"
+                />
+                <Typography
+                  sx={{
+                    fontWeight: '700',
+                    fontSize: '12px',
+                    display: 'flex',
+                    gap: '3px',
+                    color: 'var(--white)',
+                  }}
+                >
+                  {(chainId === 943 ? 'PulseChain Testnet' : 'PulseChain Mainnet')}
+                  <IoIosArrowDown size={16} />
+                </Typography>
+              </IconButton>
+            </Tooltip>
+
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleClick}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '8px 16px',
+                borderRadius: '20px',
+                width: '100%',
+                minWidth: '120px',
+                '@media (max-width: 899px)': {
+                  padding: '6px 12px',
+                },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  ml: '5px',
+                  fontSize: '1rem',
+                  '@media (max-width: 899px)': {
+                    fontSize: '0.85rem',
+                  },
+                }}
+              >
+                {buttonText}
+              </Typography>
+            </Button>
+
+          </Box>
+        </Drawer>
       </Box>
     </>
   );
