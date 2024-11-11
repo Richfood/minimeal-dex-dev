@@ -1,40 +1,129 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Contract Deployment
+Copy node_modules to all three folders (V2, V3 and stable swap)
+Update the .dev.env. Add values as
+MAINNET=https://rpc.pulsechain.com
+TESTNET=https://rpc.v4.testnet.pulsechain.com
+PRIVATE_KEY=<YOUR_PRIVATE_KEY>
 
-## Getting Started
+## Deploy V2 Contracts - 
+### For Testnet - 
+    npm run deploy:testnet
+    Deploy custom ERC20 tokens for testing - npx hardhat run scripts/deploy.allTokens.testnet.js --network localhost
+### For Mainnet - 
+    npm run deploy:mainnet
 
-First, run the development server:
+## Deploy StableSwap Contracts - 
+### For Testnet - 
+    npm run deploy:testnet
+### For Mainnet - 
+    npm run deploy:mainnet
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Deploy V3 Contracts - 
+### For Testnet - 
+    npm run deploy:testnet
+    npm run addFee:testnet
+    npm run setFactory:testnet
+### For Mainnet - 
+    npm run deploy:mainnet
+    npm run addFee:mainnet
+    npm run setFactory:mainnet
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Deploy Additional V3 Contracts (After a WPLS/USDT pool has beeen created)- 
+### For Testnet - 
+npm run deploy-extra:testnet
+### For Mainnet - 
+npm run deploy-extra:mainnet
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+##  Graph Node
+### Prerequisites
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+To build and run this project you need to have the following installed on your system:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- Rust (latest stable) – [How to install Rust](https://www.rust-lang.org/en-US/install.html)
+  - Note that `rustfmt`, which is part of the default Rust installation, is a build-time requirement.
+- PostgreSQL – [PostgreSQL Downloads](https://www.postgresql.org/download/)
+- IPFS – [Installing IPFS](https://docs.ipfs.io/install/)
+- Profobuf Compiler - [Installing Protobuf](https://grpc.io/docs/protoc-installation/)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Docker
+Inside the graph-node/docker folder
+#### Change docker-compose.yml - 
+    - Change environment for graph-node 
+        - postgres_host
+        - postgres_user
+        - postgres_pass
+        - postgres_db
+        - ethereum (chain_name:chain_rpc)
+    - Change environment for postgres
+        - POSTGRES_USER
+        - POSTGRES_PASSWORD
+        - POSTGRES_DB
+#####Make sure you have docker-compose installed. 
+#####To start the docker setup run `docker-compose up`
 
-## Learn More
+## Subgraph V2
+run `yarn install`
+    - Change subgraph.yaml
+        - Factory
+            - address
+            - startBlock
+    - Change /src/mappings/helpers.ts
+        - FACTORY_ADDRESS
+    - Deploy on graph-node- 
+        - yarn codegen
+        - yarn build
+        - yarn create-local
+        - yarn deploy-local
 
-To learn more about Next.js, take a look at the following resources:
+## Subgraph V3
+run `yarn-install`
+    - Change subgraph.yml
+        - Factory
+            - address
+            - startBlock
+        - NonfungiblePositionManager
+            - address
+            - startBlock
+        - Constants.ts (addresses in lower case)
+    - Deploy on graph-node -  
+        - yarn codegen
+        - yarn build
+        - yarn create-local
+        - yarn deploy-local
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## sdk-core
+    - Copy testnet/mainnet addresses in src/contractAddresses.ts
+    - Change src/chains
+        - For Testnet - change chainId enum. PULSE = 943
+        - For Testnet - change chainId enum. PULSE = 369
+        - change NativeCurrencyName enum (tPLS/PLS)
+## v3-sdk
+    Copy Testnet/Mainnet addresses in src/contractAddresses.json
+## v2-sdk
+    Copy Testnet/Mainnet addresses in src/addresses.json
+## Router-API
+run `npm install`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Make Build for v3-sdk, v2-sdk, sdk-core and move to to node_modules of smart-order-router and router-api
+## Smart-Order-Router
+    Copy testnet/mainnet addresses in src/contractAddresses.json
+    Change subgraph address in src/providers/v3/subgraph-provider
+    Change src/util/chains.ts
+        Change case: 943(testnet) / 369(mainnet) in the ID_TO_CHAIN_ID for pulse
+        Change NativeCurrencyName. (tPLS/PLS)
+        Change case: 943(testnet) / 369(mainnet) in the ID_TO_NETWORK_NAME for pulse
+        Change ID_TO_PROVIDER (RPC)
+    For Mainnet 
+        Change the MOCK_USDC address to actual USDC Address
+        Add USDT Address in contractAddresses.ts, Change src/providers/token-provider.ts USDT_PULSE Token address
 
-## Deploy on Vercel
+## Router-API
+    - For testnet : npm run start:testnet
+    - For mainnet : npm run start:mainnet
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Front-End
+Copy contract addresses in addresses.json inside /src/utils
+For testnet, Copy custom token addresses in famousTokenTestnet.json
+- pnpm install
+- For local development - pnpm run dev
+- For production pnpm run build & pnpm run start
