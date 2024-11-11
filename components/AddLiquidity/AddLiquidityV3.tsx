@@ -38,8 +38,8 @@ import { useCall } from 'wagmi';
 import { getAllPoolsForTokens } from '@/utils/api/getAllPoolsForTokens';
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import famousToken from "../../utils/famousToken.json";
-const { useChainId, useIsActive, useAccounts } = hooks;
-import { hooks, metaMask } from '../ConnectWallet/connector';
+const { useChainId } = hooks;
+import { hooks } from '../ConnectWallet/connector';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -69,12 +69,6 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [pickData, setPickData] = useState<string>('Not created');
   // const [vTwo, setVTwo] = useState(activeProtocol === Protocol.V2 ? true : false);
-  const [circleImages, setCircleImages] = useState<{ circle1: string; circle2: string }>({
-    circle1: '/images/circle1.svg',
-    circle2: '/images/circle2.svg',
-  });
-  const [activeCurrency, setActiveCurrency] = useState<'PLS/9MM' | '9MM/PLS'>('PLS/9MM');
-  const [activeNewCurrency, setActiveNewCurrency] = useState<'PLS/9MM' | '9MM/PLS'>('PLS/9MM');
   const [openToken, setOpenToken] = useState(false);
   const [tier, setTier] = useState<string>('0.01%');
 
