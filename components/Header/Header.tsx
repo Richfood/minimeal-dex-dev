@@ -161,7 +161,7 @@ const Header = () => {
                         color: 'var(--white)',
                       }}
                     >
-                      {(isMainnet ? 'PulseChain Mainnet' : (chainId === 943 ? 'PulseChain Testnet' : 'PulseChain Mainnet'))}
+                      {(chainId === 943 ? 'PulseChain Testnet' : 'PulseChain Mainnet')}
                       <IoIosArrowDown size={16} />
                     </Typography>
                   </IconButton>
@@ -276,7 +276,7 @@ const Header = () => {
                     color: 'var(--white)',
                   }}
                 >
-                  {(isMainnet ? 'PulseChain Mainnet' : (chainId === 943 ? 'PulseChain Testnet' : 'PulseChain Mainnet'))}
+                  {(chainId === 943 ? 'PulseChain Testnet' : 'PulseChain Mainnet')}
                   <IoIosArrowDown size={16} />
                 </Typography>
               </IconButton>
