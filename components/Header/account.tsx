@@ -43,7 +43,7 @@ export default function NetworkMenu({
 
   return (
     <>
-      (<Menu
+      <Menu
         anchorEl={anchorEl}
         id="network-menu"
         open={openMenu}
@@ -92,7 +92,7 @@ export default function NetworkMenu({
         >
           <Image src={networkImages.PulseChain} width={24} height={24} alt="Testnet" /> Testnet
         </MenuItem>
-      </Menu>)
+      </Menu>
     </>
   );
 }
