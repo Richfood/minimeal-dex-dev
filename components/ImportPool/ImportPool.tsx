@@ -25,6 +25,7 @@ const ImportPool: React.FC<ImportPoolProps> = ({ open, onClose }) => {
   const [token0,setToken0] =  useState<TokenDetails | null>(null);
   const [token1, setToken1] = useState<TokenDetails | null>(null);
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
+  const [tokensSelected, setTokensSelected] = useState(false);
 
   const style = {
     position: 'absolute',
@@ -104,7 +105,8 @@ const ImportPool: React.FC<ImportPoolProps> = ({ open, onClose }) => {
         tokenNumber={tokenBeingChosen}
         description='' 
         token0={token0} 
-        token1={token1}      
+        token1={token1}
+        setTokensSelected={setTokensSelected}      
       />
     </>
   );

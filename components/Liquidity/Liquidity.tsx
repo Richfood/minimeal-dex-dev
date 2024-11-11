@@ -97,7 +97,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
         </Box>
 
         <Box className="Liq_mid">
-          <Box>
+          {/* <Box>
             <FormGroup>
               <FormControlLabel
                 sx={{ m: '0' }}
@@ -109,7 +109,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
                 }
               />
             </FormGroup>
-          </Box>
+          </Box> */}
           <Box>
             <TabContext value={value}>
               <Tabs
@@ -130,11 +130,6 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
         </Box>
 
         <Box className="tabsContent">
-          {value === '0' && (
-            <Box sx={{ py: '15px', textAlign: 'center' }}>
-              <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
-            </Box>
-          )}
           {value === '1' && (
             <Box sx={{ py: '15px', display: 'flex', justifyContent: 'center' }}>
               {v3Positions ? (
@@ -186,8 +181,6 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
             </Box>
           )}
 
-
-
           {value === '2' && (
             <Box sx={{ py: '15px', textAlign: 'center' }}>
               {v2Positions ? (
@@ -198,6 +191,24 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
                     );
                   })}
                 </List>
+              ) : (
+                <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
+              )}
+            </Box>
+          )}
+
+          {value === '0' && (
+            <Box sx={{ py: '15px', display: 'flex', justifyContent: 'center' }}>
+              {v3Positions && v2Positions? (
+                  <List sx={{ width: '100%', maxWidth: 'screen' }}>
+                    {v3Positions.map((elem) => (
+                      <PositionListV3 theme={theme} data={elem}/>
+                    ))}
+                    {v2Positions.map((elem)=>
+                      <PositionListV2 theme={theme} data={elem}/>
+                    )
+                  }
+                  </List>
               ) : (
                 <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
               )}

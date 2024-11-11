@@ -27,14 +27,12 @@ export const PositionListV2 : React.FC<PositionList> = ({theme, data})=>{
         return elem.address.contract_address.toLowerCase() === data.pair.token1.id;
     })
 
-    const decimalDifference = Number(data.pair.token1.decimals) - Number(data.pair.token1.decimals)
-
     return (
         <Box className="white_box" sx={{ p: 3, borderRadius: 2, boxShadow: 1, mb: '15px' }}>
 
-<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+<Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
     <Box>
-        <Box sx={{ position: 'relative' }}>
+        <Box sx={{ position: 'relative', right:"40px" }}>
             <Image src={token0[0]?.logoURI} width={30} height={30} alt="Token" />
             <Image src={token1[0]?.logoURI} width={30} height={30} alt="Token" style={{ marginLeft: '-15px' }} />
         </Box>
@@ -46,18 +44,18 @@ export const PositionListV2 : React.FC<PositionList> = ({theme, data})=>{
 </Box>
 <Box
     sx={{
-        display: 'inline-flex',
+        display: 'flex',
         gap: '5px',
         flexWrap: 'wrap',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         '@media (max-width: 767px)': {
             flexDirection: 'column',
             alignItems: 'flex-start'
         },
     }}
 >
-    <Typography sx={{ color: theme === 'light' ? 'var(--cream)' : 'var(--white)' }}>Current Price: <Typography sx={{ color: theme === 'light' ? 'var(--primary)' : 'var(--cream)' }} component="span">{data.pair.token0Price} {data.pair.token0.symbol} per {data.pair.token1.symbol}</Typography></Typography>
+    <Typography sx={{ color: theme === 'light' ? 'var(--cream)' : 'var(--white)' }}>Price : <Typography sx={{ color: theme === 'light' ? 'var(--primary)' : 'var(--cream)' }} component="span">{data.pair.token0Price} {data.pair.token0.symbol} / {data.pair.token1.symbol}</Typography></Typography>
 </Box>
 </Box>
     )

@@ -114,10 +114,10 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
       const addressToApprove = v2RouterAddress;
 
       if (!isNative(token0)) {
-        await getTokenApproval(token0, addressToApprove, amount1Desired);
+        await getTokenApproval(token0, addressToApprove, amount0Desired);
       }
       if (!isNative(token1)) {
-        await getTokenApproval(token1, addressToApprove, amount0Desired);
+        await getTokenApproval(token1, addressToApprove, amount1Desired);
       }
 
       alert("Tokens Approved!");
@@ -242,6 +242,11 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   }, [])
 
   useEffect(() => {
+    if(token0 && token1){
+      setIsSorted(token0.address.contract_address < token1.address.contract_address);
+    }
+    setAmount0Desired("");
+    setAmount1Desired("")
     getPoolRatio();
   }, [token0, token1])
 
@@ -429,8 +434,8 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
 
 
                 <Box sx={{ display: "flex", justifyContent: 'space-between', width: '100%' }}>
-                  <Typography sx={{ fontSize: '14px' }}>Price:</Typography>
-                  <Typography sx={{ fontSize: '14px' }}>24534323</Typography>
+                  <Typography sx={{ fontSize: '14px' }}>Current Price:</Typography>
+                  <Typography sx={{ fontSize: '14px' }}>{isSorted && currentV2PoolRatio? currentV2PoolRatio : currentV2PoolRatio ? 1 / currentV2PoolRatio : ""}</Typography>
                 </Box>
 
                 <Box sx={{ width: '100%' }}>
