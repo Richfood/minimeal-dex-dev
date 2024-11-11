@@ -62,7 +62,7 @@ export async function swapV3(
 
     amountIn = ethers.utils.parseUnits(expandIfNeeded(amountIn), token.address.decimals).toString();
 
-    const SmartRouterAddress = addresses.SmartRouterAddress;
+    const SmartRouterAddress = addresses.PancakeV2RouterAddress;
     const SmartRouterContract = new ethers.Contract(SmartRouterAddress, SMART_ROUTER_ABI, newSigner);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
 

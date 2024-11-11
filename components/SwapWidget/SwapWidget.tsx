@@ -80,7 +80,7 @@ const SwapWidget = () => {
     const [slippageTolerance, setSlippageTolerance] = useState<number | null>(1);
     console.log("🚀 ~ SwapWidget ~ slippageTolerance:", slippageTolerance)
     const [userBalance, setUserBalance] = useState<string | null>(null);
-    const smartRouterAddress = addresses.SmartRouterAddress;
+    const smartRouterAddress = addresses.PancakeRouterAddress;
     const [isTestnet, setIsTestnet] = React.useState<boolean | null>(null);
     const [allowSwapForV2, setAllowSwapForV2] = useState<boolean>(true);
     const [allowSwapForV3, setAllowSwapForV3] = useState<boolean>(true);
@@ -315,23 +315,24 @@ const SwapWidget = () => {
                 return;
             }
 
-            // let protocol: Protocol; // Declare protocol as a single Protocol type
+            let protocol: Protocol[] = []; // Declare protocol as a single Protocol type
 
             // Determine which protocol(s) are enabled
-            // if (allowSwapForV2 && allowSwapForV3) {
-            //     // Both V2 and V3 are enabled
-            //     protocol = Protocol.V3; // Choose one protocol (you can decide which one to prefer)
-            //     // Optionally handle the V3 case separately in the API call if needed
-            // } else if (allowSwapForV2) {
-            //     // Only V2 is enabled
-            //     protocol = Protocol.V2; // Assign only V2 protocol
-            // } else if (allowSwapForV3) {
-            //     // Only V3 is enabled
-            //     protocol = Protocol.V3; // Assign only V3 protocol
-            // } else {
-            //     // Both are disabled, exit the function
-            //     return;
-            // }
+            if (allowSwapForV2 && allowSwapForV3) {
+                // Both V2 and V3 are enabled
+                protocol.push(Protocol.V3);
+                protocol.push(Protocol.V2); // Choose one protocol (you can decide which one to prefer)
+                // Optionally handle the V3 case separately in the API call if needed
+            } else if (allowSwapForV2) {
+                // Only V2 is enabled
+                protocol.push(Protocol.V2); // Assign only V2 protocol
+            } else if (allowSwapForV3) {
+                // Only V3 is enabled
+                protocol.push(Protocol.V3); // Assign only V3 protocol
+            } else {
+                // Both are disabled, exit the function
+                return;
+            }
 
             const tradeType = isAmountIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT;
 

@@ -175,11 +175,11 @@ export async function addLiquidityV3(
     const combinedData = [createAndInitializePoolIfNecessaryData, mintData, refundETHData];
 
     const valueForNativeToken = is0Native ? amount0Desired : is1Native ? amount1Desired : 0;
-    const finalValueToPass = ethers.utils.parseEther("1").add(valueForNativeToken);
+    // const finalValueToPass = //ethers.utils.parseEther("1").add(valueForNativeToken);
 
     console.log("Running multicall for add liquidity");
     const tx = await nfpmContract.multicall(combinedData, {
-        value: finalValueToPass,
+        value: valueForNativeToken,
     });
     console.log("Multicall TX = ", tx);
     await tx.wait();

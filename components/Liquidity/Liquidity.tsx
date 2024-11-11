@@ -17,7 +17,9 @@ import Link from 'next/link';
 import tokenList from "@/utils/tokenList.json";
 import { getV2Positions } from '@/utils/api/getV2Positions';
 import postionDataV2 from "@/utils/positionsDataV2.json";
-import postionDataV3 from "@/utils/positionsDataV3.json";
+// import postionDataV3 from "@/utils/positionsDataV3.json";
+import { PositionListV3 } from '../PositionList/PositionListV3';
+import { PositionListV2 } from '../PositionList/PositionListV2';
 
 
 interface LiquidityProps {
@@ -137,44 +139,45 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
             <Box sx={{ py: '15px', display: 'flex', justifyContent: 'center' }}>
               {v3Positions ? (
                 <List sx={{ width: '100%', maxWidth: 'screen' }}>
-                  {postionDataV3.map((elem) => (
-                    <Link href={`/position`} passHref key={elem.id} style={{ textDecoration: 'none' }}> {/* Removes underline from link */}
-                      <ListItem
-                        component="a"
-                        sx={{
-                          width: '100%',
-                          cursor: 'pointer',
-                          '&:hover': {
-                            backgroundColor: 'var(--hover-color)',
-                          },
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: '100%',
-                            background: theme === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)',
-                            padding: '35px',
-                            borderRadius: '10px',
-                            textAlign: 'left',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                            <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>
-                              {elem.token0.name} / {elem.token1.name}
-                            </Typography>
-                            <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>
-                              {elem.liquidity}
-                            </Typography>
-                            <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>
-                              {calculatePositionData(elem).humanReadableFeesToken0}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </ListItem>
-                    </Link>
+                  {v3Positions.map((elem) => (
+                    <PositionListV3 theme={theme} data={elem}/>
+                    // <Link href={`/position`} passHref key={elem.id} style={{ textDecoration: 'none' }}> {/* Removes underline from link */}
+                    //   <ListItem
+                    //     component="a"
+                    //     sx={{
+                    //       width: '100%',
+                    //       cursor: 'pointer',
+                    //       '&:hover': {
+                    //         backgroundColor: 'var(--hover-color)',
+                    //       },
+                    //     }}
+                    //   >
+                    //     <Box
+                    //       sx={{
+                    //         width: '100%',
+                    //         background: theme === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)',
+                    //         padding: '35px',
+                    //         borderRadius: '10px',
+                    //         textAlign: 'left',
+                    //         display: 'flex',
+                    //         flexDirection: 'column',
+                    //         alignItems: 'center',
+                    //       }}
+                    //     >
+                    //       <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                    //         <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>
+                    //           {elem.token0.name} / {elem.token1.name}
+                    //         </Typography>
+                    //         <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>
+                    //           {elem.liquidity}
+                    //         </Typography>
+                    //         <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>
+                    //           {calculatePositionData(elem).humanReadableFeesToken0}
+                    //         </Typography>
+                    //       </Box>
+                    //     </Box>
+                    //   </ListItem>
+                    // </Link>
                   ))}
                 </List>
               ) : (
@@ -189,28 +192,9 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
             <Box sx={{ py: '15px', textAlign: 'center' }}>
               {v2Positions ? (
                 <List sx={{ width: '100%', maxWidth: 'screen' }}> {/* Set a max width for uniformity */}
-                  {postionDataV3.map((elem) => {
+                  {v2Positions.map((elem) => {
                     return (
-                      <ListItem sx={{ width: '100%' }}>
-                        <Box
-                          sx={{
-                            width: '100%',
-                            background: theme === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)',
-                            padding: '35px',
-                            borderRadius: '10px',
-                            textAlign: 'left', // Align text to the left within each box
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center', // Center-align the box itself within each list item
-                          }}
-                        >
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                            <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>{elem.token0.name} / {elem.token1.name}</Typography>
-                            <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>{elem.liquidity}</Typography>
-                            <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>{calculatePositionData(elem).humanReadableFeesToken0}</Typography>
-                          </Box>
-                        </Box>
-                      </ListItem>
+                      <PositionListV2 theme={theme} data={elem}/>
                     );
                   })}
                 </List>

@@ -166,7 +166,7 @@ const Position = () => {
 
 
 
-                    <Box className="white_box" sx={{ p: 3, borderRadius: 2, boxShadow: 1, mb: '15px' }}>
+                    {/* <Box className="white_box" sx={{ p: 3, borderRadius: 2, boxShadow: 1, mb: '15px' }}>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
                             <Box>
@@ -202,7 +202,7 @@ const Position = () => {
                             <Typography><VscArrowBoth /></Typography>
                             <Typography sx={{ color: theme === 'light' ? 'var(--cream)' : 'var(--white)' }}>Max: <Typography sx={{ color: theme === 'light' ? 'var(--primary)' : 'var(--cream)' }} component="span">1,650.83 USDC per ETH</Typography></Typography>
                         </Box>
-                    </Box>
+                    </Box> */}
 
 
 

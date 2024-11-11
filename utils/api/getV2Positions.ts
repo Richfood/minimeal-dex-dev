@@ -19,13 +19,18 @@ export async function getV2Positions(): Promise<any> {
             ) {
             liquidity
             pair {
+              token0Price
                 token0 {
                     id
                     name
+                    symbol
+                    decimals
                 }
                 token1 {
                     id
                     name
+                    symbol
+                    decimals
                 }
                 totalSupply
                 id

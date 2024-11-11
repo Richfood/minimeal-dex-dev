@@ -32,37 +32,51 @@ export interface V3PositionData {
   withdrawnToken0: string;
   withdrawnToken1: string;
   pool: {
+    feeTier: string
+    tick: string
     feeGrowthGlobal0X128: string;
     feeGrowthGlobal1X128: string;
+    token0Price: string
   };
   tickLower: {
+    tickIdx: string
     feeGrowthOutside0X128: string;
     feeGrowthOutside1X128: string;
   };
   tickUpper: {
+    tickIdx: string
     feeGrowthOutside0X128: string;
     feeGrowthOutside1X128: string;
   };
   token0: {
     decimals: string;
     name: string;
+    symbol : string;
+    id: string
   };
   token1: {
     decimals: string;
     name: string;
+    symbol : string;
+    id : string
   };
 }
 
 export interface V2PositionsData {
   liquidity : string,
   pair: {
+    token0Price : string
     token0: {
         id: string
         name: string
+        symbol: string
+        decimals: string
     },
     token1: {
         id: string,
         name: string,
+        symbol: string
+        decimals: string
     },
     totalSupply: string,
     id: string

@@ -41,7 +41,7 @@ export async function swapExactTokensForTokens(
     console.log("🚀 ~ path:", path);
 
 
-    const SmartRouterAddress = addresses.SmartRouterAddress;
+    const SmartRouterAddress = addresses.PancakeV2RouterAddress;
     const SmartRouterContract = new ethers.Contract(SmartRouterAddress, SMART_ROUTER_ABI, newSigner);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
 

@@ -32,22 +32,29 @@ export async function getV3PositionsData(): Promise<any> {
               pool {
                 feeGrowthGlobal0X128
                 feeGrowthGlobal1X128
+                tick
               }
               tickLower {
+                tickIdx
                 feeGrowthOutside0X128
                 feeGrowthOutside1X128
               }
               tickUpper {
+                tickIdx
                 feeGrowthOutside0X128
                 feeGrowthOutside1X128
               }
               token0 {
+                id
                 decimals
                 name
+                symbol
               }
               token1 {
+                id
                 decimals
                 name
+                symbol
               }
             }
           }

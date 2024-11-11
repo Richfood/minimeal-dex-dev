@@ -18,6 +18,10 @@ export async function getSmartOrderRoute(
     protocol: Protocol[],
     tradeType: TradeType
 ) {
+
+    // console.log(inputToken);
+    // console.log(outputToken);
+
     const url = process.env.NEXT_PUBLIC_SMART_ORDER_ROUTER_API;
     const newProvider = new ethers.providers.Web3Provider(window.ethereum);
     const newSigner = newProvider.getSigner();
