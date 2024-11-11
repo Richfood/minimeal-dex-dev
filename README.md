@@ -23,16 +23,12 @@ PRIVATE_KEY=<YOUR_PRIVATE_KEY>
     npm run deploy:testnet
     npm run addFee:testnet
     npm run setFactory:testnet
+    npm run deploy-extra:testnet
 ### For Mainnet - 
     npm run deploy:mainnet
     npm run addFee:mainnet
     npm run setFactory:mainnet
-
-### Deploy Additional V3 Contracts (After a WPLS/USDT pool has beeen created)- 
-### For Testnet - 
-npm run deploy-extra:testnet
-### For Mainnet - 
-npm run deploy-extra:mainnet
+    npm run deploy-extra:mainnet
 
 ##  Graph Node
 ### Prerequisites
