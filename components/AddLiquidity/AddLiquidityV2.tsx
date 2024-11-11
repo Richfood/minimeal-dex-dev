@@ -64,6 +64,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   const [slippageTolerance, setSlippageTolerance] = useState<number | null>(1);
   const [deadline, setDeadline] = useState("10");
   const chainId = useChainId();
+  const [tokensSelected, setTokensSelected] = useState(false);
 
   console.log("🚀 ~ slippageTolerance:", slippageTolerance)
   console.log("🚀 ~ deadline:", deadline)
@@ -74,7 +75,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
 
     const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
-    if (tokenData.length > 0) {
+    if (tokenData.length > 0 && !tokensSelected) {
       setToken0(tokenData[9]);
       setToken1(tokenData[10]);
     }
@@ -461,6 +462,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
           description=''
           token0={token0}
           token1={token1}
+          setTokensSelected={setTokensSelected}
         />
 
         {/* <RoiCalculator open={open} handleClose={handleClose} /> */}

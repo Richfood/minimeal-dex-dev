@@ -129,6 +129,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [pickPercent10000, setPickPercent10000] = useState(0);
   const [pickPercent20000, setPickPercent20000] = useState(0);
   const chainId = useChainId();
+  const [tokensSelected, setTokensSelected] = useState(false);
 
   const [priceRangeErrorIndex, setPriceRangeErrorIndex] = useState<PriceRangeError | null>(null);
 
@@ -143,7 +144,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
     const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
-    if (tokenData.length > 0) {
+    if (tokenData.length > 0 && !tokensSelected) {
       setToken0(tokenData[9]);
       setToken1(tokenData[10]);
     }
@@ -988,7 +989,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                   </Box>
 
                   <Box className="fiFooter" sx={{ display: 'block', mt: '30px' }}>
-                    <Typography onClick={toggleV2Class} sx={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer',p:"8px 16px",borderRadius: "30px", background: 'transparent',border: '1px solid var(--primary)', color: 'var(--primary)',textDecoration: 'none' }}>Add V2 Liquidity</Typography>
+                    <Typography onClick={toggleV2Class} sx={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer', p: "8px 16px", borderRadius: "30px", background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', textDecoration: 'none' }}>Add V2 Liquidity</Typography>
                   </Box>
                 </Box>
               </Box>
@@ -1372,10 +1373,11 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
           description=''
           token0={token0}
           token1={token1}
+          setTokensSelected={setTokensSelected}
         />
 
         {/* <RoiCalculator open={open} handleClose={handleClose} /> */}
-       {/* not need toggling of V2 and V3 */}
+        {/* not need toggling of V2 and V3 */}
         <SettingsModal
           isOpen={open}
           handleClose={handleClose}

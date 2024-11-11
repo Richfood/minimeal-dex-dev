@@ -26,8 +26,9 @@ interface SelectedTokenProps {
     title?: string;
     description: string;
     tokenNumber: number;
-    token0: TokenDetails | null
-    token1: TokenDetails | null
+    token0: TokenDetails | null;
+    token1: TokenDetails | null;
+    setTokensSelected: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // interface Token {
@@ -93,7 +94,7 @@ const fetchCoinStablecoins = async () => {
     }
 };
 
-const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode, setToken0, setToken1, tokenNumber, token0, token1
+const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode, setToken0, setToken1, tokenNumber, token0, token1, setTokensSelected
 
 }) => {
     const [openManage, setOpenManage] = useState(false);
@@ -147,6 +148,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
         }
 
         handleCloseToken();
+        setTokensSelected(true);
     };
 
     const style = {

@@ -83,6 +83,8 @@ const SwapWidget = () => {
     const [isSwapping, setIsSwapping] = useState<boolean>(false);
     const [deadline, setDeadline] = useState("10");
     console.log("🚀 ~ SwapWidget ~ deadline:", deadline)
+    const [tokensSelected, setTokensSelected] = useState(false);
+    console.log("🚀 ~ SwapWidget ~ tokensSelected:", tokensSelected)
 
     useEffect(() => {
         if (!token0) return;
@@ -106,7 +108,7 @@ const SwapWidget = () => {
 
         const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
-        if (tokenData.length > 0) {
+        if (tokenData.length > 0 && !tokensSelected) {
             setToken0(tokenData[9]);
             setToken1(tokenData[10]);
         }
@@ -706,7 +708,7 @@ const SwapWidget = () => {
                     description=''
                     token0={token0}
                     token1={token1}
-
+                    setTokensSelected={setTokensSelected}
                 />
             </Box>
         </>
