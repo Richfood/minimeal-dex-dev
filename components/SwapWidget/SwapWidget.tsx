@@ -4,8 +4,6 @@ import { Box, Typography, Button, List, ListItem, ListItemButton, Badge } from '
 import { IoIosArrowDown } from 'react-icons/io';
 import { FaArrowRight } from 'react-icons/fa';
 import { PiChartBar, PiCopy } from 'react-icons/pi';
-import { RxCountdownTimer } from 'react-icons/rx';
-import { GrRefresh } from 'react-icons/gr';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { PiPencilSimpleBold } from 'react-icons/pi';
 import { useTheme } from '../ThemeContext';
@@ -29,10 +27,8 @@ import addresses from "@/utils/address.json";
 import { flushSync } from 'react-dom';
 import { getTokenUsdPrice } from "@/utils/api/getTokenUsdPrice"
 import getTokenApproval from '@/utils/contract-methods/getTokenApproval';
-import { debounce } from '@syncfusion/ej2-base';
 import getUserBalance from '@/utils/api/getUserBalance';
 const { useChainId, useIsActive, useAccounts } = hooks;
-import { swapExactTokensForTokens } from '@/utils/swapV2exacttokensfortokens';
 
 const fetchCoinUSDPrice = async (tokenAddress?: string) => {
     if (!tokenAddress) {
@@ -121,22 +117,7 @@ const SwapWidget = () => {
         setOpenToken(prev => !prev)
     }, []);
 
-    // useEffect(() => {
-    //     const updateAddressAndButtonText = async () => {
-    //         if (accounts && accounts.length > 0 && isConnected) {
-    //             // Shorten the address for display (e.g., 0x123...789)
-    //             const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
-    //             setAddress(shortenedAddress);
-    //         }
-    //     };
-
-    //     updateAddressAndButtonText();
-    // }, [accounts, isConnected]);
-
-    // Using useRef to maintain a consistent timeout reference across renders
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -718,6 +699,8 @@ const SwapWidget = () => {
                     description=''
                     token0={token0}
                     token1={token1}
+                    setAmountIn={setAmountIn}
+                    setAmountOut={setAmountOut}
                 />
             </Box>
         </>
