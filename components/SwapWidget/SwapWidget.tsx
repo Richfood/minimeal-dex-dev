@@ -112,6 +112,13 @@ const SwapWidget = () => {
         }
     }, [chainId]);
 
+    useEffect(() => {
+        // Example logic
+        setAmountIn("");   // Reset the amount in field
+        setAmountOut("");  // Reset the amount out field
+
+    }, [token0, token1]);
+
     const handleOpenToken = useCallback((tokenNumber: number) => {
         setTokenBeingChosen(tokenNumber)
         setOpenToken(prev => !prev)
@@ -699,8 +706,7 @@ const SwapWidget = () => {
                     description=''
                     token0={token0}
                     token1={token1}
-                    setAmountIn={setAmountIn}
-                    setAmountOut={setAmountOut}
+
                 />
             </Box>
         </>

@@ -28,8 +28,6 @@ interface SelectedTokenProps {
     tokenNumber: number;
     token0: TokenDetails | null
     token1: TokenDetails | null
-    setAmountIn: any
-    setAmountOut: any;
 }
 
 // interface Token {
@@ -95,7 +93,7 @@ const fetchCoinStablecoins = async () => {
     }
 };
 
-const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode, setToken0, setToken1, tokenNumber, token0, token1, setAmountIn, setAmountOut
+const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode, setToken0, setToken1, tokenNumber, token0, token1
 
 }) => {
     const [openManage, setOpenManage] = useState(false);
@@ -134,28 +132,16 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
 
         if (tokenNumber === 0) {
             if (token.address === token1?.address) {
-                // If the selected token is already token1, swap it with token0
-                setAmountIn("");
-                setAmountOut("");
                 setToken0(token);
                 setToken1(token0);
             } else {
-                // Set the selected token as token0
-                setAmountIn("");
-                setAmountOut("");
                 setToken0(token);
             }
         } else {
             if (token.address === token0?.address) {
-                // If the selected token is already token0, swap it with token1
-                setAmountIn("");
-                setAmountOut("");
                 setToken1(token);
                 setToken0(token1);
             } else {
-                // Set the selected token as token1
-                setAmountOut("");
-                setAmountIn("");
                 setToken1(token);
             }
         }
