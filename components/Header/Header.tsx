@@ -23,7 +23,7 @@ const Header = () => {
   const router = useRouter();
   const isActive = useIsActive();
   const [buttonText, setButtonText] = useState('Connect Wallet');
-  const [isMainnet, setIsMainnet] = useState<boolean | null>(true);
+  // const [isMainnet, setIsMainnet] = useState<boolean | null>(true);
 
   const handleOpenSettings = () => setOpenSettingsModal(true);
   const handleCloseSettings = () => setOpenSettingsModal(false);
@@ -44,14 +44,14 @@ const Header = () => {
     const updateButtonText = async () => {
       if (typeof window === 'undefined') return;
 
-      const domain = window.location.hostname;
+      // const domain = window.location.hostname;
 
-      if (domain === 'dex.sunrewards.io') {
-        setIsMainnet(true);
+      // if (domain === 'dex.sunrewards.io') {
+        // setIsMainnet(true);
         if (isActive && chainId !== 369) {
           await metaMask.activate(369);
         }
-      }
+      // }
 
       if (accounts && accounts.length > 0 && isConnected) {
         const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
@@ -176,7 +176,7 @@ const Header = () => {
                 networkImages={networkImages}
                 theme={theme}
                 chainId={chainId}
-                isMainnet={isMainnet}
+                // isMainnet={isMainnet}
               />
 
               <ListItem sx={{ display: { md: 'block', xs: 'none' } }} disablePadding>
@@ -240,7 +240,7 @@ const Header = () => {
               networkImages={networkImages}
               theme={theme}
               chainId={chainId}
-              isMainnet={isMainnet}
+              // isMainnet={isMainnet}
             />
 
             <Tooltip title="Account settings">
