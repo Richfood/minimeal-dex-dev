@@ -75,11 +75,11 @@ export async function addLiquidityV2(
 
     amount0Desired = ethers.utils.parseUnits(expandIfNeeded(amount0Desired), token0.address.decimals).toString();
     amount1Desired = ethers.utils.parseUnits(expandIfNeeded(amount1Desired), token1.address.decimals).toString();
-    let amount0Min = ethers.utils.parseUnits(expandIfNeeded(amount0Desired), token0.address.decimals).toString();
-    let amount1Min = ethers.utils.parseUnits(expandIfNeeded(amount1Desired), token1.address.decimals).toString();
+    let amount0Min = amount0Desired;//ethers.utils.parseUnits(expandIfNeeded(amount0Desired), token0.address.decimals).toString();
+    let amount1Min = amount1Desired;//ethers.utils.parseUnits(expandIfNeeded(amount1Desired), token1.address.decimals).toString();
 
-    amount0Min = adjustForSlippage(amount0Min, slippageTolerance).toString();
-    amount1Min = adjustForSlippage(amount1Min, slippageTolerance).toString();
+    amount0Min = (Number(amount0Min) - adjustForSlippage(amount0Min, slippageTolerance)).toString();
+    amount1Min = (Number(amount1Min) - adjustForSlippage(amount1Min, slippageTolerance)).toString();
 
     const pancakeV2RouterAddress = addresses.PancakeV2RouterAddress;
     const pancakeV2RouterContract = new ethers.Contract(pancakeV2RouterAddress, V2_ROUTER_ABI, newSigner);
