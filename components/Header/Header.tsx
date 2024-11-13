@@ -48,9 +48,9 @@ const Header = () => {
 
       // if (domain === 'dex.sunrewards.io') {
         // setIsMainnet(true);
-        if (isActive && chainId !== 369) {
-          await metaMask.activate(369);
-        }
+        // if (isActive && chainId !== 369) {
+        //   await metaMask.activate(369);
+        // }
       // }
 
       if (accounts && accounts.length > 0 && isConnected) {
