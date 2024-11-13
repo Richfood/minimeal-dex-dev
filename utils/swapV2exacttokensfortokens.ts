@@ -12,7 +12,7 @@ export async function swapExactTokensForTokens(
     amountIn: string,
     slippageTolerance: number,
     amountOut: string,
-    routePath: TokenDetails[] | null
+    data: any
 ) {
 
     if (!window.ethereum) return;
@@ -23,8 +23,12 @@ export async function swapExactTokensForTokens(
 
     amountIn = ethers.utils.parseUnits(expandIfNeeded(amountIn), token0.address.decimals).toString();
 
+    const routePath = data.tokenPath
+
+    // console.log(data);
+
     // Extract addresses from routePath if it exists
-    const pathArray = routePath?.map(route => route.address);
+    const pathArray = routePath?.map((route: { address: any; })=> route.address);
     console.log("🚀 ~ pathArray:", pathArray);
 
     // Check if pathArray is null, undefined, or empty
@@ -33,20 +37,13 @@ export async function swapExactTokensForTokens(
         return;
     }
 
-    // Create an array of 'address' types based on the length of pathArray
-    const dataTypeArray = Array(pathArray.length).fill('address');
 
-    // Pack the data with ethers.utils.solidityPack
-    const path = ethers.utils.solidityPack(dataTypeArray, pathArray);
-    console.log("🚀 ~ path:", path);
-
-
-    const SmartRouterAddress = addresses.PancakeV2RouterAddress;
+    const SmartRouterAddress = addresses.PancakeRouterAddress;
     const SmartRouterContract = new ethers.Contract(SmartRouterAddress, SMART_ROUTER_ABI, newSigner);
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
 
     let recipient = newSignerAddress;
 
+    amountOut = ethers.utils.parseUnits(amountOut, token1.address.decimals).toString();
     let amountOutMinimum = (Number(amountOut) - Math.round(adjustForSlippage(amountOut, slippageTolerance))).toString();
 
     console.log("🚀 ~ slippageTolerance:", slippageTolerance)
@@ -54,15 +51,19 @@ export async function swapExactTokensForTokens(
     console.log("🚀 ~ amountIn:", amountIn)
     console.log("🚀 ~ recipient:", recipient);
 
-    const SmartRouterContractExactTokensForTokensTx = await SmartRouterContract["swapExactTokensForTokens(uint256,uint256,address[],address,uint256)"](
+    const valueToSend = token0.symbol === "PLS" ? amountIn : 0;
+
+    const SmartRouterContractExactTokensForTokensTx = await SmartRouterContract.swapExactTokensForTokens(
         amountIn,
         amountOutMinimum,
-        path,
+        pathArray,
         recipient,
-        deadline
+        {
+            value: valueToSend
+        }
     );
 
     await SmartRouterContractExactTokensForTokensTx.wait();
 
-    console.log("🚀Running swap ~ SmartRouterContractExactTokensForTokensTx:", SmartRouterContractExactTokensForTokensTx)
+    return SmartRouterContractExactTokensForTokensTx.hash;
 }

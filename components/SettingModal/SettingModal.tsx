@@ -20,8 +20,8 @@ interface SettingsModalProps {
     onToggleV3: (newValue: boolean) => void;
     allowSwapForV2: boolean;
     allowSwapForV3: boolean;
-    slippageTolerance: number | null;
-    setSlippageTolerance: React.Dispatch<React.SetStateAction<number | null>>;
+    slippageTolerance: number;
+    setSlippageTolerance: React.Dispatch<React.SetStateAction<number>>;
     deadline: string;
     setDeadline: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -58,7 +58,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, them
         setActiveIndex(3);
 
         if (!value) {
-            setSlippageTolerance(null);
+            setSlippageTolerance(1);
         }
         else if (Number(value) > 100) {
             setSlippageTolerance(100);

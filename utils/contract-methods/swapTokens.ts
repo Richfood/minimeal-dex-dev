@@ -15,9 +15,11 @@ interface PoolData {
 };
 
 export async function swapV3(
-    token: TokenDetails,
+    token0: TokenDetails,
+    token1: TokenDetails,
     data: any,
     amountIn: string,
+    amountOut : string,
     slippageTolerance: number | null
 ) {
 
@@ -33,6 +35,8 @@ export async function swapV3(
     const pathArray: any[] = [];
     const dataTypeArray: string[] = [];
     let index = 0;
+
+    // console.log(data);
 
     pools.forEach((pool: PoolData) => {
         const tokenIn = tokenPath[index].address;
@@ -60,9 +64,10 @@ export async function swapV3(
     console.log("🚀 ~ path:", path)
     console.log(path);
 
-    amountIn = ethers.utils.parseUnits(expandIfNeeded(amountIn), token.address.decimals).toString();
+    amountIn = ethers.utils.parseUnits(expandIfNeeded(amountIn), token0.address.decimals).toString();
+    amountOut = ethers.utils.parseUnits(expandIfNeeded(amountOut), token1.address.decimals).toString();
 
-    const SmartRouterAddress = addresses.PancakeV2RouterAddress;
+    const SmartRouterAddress = addresses.PancakeRouterAddress;
     const SmartRouterContract = new ethers.Contract(SmartRouterAddress, SMART_ROUTER_ABI, newSigner);
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20;
 
@@ -76,7 +81,7 @@ export async function swapV3(
 
     if (amountIn !== null && slippageTolerance !== null) {
         let amountOutMinimum = (
-            Number(amountIn) - Math.round(adjustForSlippage(amountIn, slippageTolerance))
+            Number(amountOut) - Math.round(adjustForSlippage(amountOut, slippageTolerance))
         ).toString();
         console.log("🚀 ~ slippageTolerance:", slippageTolerance)
         console.log("🚀 ~ amountOutMinimum:", amountOutMinimum)
@@ -88,12 +93,15 @@ export async function swapV3(
         const exactInputData = exactInput.encodeFunctionData("exactInput", [[path, recipient, amountIn, amountOutMinimum]]);
 
 
+        const valueToSend = token0.symbol === "PLS" ? amountIn : 0;
+
         const combinedData = [exactInputData, refundETHData];
 
-        const SmartRouterContractExactInputMulticallTx = await SmartRouterContract["multicall(uint256,bytes[])"](deadline, combinedData, { value: ethers.utils.parseEther("1") });
+        const SmartRouterContractExactInputMulticallTx = await SmartRouterContract["multicall(uint256,bytes[])"](deadline, combinedData, { value: valueToSend });
 
         console.log("Running swap... Tx Details : ", SmartRouterContractExactInputMulticallTx);
         await SmartRouterContractExactInputMulticallTx.wait();
+        return SmartRouterContractExactInputMulticallTx.hash
     } else {
         console.warn("amountIn or slippageTolerance is null");
         // Handle the case where amountIn or slippageTolerance is null

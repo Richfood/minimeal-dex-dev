@@ -106,7 +106,7 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({
                                 alignItems: 'center',
                             }}
                         >
-                            9mm Swap V3
+                            9mm Swap V2
 
                             <CustomTooltip
                                 title="Bypasses confirmation modals and allows high slippage trades. Use at your own risk."
@@ -140,7 +140,7 @@ const CustomizeRouting: React.FC<CustomizeRoutingProps> = ({
                                 alignItems: 'center',
                             }}
                         >
-                            9mm Swap V2
+                            9mm Swap V3
 
 
                             <CustomTooltip

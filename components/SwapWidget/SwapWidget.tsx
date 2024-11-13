@@ -28,6 +28,7 @@ import { flushSync } from 'react-dom';
 import { getTokenUsdPrice } from "@/utils/api/getTokenUsdPrice"
 import getTokenApproval from '@/utils/contract-methods/getTokenApproval';
 import getUserBalance from '@/utils/api/getUserBalance';
+import { swapExactTokensForTokens } from '@/utils/swapV2exacttokensfortokens';
 const { useChainId, useIsActive, useAccounts } = hooks;
 
 const fetchCoinUSDPrice = async (tokenAddress?: string) => {
@@ -73,13 +74,13 @@ const SwapWidget = () => {
     const accounts = useAccounts();
     const isConnected = useAccounts();
     // const [address, setAddress] = React.useState<string | null>(null);
-    const [slippageTolerance, setSlippageTolerance] = useState<number | null>(1);
+    const [slippageTolerance, setSlippageTolerance] = useState<number>(1);
     console.log("🚀 ~ SwapWidget ~ slippageTolerance:", slippageTolerance)
     const [userBalance, setUserBalance] = useState<string | null>(null);
     const smartRouterAddress = addresses.PancakeRouterAddress;
     const [isTestnet, setIsTestnet] = React.useState<boolean | null>(null);
     const [allowSwapForV2, setAllowSwapForV2] = useState<boolean>(true);
-    const [allowSwapForV3, setAllowSwapForV3] = useState<boolean>(true);
+    const [allowSwapForV3, setAllowSwapForV3] = useState<boolean>(false);
     const [isSwapping, setIsSwapping] = useState<boolean>(false);
     const [deadline, setDeadline] = useState("10");
     console.log("🚀 ~ SwapWidget ~ deadline:", deadline)
@@ -256,11 +257,19 @@ const SwapWidget = () => {
 
         try {
             // Approve token for the swap
+            if(token0.symbol !== "PLS")
             await getTokenApproval(token0, smartRouterAddress, amountIn);
 
             // Execute the swap after approval
             // await swapExactTokensForTokens(token0, token1, amountIn, slippageTolerance, amountOut, routePath)
-            await swapV3(token0, dataForSwap, amountIn, slippageTolerance);
+            let txHash : string;
+            if(dataForSwap.protocol === "V3")
+                txHash = await swapV3(token0, token1, dataForSwap, amountIn, amountOut, slippageTolerance);
+            else{
+                txHash = await swapExactTokensForTokens(token0,token1,amountIn,slippageTolerance,amountOut,dataForSwap);
+            }
+
+            alert(`Swapping done! TxHash : ${txHash}`);
 
             // Reset input/output values after swap
             setAmountIn("");
@@ -327,7 +336,7 @@ const SwapWidget = () => {
             const tradeType = isAmountIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT;
 
             try {
-                const protocol = [Protocol.V2, Protocol.V3];
+                // const protocol = [Protocol.V2, Protocol.V3];
                 // Always pass the selected protocol as a tuple (array with one element)
                 const { data, value } = await getSmartOrderRoute(
                     token0,
