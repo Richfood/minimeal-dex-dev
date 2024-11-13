@@ -27,7 +27,7 @@ interface SettingsModalProps {
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, handleClose, theme, allowSwapForV2, allowSwapForV3, onToggleV2, onToggleV3, slippageTolerance, setSlippageTolerance, deadline, setDeadline }) => {
-    const [activeIndex, setActiveIndex] = useState<number | null>(0);
+    const [activeIndex, setActiveIndex] = useState<number | null>(2);
     const [isExpertModalOpen, setExpertModalOpen] = useState<boolean>(false);
     const [isCustomize, setCustomize] = useState<boolean>(false);
 
