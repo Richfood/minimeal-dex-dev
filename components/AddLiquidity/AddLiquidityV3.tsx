@@ -445,21 +445,27 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     }
 
     //console.log("Running emulate");
-    const result = emulate(
-      priceLower,
-      priceUpper,
-      priceCurrent,
-      fee,
-      amount0ToEmulate.toString(),
-      amount1ToEmulate.toString(),
-      token0,
-      token1,
-      isSorted,
-      slippageTolerance
-    );
+    let result : any = undefined;
+    try{
+      result = emulate(
+        priceLower,
+        priceUpper,
+        priceCurrent,
+        fee,
+        amount0ToEmulate.toString(),
+        amount1ToEmulate.toString(),
+        token0,
+        token1,
+        isSorted,
+        slippageTolerance,
+      );
 
-    console.log('HEllo - ,', result);
-
+      console.log('HEllo - ,', result);
+    }
+    catch(error){
+      setEmulateError(true);
+      console.log("Emulate Error", error);
+    }
     if (result) {
       setEmulateError(false);
       if (result.amount0Desired !== "0" && result.amount1Desired !== "0") {
