@@ -33,6 +33,7 @@ export async function getV3PositionsData(): Promise<any> {
                 feeGrowthGlobal0X128
                 feeGrowthGlobal1X128
                 tick
+                feeTier
               }
               tickLower {
                 tickIdx

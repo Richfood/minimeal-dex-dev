@@ -46,20 +46,34 @@ export const PositionListV3 : React.FC<PositionList> = ({theme, data})=>{
         </Box>
         <Box sx={{ display: "flex", gap: '5px' }}>
             <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>{data.token0.symbol} / {data.token1.symbol}</Typography>
-            <Typography component="span">{data.pool.feeTier}</Typography>
+            <Typography component="span">{Number(data.pool.feeTier) / 10000}%</Typography>
         </Box>
     </Box>
-    <Box sx={{ color: '#2e7d32' }}>
-        
-            {currentTick < lowerTick ? (
-                (<Badge color="error">Not In Range</Badge>)
-            ):(
-                currentTick > upperTick ? 
-                (<Badge color="error">Not In Range</Badge>)
-                :
-                (<Badge color="success">In Range</Badge>))
-            }
-        
+    <Box sx={{ color: '#2e7d32', display: 'flex', alignItems: 'center', gap: '10px' }}>
+
+        {/* Status Badge Based on Tick Comparison */}
+        {currentTick < lowerTick ? (
+            <Badge color="error">Not In Range</Badge>
+        ) : currentTick > upperTick ? (
+            <Badge color="error">Not In Range</Badge>
+        ) : (
+            <Badge color="success">In Range</Badge>
+        )}
+          {/* V3 Badge */}
+        <Box 
+            sx={{ 
+                color: '#993902', 
+                backgroundColor: 'rgba(153, 57, 2, 0.2)', // Translucent brown
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                width: '30px', // Adjust to your desired size
+                height: '30px', // Same as width to make it a circle
+                borderRadius: '50%', // Makes the container circular
+            }}
+        >
+            <Badge>V3</Badge>
+        </Box>
     </Box>
 </Box>
 <Box

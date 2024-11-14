@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Box, Typography, List, ListItem, ListItemButton, FormGroup, FormControlLabel, Tab, Tabs, Button } from '@mui/material';
+import { Box, Typography, List, ListItem, ListItemButton, FormGroup, FormControlLabel, Tab, Tabs, Button, CircularProgress } from '@mui/material';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { RxCountdownTimer } from 'react-icons/rx';
 import SettingsModal from '../SettingModal/SettingModal';
@@ -36,6 +36,8 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
   const [v3Positions, setV3Positions] = useState<V3PositionData[]>([]);
   const [v2Positions, setV2Positions] = useState<V2PositionsData[]>([]);
 
+  const [isLoadingPosition, setIsLoadingPosition] = useState(false);
+
   const handleOpen = useCallback(() => setIsOpen(true), []);
   const handleClose = () => setIsOpen(false);
 
@@ -54,19 +56,26 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
 
   useEffect(() => {
     const runGetPositionsData = async () => {
+      setIsLoadingPosition(true);
 
-      if (value === "2") {
+      if(value === "0" && (v2Positions.length === 0 || v3Positions.length === 0)){
+        let newV3Positions: V3PositionData[] = await getV3PositionsData();
+        setV3Positions(newV3Positions);
+
+        let newV2Positions: V2PositionsData[] = await getV2Positions();
+        setV2Positions(newV2Positions)
+      }
+      else if (value === "2" && v2Positions.length === 0) {
         let newPositions: V2PositionsData[] = await getV2Positions();
-        console.log("🚀 ~ runGetPositionsData ~ V2 ~ newPositions:", newPositions)
         setV2Positions(newPositions)
       }
-      else {
+      else if(value === "1" && v3Positions.length === 0){
         let newPositions: V3PositionData[] = await getV3PositionsData();
-
         setV3Positions(newPositions);
       }
-    }
 
+      setIsLoadingPosition(false);
+    }
     runGetPositionsData();
   }, [value])
 
@@ -130,90 +139,59 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
         </Box>
 
         <Box className="tabsContent">
-          {value === '1' && (
-            <Box sx={{ py: '15px', display: 'flex', justifyContent: 'center' }}>
-              {v3Positions ? (
-                <List sx={{ width: '100%', maxWidth: 'screen' }}>
-                  {v3Positions.map((elem) => (
-                    <PositionListV3 theme={theme} data={elem}/>
-                    // <Link href={`/position`} passHref key={elem.id} style={{ textDecoration: 'none' }}> {/* Removes underline from link */}
-                    //   <ListItem
-                    //     component="a"
-                    //     sx={{
-                    //       width: '100%',
-                    //       cursor: 'pointer',
-                    //       '&:hover': {
-                    //         backgroundColor: 'var(--hover-color)',
-                    //       },
-                    //     }}
-                    //   >
-                    //     <Box
-                    //       sx={{
-                    //         width: '100%',
-                    //         background: theme === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)',
-                    //         padding: '35px',
-                    //         borderRadius: '10px',
-                    //         textAlign: 'left',
-                    //         display: 'flex',
-                    //         flexDirection: 'column',
-                    //         alignItems: 'center',
-                    //       }}
-                    //     >
-                    //       <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                    //         <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>
-                    //           {elem.token0.name} / {elem.token1.name}
-                    //         </Typography>
-                    //         <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>
-                    //           {elem.liquidity}
-                    //         </Typography>
-                    //         <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>
-                    //           {calculatePositionData(elem).humanReadableFeesToken0}
-                    //         </Typography>
-                    //       </Box>
-                    //     </Box>
-                    //   </ListItem>
-                    // </Link>
-                  ))}
-                </List>
-              ) : (
-                <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
+          {isLoadingPosition ? 
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <CircularProgress size={30} />
+            </Box>
+            :
+            <Box>
+              {value === '1' && (
+                <Box sx={{ py: '15px', display: 'flex', justifyContent: 'center' }}>
+                  {v3Positions.length ? (
+                    <List sx={{ width: '100%', maxWidth: 'screen' }}>
+                      {v3Positions.map((elem) => (
+                        <PositionListV3 theme={theme} data={elem}/>
+                      ))}
+                    </List>
+                  ) : (
+                    <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
+                  )}
+                </Box>
+              )}
+              {value === '2' && (
+                <Box sx={{ py: '15px', textAlign: 'center' }}>
+                  {v2Positions.length ? (
+                    <List sx={{ width: '100%', maxWidth: 'screen' }}> {/* Set a max width for uniformity */}
+                      {v2Positions.map((elem) => {
+                        return (
+                          <PositionListV2 theme={theme} data={elem}/>
+                        );
+                      })}
+                    </List>
+                  ) : (
+                    <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
+                  )}
+                </Box>
+              )}
+              {value === '0' && (
+                <Box sx={{ py: '15px', display: 'flex', justifyContent: 'center' }}>
+                  {v3Positions.length && v2Positions.length ? (
+                      <List sx={{ width: '100%', maxWidth: 'screen' }}>
+                        {v3Positions.map((elem) => (
+                          <PositionListV3 theme={theme} data={elem}/>
+                        ))}
+                        {v2Positions.map((elem)=>
+                          <PositionListV2 theme={theme} data={elem}/>
+                        )
+                      }
+                      </List>
+                  ) : (
+                    <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
+                  )}
+                </Box>
               )}
             </Box>
-          )}
-
-          {value === '2' && (
-            <Box sx={{ py: '15px', textAlign: 'center' }}>
-              {v2Positions ? (
-                <List sx={{ width: '100%', maxWidth: 'screen' }}> {/* Set a max width for uniformity */}
-                  {v2Positions.map((elem) => {
-                    return (
-                      <PositionListV2 theme={theme} data={elem}/>
-                    );
-                  })}
-                </List>
-              ) : (
-                <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
-              )}
-            </Box>
-          )}
-
-          {value === '0' && (
-            <Box sx={{ py: '15px', display: 'flex', justifyContent: 'center' }}>
-              {v3Positions && v2Positions? (
-                  <List sx={{ width: '100%', maxWidth: 'screen' }}>
-                    {v3Positions.map((elem) => (
-                      <PositionListV3 theme={theme} data={elem}/>
-                    ))}
-                    {v2Positions.map((elem)=>
-                      <PositionListV2 theme={theme} data={elem}/>
-                    )
-                  }
-                  </List>
-              ) : (
-                <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
-              )}
-            </Box>
-          )}
+          }
         </Box>
 
         <Box sx={{ py: '15px', textAlign: 'center' }}>
