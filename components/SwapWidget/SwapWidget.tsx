@@ -80,7 +80,7 @@ const SwapWidget = () => {
     const smartRouterAddress = addresses.PancakeRouterAddress;
     const [isTestnet, setIsTestnet] = React.useState<boolean | null>(null);
     const [allowSwapForV2, setAllowSwapForV2] = useState<boolean>(true);
-    const [allowSwapForV3, setAllowSwapForV3] = useState<boolean>(false);
+    const [allowSwapForV3, setAllowSwapForV3] = useState<boolean>(true);
     const [isSwapping, setIsSwapping] = useState<boolean>(false);
     const [deadline, setDeadline] = useState("10");
     console.log("🚀 ~ SwapWidget ~ deadline:", deadline)
