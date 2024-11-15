@@ -155,13 +155,13 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
     console.log("🚀 ~ checkRange ~ priceRangeErrorIndex:", priceRangeErrorIndex)
 
-    if (priceLower >= priceUpper) {
+    if (Number(priceLower) >= Number(priceUpper)) {
       setPriceRangeErrorIndex(PriceRangeError.INVALID);
     }
-    else if (priceCurrent <= priceLower) {
+    else if (Number(priceLower) >= Number(priceUpper)) {
       setPriceRangeErrorIndex(PriceRangeError.BELOW_RANGE);
     }
-    else if (priceCurrent >= priceUpper) {
+    else if (Number(priceLower) >= Number(priceUpper)) {
       setPriceRangeErrorIndex(PriceRangeError.ABOVE_RANGE);
     }
     else {
@@ -589,6 +589,10 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     //console.log("🚀 ~ fetchPoolData ~ fetchPoolData: RUNN");
     if (token0 && token1 && fee) {
       const poolDataFromSubgraph: AddLiquidityPoolData = await getPoolData(token0, token1, fee);
+      console.log("🚀 ~ fetchPoolData ~ poolDataFromSubgraph:", poolDataFromSubgraph)
+
+      
+
       setCurrentPoolData(poolDataFromSubgraph);
 
       let priceCurrentToSet: number | undefined = undefined;
