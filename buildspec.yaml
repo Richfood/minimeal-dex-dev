@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing dependencies"
+      - npm install --force
+
+  pre_build:
+    commands:
+      - cp -r v3-sdk node_modules/@uniswap/
+      - echo "required dependencies"
+
+  build:
+    commands:
+      - echo "Building Next.js app"
+      - npm run build
+
+  post_build:
+    commands:
+      - echo Post-build steps...
+
+artifacts:
+  files:
+    - '**/*'
