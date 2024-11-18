@@ -257,16 +257,16 @@ const SwapWidget = () => {
 
         try {
             // Approve token for the swap
-            if(token0.symbol !== "PLS")
-            await getTokenApproval(token0, smartRouterAddress, amountIn);
+            if (token0.symbol !== "PLS")
+                await getTokenApproval(token0, smartRouterAddress, amountIn);
 
             // Execute the swap after approval
             // await swapExactTokensForTokens(token0, token1, amountIn, slippageTolerance, amountOut, routePath)
-            let txHash : string;
-            if(dataForSwap.protocol === "V3")
+            let txHash: string;
+            if (dataForSwap.protocol === "V3")
                 txHash = await swapV3(token0, token1, dataForSwap, amountIn, amountOut, slippageTolerance);
-            else{
-                txHash = await swapExactTokensForTokens(token0,token1,amountIn,slippageTolerance,amountOut,dataForSwap);
+            else {
+                txHash = await swapExactTokensForTokens(token0, token1, amountIn, slippageTolerance, amountOut, dataForSwap);
             }
 
             alert(`Swapping done! TxHash : ${txHash}`);
@@ -366,8 +366,11 @@ const SwapWidget = () => {
                 } else {
                     console.error("Token path not found in response.");
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Error fetching route:", error);
+                alert(error.response.data);
+                setAmountIn("");
+                setAmountOut("");
             }
         },
         [token0, token1, allowSwapForV2, allowSwapForV3, setRoutePath, setDataForSwap, setToken1Price, setAmountOut, setToken0Price, setAmountIn] // Ensure allowSwapForV2 and allowSwapForV3 are dependencies
