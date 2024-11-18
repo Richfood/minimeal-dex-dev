@@ -40,6 +40,7 @@ import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import famousToken from "../../utils/famousToken.json";
 const { useChainId } = hooks;
 import { hooks } from '../ConnectWallet/connector';
+import getUserBalance from '@/utils/api/getUserBalance';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -132,6 +133,9 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [tokensSelected, setTokensSelected] = useState(false);
 
   const [priceRangeErrorIndex, setPriceRangeErrorIndex] = useState<PriceRangeError | null>(null);
+
+  const[tokenBalance0, setTokenBalance0] = useState<string>("");
+  const[tokenBalance1, setTokenBalance1] = useState<string>("");
 
   console.log("🚀 ~ rangeButtonSelected:", rangeButtonSelected)
 
@@ -417,6 +421,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
         )
 
         alert(`Liquidity added. tx hash : ${addLiquidityTxHash} `)
+
+        reset();
       }
     }
     catch (error) {
@@ -744,6 +750,20 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   useEffect(() => {
     checkRange()
   }, [priceLower, priceUpper, priceCurrent])
+
+  useEffect(()=>{
+    const getUserBalances = async ()=>{
+      if(token0 && token1){
+        const token0Balance = await getUserBalance(token0);
+        const token1Balance = await getUserBalance(token1);
+
+        setTokenBalance0(token0Balance);
+        setTokenBalance1(token1Balance);
+      }
+      
+      getUserBalances();
+    }
+  },[amount0Desired, amount1Desired]);
 
   const handleButton = (buttonValue: boolean, fullRangeValue: boolean) => {
 
@@ -1365,8 +1385,17 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                 </Box>
 
                 <Box>
-                  <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning}>
-                    {addLiquidityRunning ? <CircularProgress size={25} /> : <>Create Liquidity</>}
+                  <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning || tokenBalance0 < amount0Desired || tokenBalance1 < amount1Desired}>
+                  {addLiquidityRunning ? (
+    <CircularProgress size={25} />
+) : (
+    tokenBalance0 < amount0Desired || tokenBalance1 < amount1Desired ? (
+        <>Insufficient Balance</>
+    ) : (
+        <>Create Liquidity</>
+    )
+)}
+
                   </Button>
                 </Box>
               </Box>
