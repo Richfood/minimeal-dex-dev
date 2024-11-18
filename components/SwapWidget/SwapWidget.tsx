@@ -103,17 +103,17 @@ const SwapWidget = () => {
     console.log(userBalance, amountIn);
     // Load token data from local storage and set it to state
     useEffect(() => {
-        const isTestnet = chainId === 943;
-        setIsTestnet(isTestnet)
-        console.log("🚀 ~ useEffect ~ isTestnet:", isTestnet)
+        // const isTestnet = chainId === 943;
+        // setIsTestnet(isTestnet)
+        // console.log("🚀 ~ useEffect ~ isTestnet:", isTestnet)
 
-        const tokenData = isTestnet ? famousTokenTestnet : famousToken;
+        // const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
-        if (tokenData.length > 0 && !tokensSelected) {
-            setToken0(tokenData[9]);
-            setToken1(tokenData[10]);
-        }
-    }, [chainId]);
+        // if (tokenData.length > 0 && !tokensSelected) {
+            setToken0(famousTokenTestnet[9]);
+            setToken1(famousTokenTestnet[10]);
+        // }
+    }, []);
 
     useEffect(() => {
         // Example logic

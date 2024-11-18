@@ -6,6 +6,11 @@ import v2FactoryArtifact from "../../abis/PancakeFactory.sol/PancakeFactory.json
 
 export async function getV2Pair(token0: TokenDetails, token1: TokenDetails) {
     try {
+
+        if(token0.address.contract_address > token1.address.contract_address){
+            [token0,token1] = [token1,token0];
+        }
+
         // Create a new provider and signer
         const newProvider = new ethers.providers.Web3Provider(window.ethereum);
         const newSigner = newProvider.getSigner();
@@ -55,8 +60,7 @@ export async function getV2Pair(token0: TokenDetails, token1: TokenDetails) {
             return null; // Or handle this case as needed
         }
 
-        const ratio = reserve0 / reserve1;
-        return ratio;
+        return {reserve0, reserve1};
 
     } catch (error) {
         console.error("An error occurred:", error);

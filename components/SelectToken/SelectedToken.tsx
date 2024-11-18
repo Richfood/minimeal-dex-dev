@@ -12,7 +12,7 @@ import { metaMask, hooks } from '../ConnectWallet/connector';
 import tokenList from "../../utils/tokenList.json"
 const { useChainId, useAccounts } = hooks;
 
-import famousToken from "../../utils/famousToken.json";
+// import famousToken from "../../utils/famousToken.json";
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 
 import { TokenDetails } from '@/interfaces';
@@ -65,41 +65,42 @@ const fetchStablecoins = async (): Promise<any> => {
     }
 };
 
-const fetchCoinStablecoins = async () => {
-    try {
+// const fetchCoinStablecoins = async () => {
+//     try {
 
-        const idsArray = ["0xaiswap", "1000bonk", "16dao", "1ex", "2080",
-            "2fai", "doge-on-pulsechain", "5g-cash", "404ver", "xen-crypto-pulsechain"]
-        const response = await fetch('api/coins', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ idsArray }),
-        });
+//         const idsArray = ["0xaiswap", "1000bonk", "16dao", "1ex", "2080",
+//             "2fai", "doge-on-pulsechain", "5g-cash", "404ver", "xen-crypto-pulsechain"]
+//         const response = await fetch('api/coins', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({ idsArray }),
+//         });
 
-        if (!response.ok) {
-            console.log('Failed to fetch data from API:', response);
-            return null;
-        }
+//         if (!response.ok) {
+//             console.log('Failed to fetch data from API:', response);
+//             return null;
+//         }
 
-        const data = await response.json();
-        console.log("🚀 ~ fetchCoinStablecoins ~ response:", response)
+//         const data = await response.json();
+//         console.log("🚀 ~ fetchCoinStablecoins ~ response:", response)
 
-        return data;
-    } catch (error) {
-        console.log('Error fetching data from API:', error);
-        return null;
+//         return data;
+//     } catch (error) {
+//         console.log('Error fetching data from API:', error);
+//         return null;
 
-    }
-};
+//     }
+// };
 
 const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode, setToken0, setToken1, tokenNumber, token0, token1, setTokensSelected
 
 }) => {
+    console.log("🚀 ~SelectedToken token1:", token1)
+    console.log("🚀 ~SelectedToken token0:", token0)
     const [openManage, setOpenManage] = useState(false);
-    const [coinData, setCoinData] = useState<any[]>([]);
-    console.log("🚀 ~ coinData:", coinData)
+    // const [coinData, setCoinData] = useState<any[]>([]);
     const [tokens, setTokens] = useState<TokenDetails[]>([]);
     const [tokensOfLiquidity, setTokensOfLiquidity] = useState<TokenDetails[]>([]);
 
@@ -111,22 +112,21 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
     const handleCloseManage = () => setOpenManage(false);
 
     useEffect(() => {
-        const initializeData = async () => {
-            const data = await fetchStablecoins();
+        // const initializeData = async () => {
+            // const tokenData = isTestnet ? famousTokenTestnet : famousToken;
+            // const data = await fetchStablecoins();
 
-            const usableCoinData = await fetchCoinStablecoins();
-            setCoinData(usableCoinData);
+            // const usableCoinData = await fetchCoinStablecoins();
+            // setCoinData(usableCoinData);
 
-            const isTestnet = chainId === 943;
 
-            const tokenData = isTestnet ? famousTokenTestnet : famousToken;
-            setTokens(tokenData);
-            const tokenOfLiquidityData = isTestnet && tokenList ? Object.entries(tokenList).map(([key, value]) => value) : [];
-            setTokensOfLiquidity(tokenOfLiquidityData);
-        };
+            setTokens(famousTokenTestnet);
+            // const tokenOfLiquidityData = isTestnet && tokenList ? Object.entries(tokenList).map(([key, value]) => value) : [];
+            // setTokensOfLiquidity(tokenOfLiquidityData);
+        // };
 
-        initializeData();
-    }, [isConnected, chainId]); // Add dependencies
+        // initializeData();
+    }, []); // Add dependencies
 
 
     const handleSelectToken = (token: TokenDetails) => {

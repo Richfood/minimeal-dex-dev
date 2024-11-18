@@ -81,9 +81,9 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   // const tempToken0 = tokenList.MOCK_USDC;
   // const tempToken1 = tokenList.Pulse;
   const [token0, setToken0] = useState<TokenDetails | null>(null);
-  console.log("🚀 ~ token0:", token0)
+  console.log("🚀 ~AddLiquidityV3 token0:", token0)
   const [token1, setToken1] = useState<TokenDetails | null>(null);
-  console.log("🚀 ~ token1:", token1)
+  console.log("🚀 ~AddLiquidityV3 token1:", token1)
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
   const [isFullRange, setIsFullRange] = useState(false);
   const [isButton, setIsButton] = useState(false);
@@ -139,16 +139,16 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [deadline, setDeadline] = useState("10");
   console.log("🚀 ~ deadline:", deadline)
   useEffect(() => {
-    const isTestnet = chainId === 943;
-    console.log("🚀 ~ useEffect ~ isTestnet:", isTestnet)
+    // const isTestnet = chainId === 943;
+    // console.log("🚀 ~ useEffect ~ isTestnet:", isTestnet)
 
-    const tokenData = isTestnet ? famousTokenTestnet : famousToken;
+    // const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
-    if (tokenData.length > 0 && !tokensSelected) {
-      setToken0(tokenData[9]);
-      setToken1(tokenData[10]);
-    }
-  }, [chainId]);
+    // if (tokenData.length > 0 && !tokensSelected) {
+      setToken0(famousTokenTestnet[9]);
+      setToken1(famousTokenTestnet[10]);
+    // }
+  }, []);
 
   const checkRange = () => {
     if (!priceUpper || !priceLower || !priceCurrent) return true;

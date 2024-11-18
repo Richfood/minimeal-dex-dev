@@ -74,12 +74,15 @@ export async function addLiquidityV2(
     const newSignerAddress = await newSigner.getAddress()
 
     amount0Desired = ethers.utils.parseUnits(expandIfNeeded(amount0Desired), token0.address.decimals).toString();
+    // console.log("🚀 ~ amount0Desired:", amount0Desired)
     amount1Desired = ethers.utils.parseUnits(expandIfNeeded(amount1Desired), token1.address.decimals).toString();
-    let amount0Min = amount0Desired;//ethers.utils.parseUnits(expandIfNeeded(amount0Desired), token0.address.decimals).toString();
-    let amount1Min = amount1Desired;//ethers.utils.parseUnits(expandIfNeeded(amount1Desired), token1.address.decimals).toString();
+    // console.log("🚀 ~ amount1Desired:", amount1Desired)
+    let amount0Min = amount0Desired;
+    // console.log("🚀 ~ amount0Min:", amount0Min)
+    let amount1Min = amount1Desired;
 
-    amount0Min = (Number(amount0Min) - adjustForSlippage(amount0Min, slippageTolerance)).toString();
-    amount1Min = (Number(amount1Min) - adjustForSlippage(amount1Min, slippageTolerance)).toString();
+    amount0Min = expandIfNeeded((Number(amount0Min) - adjustForSlippage(amount0Min, slippageTolerance)).toString());
+    amount1Min = expandIfNeeded((Number(amount1Min) - adjustForSlippage(amount1Min, slippageTolerance)).toString());
 
     const pancakeV2RouterAddress = addresses.PancakeV2RouterAddress;
     const pancakeV2RouterContract = new ethers.Contract(pancakeV2RouterAddress, V2_ROUTER_ABI, newSigner);

@@ -26,6 +26,8 @@ import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import famousToken from "../../utils/famousToken.json";
 const { useChainId } = hooks;
 import { hooks } from '../ConnectWallet/connector';
+import { debounce } from '@syncfusion/ej2-base';
+import { flushSync } from 'react-dom';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -54,11 +56,14 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   const handleClose = () => setOpen(false);
   const v2RouterAddress = addresses.PancakeV2RouterAddress;
   const [token0, setToken0] = useState<TokenDetails | null>(null);
+  console.log("🚀 ~AddLiquidityV2 token0:", token0)
   const [token1, setToken1] = useState<TokenDetails | null>(null);
+  console.log("🚀 ~AddLiquidityV2 token1:", token1)
   const [amount0Desired, setAmount0Desired] = useState("");
   const [amount1Desired, setAmount1Desired] = useState("");
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
-  const [currentV2PoolRatio, setCurrentV2PoolRatio] = useState<number | null>(null);
+  // const [currentV2PoolRatio, setCurrentV2PoolRatio] = useState<number | null>(null);
+  const [reserves, setReserves] = useState<{ reserve0: number; reserve1: number } | null> (null);
   const [isSorted, setIsSorted] = useState<boolean>(true);
   const [addLiquidityRunning, setAddLiquidityRunning] = useState(false);
   const [slippageTolerance, setSlippageTolerance] = useState<number | null>(1);
@@ -66,20 +71,23 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   const chainId = useChainId();
   const [tokensSelected, setTokensSelected] = useState(false);
 
+  const [amount1Loading, setAmount1Loading] = useState(false);
+  const [amount0Loading, setAmount0Loading] = useState(false);
+
   console.log("🚀 ~ slippageTolerance:", slippageTolerance)
   console.log("🚀 ~ deadline:", deadline)
 
   useEffect(() => {
-    const isTestnet = chainId === 943;
-    console.log("🚀 ~ useEffect ~ isTestnet:", isTestnet)
+    // const isTestnet = chainId === 943;
+    // console.log("🚀 ~ useEffect ~ isTestnet:", isTestnet)
 
-    const tokenData = isTestnet ? famousTokenTestnet : famousToken;
+    // const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
-    if (tokenData.length > 0 && !tokensSelected) {
-      setToken0(tokenData[9]);
-      setToken1(tokenData[10]);
-    }
-  }, [chainId]);
+    // if (tokenData.length > 0 && !tokensSelected) {
+      setToken0(famousTokenTestnet[9]);
+      setToken1(famousTokenTestnet[10]);
+    // }
+  }, []);
 
   const toggleClass = () => {
     //console.log("🚀 ~ toggleClass ~ isActive:", isActive)
@@ -181,7 +189,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
       }
     }
     catch (error) {
-      //console.log("Error adding liquidity", error);
+      console.log("Error adding V2 liquidity", error);
       setAddLiquidityRunning(false);
       alert(`Error adding liquidity`);
     }
@@ -192,46 +200,79 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
     await getPoolRatio();
   }
 
-  const calculate = async (value: string, inputBox: number) => {
-    console.log("calculate run V2")
-
-    if (value === "") {
-      setAmount0Desired('');
-      setAmount1Desired('');
-      return;
-    }
-
-    if (currentV2PoolRatio) {
-      if (inputBox === 0) {
-        const amount1DesiredToSet = calculateV2Amounts(Number(value), 0, currentV2PoolRatio, isSorted);
-        setAmount0Desired(value);
-        setAmount1Desired(amount1DesiredToSet.toString());
+  const calculate = useCallback(
+    debounce(async (value: string, inputBox: number) => {
+      console.log("calculate run V2");
+  
+      if (value === "") {
+        setAmount0Desired('');
+        setAmount1Desired('');
+        return;
       }
-      else {
-        const amount0DesiredToSet = calculateV2Amounts(0, Number(value), currentV2PoolRatio, isSorted);
-        setAmount0Desired(amount0DesiredToSet.toString());
-        setAmount1Desired(value);
+  
+      if (reserves && token0 && token1) {
+        try {
+          if (inputBox === 0) {
+            console.log("yooooooooooooooooooooo");
+            setAmount1Loading(true);
+  
+            const amount1DesiredToSet = await calculateV2Amounts(
+              token0, 
+              token1, 
+              Number(value), 
+              0, 
+              reserves.reserve0, 
+              reserves.reserve1, 
+              isSorted
+            );
+  
+            console.log("🚀 ~ calculate ~ amount1DesiredToSet:", amount1DesiredToSet);
+  
+            flushSync(() => {
+              setAmount1Desired(amount1DesiredToSet?.toString() || "");
+            });
+  
+            setAmount1Loading(false);
+          } else {
+            setAmount0Loading(true);
+  
+            const amount0DesiredToSet = await calculateV2Amounts(
+              token0, 
+              token1, 
+              0, 
+              Number(value), 
+              reserves.reserve0, 
+              reserves.reserve1, 
+              isSorted
+            );
+  
+            console.log("🚀 ~ calculate ~ amount0DesiredToSet:", amount0DesiredToSet);
+  
+            flushSync(() => {
+              setAmount0Desired(amount0DesiredToSet?.toString() || "");
+            });
+  
+            setAmount0Loading(false);
+          }
+        } catch (error) {
+          console.error('Error during calculation:', error);
+          setAmount1Loading(false);
+          setAmount0Loading(false);
+        }
       }
-    }
-    else {
-      if (inputBox === 0) {
-        setAmount0Desired(value);
-      }
-      else {
-        setAmount1Desired(value);
-      }
-    }
-
-    return;
-  }
+    }, 2000),
+    [token0, token1, reserves, isSorted]
+  );
+  
 
   const getPoolRatio = async () => {
-    let pairRatio: number | null = null;
+    let pairRatio: { reserve0: number; reserve1: number } | null = null;
+
     if (token0 && token1) {
       pairRatio = await getV2Pair(token0, token1) || null;
     }
     console.log("🚀 ~ getPoolRatio ~ pairRatio:", pairRatio)
-    setCurrentV2PoolRatio(pairRatio);
+    setReserves(pairRatio);
   }
 
   useEffect(() => {
@@ -409,10 +450,14 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
                     </Typography>
                   </Box>
                   <Box className="inputField">
-                    <input autoComplete="off" onChange={(e) => {
-                      calculate(e.target.value, 0);
-                    }} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }}
-                      value={amount0Desired} />
+                    {amount0Loading ? <CircularProgress size={30}/> : (
+                      <input autoComplete="off" onChange={(e) => {
+                        setAmount0Desired(e.target.value)
+                        setAmount1Desired("");
+                        calculate(e.target.value, 0);
+                      }} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }}
+                        value={amount0Desired} />
+                    )}
                   </Box>
                 </Box>
 
@@ -424,18 +469,22 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
                       onClick={() => copyToClipboard(token1?.address?.contract_address)}>{token1 ? (token1.symbol) : "Select a Currency"} <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
                     </Typography>
                   </Box>
-                  <Box className="inputField">
+                  {amount1Loading ? <CircularProgress size={30}/> : (
+                    <Box className="inputField">
                     <input autoComplete="off" onChange={(e) => {
+                      setAmount0Desired("");
+                      setAmount1Desired(e.target.value)
                       calculate(e.target.value, 1);
                     }} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }}
                       value={amount1Desired} />
-                  </Box>
+                    </Box>
+                  )}
                 </Box>
 
 
                 <Box sx={{ display: "flex", justifyContent: 'space-between', width: '100%' }}>
-                  <Typography sx={{ fontSize: '14px' }}>Current Price:</Typography>
-                  <Typography sx={{ fontSize: '14px' }}>{isSorted && currentV2PoolRatio? currentV2PoolRatio : currentV2PoolRatio ? 1 / currentV2PoolRatio : ""}</Typography>
+                  <Typography sx={{ fontSize: '14px' }}>Current Price {token0?.symbol} / {token1?.symbol}:</Typography>
+                  <Typography sx={{ fontSize: '14px' }}>{isSorted && reserves? reserves.reserve0 / reserves.reserve1 : reserves ? reserves.reserve1 / reserves.reserve0 : ""}</Typography>
                 </Box>
 
                 <Box sx={{ width: '100%' }}>
