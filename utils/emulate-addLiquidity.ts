@@ -138,7 +138,9 @@ function emulate(
 
         const liquidityFor0 = liquidity0(amount0DesiredForCalculation, currentSqrtPrice, upperSqrtPrice);
         amount1Desired =  calculateAmount1WhenLiquidity0Given(liquidityFor0, currentSqrtPrice, lowerSqrtPrice).toString();
-        liquidity = liquidityFor0.toString();
+        const liquidityFor1 = liquidity1(amount1Desired, currentSqrtPrice, lowerSqrtPrice);
+
+        liquidity = liquidityFor0 < liquidityFor1 ? liquidityFor0.toString() : liquidityFor1.toString();
 
         amount0Desired = amount0Entered.toString();
 
@@ -154,7 +156,8 @@ function emulate(
 
         const liquidityFor1 = liquidity1(amount1DesiredForCalculation, currentSqrtPrice, lowerSqrtPrice);
         amount0Desired = calculateAmount0WhenLiquidity1Given(liquidityFor1, currentSqrtPrice, upperSqrtPrice).toString();
-        liquidity = liquidityFor1.toString();
+        const liquidityFor0 = liquidity0(amount0Desired, currentSqrtPrice, upperSqrtPrice);
+        liquidity = (liquidityFor0 < liquidityFor1 ? liquidityFor0 : liquidityFor1).toString();
 
         amount1Desired = ethers.utils.formatUnits(amount1Entered.toString(),token1.decimals);
         amount0Desired = ethers.utils.formatUnits(amount0Desired.toString(),token0.decimals);
@@ -162,14 +165,14 @@ function emulate(
 
 
 
-    //console.log("Inside Emulate - ");
-    //console.log("lower, current, upper ticks : ", tickLower, currentTick, tickUpper)
-    //console.log("Supposed to be     : ", TickMath.getSqrtRatioAtTick(currentTick).toString());
-    //console.log("current sqrt price : ", currentSqrtPrice);
-    //console.log("lower Sqrt price   : ", lowerSqrtPrice)
-    //console.log("upper Sqrt price   : ", upperSqrtPrice)
-    //console.log("liquidity : ", liquidity);
-    //console.log("--------------------------------------------------------------------------");
+    console.log("Inside Emulate - ");
+    console.log("lower, current, upper ticks : ", tickLower, currentTick, tickUpper)
+    console.log("Supposed to be     : ", TickMath.getSqrtRatioAtTick(currentTick).toString());
+    console.log("current sqrt price : ", currentSqrtPrice);
+    console.log("lower Sqrt price   : ", lowerSqrtPrice)
+    console.log("upper Sqrt price   : ", upperSqrtPrice)
+    console.log("liquidity : ", liquidity);
+    console.log("--------------------------------------------------------------------------");
 
     try {
         // Create Pool instance
@@ -201,7 +204,7 @@ function emulate(
         amount1Min = parseFloat(amount1DesiredFromPosition.toString()).toString();
 
         //console.log(amount0DesiredFromPosition.toString(), amount1DesiredFromPosition.toString());
-        amount0Min = roundToPrecision((Number(amount0Min) - adjustForSlippage(amount0Min, slippageTolerance)).toFixed(0) , token0.decimals).toString()//(roundToPrecision(amount0Min,6) - roundToPrecision("0.000001",6)).toString(); // Math.pow(10,-token0.decimals+4)
+        amount0Min = roundToPrecision((Number(amount0Min) - adjustForSlippage(amount0Min, slippageTolerance)).toFixed(0) , token0.decimals).toString()
         //console.log("🚀 ~ amount0Min:", amount0Min)
         amount1Min = roundToPrecision((Number(amount1Min) - adjustForSlippage(amount1Min, slippageTolerance)).toFixed(0) , token1.decimals).toString()//(roundToPrecision(amount1Min,6) - roundToPrecision("0.000001",6)).toString();
         //console.log("🚀 ~ amount1Min:", amount1Min)
