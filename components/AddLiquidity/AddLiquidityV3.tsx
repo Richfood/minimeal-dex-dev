@@ -134,8 +134,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
   const [priceRangeErrorIndex, setPriceRangeErrorIndex] = useState<PriceRangeError | null>(null);
 
-  const[tokenBalance0, setTokenBalance0] = useState<string>("");
-  const[tokenBalance1, setTokenBalance1] = useState<string>("");
+  const [tokenBalance0, setTokenBalance0] = useState<string>("");
+  const [tokenBalance1, setTokenBalance1] = useState<string>("");
 
   console.log("🚀 ~ rangeButtonSelected:", rangeButtonSelected)
 
@@ -149,8 +149,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     // const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
     // if (tokenData.length > 0 && !tokensSelected) {
-      setToken0(famousTokenTestnet[9]);
-      setToken1(famousTokenTestnet[10]);
+    setToken0(famousTokenTestnet[9]);
+    setToken1(famousTokenTestnet[10]);
     // }
   }, []);
 
@@ -451,8 +451,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     }
 
     //console.log("Running emulate");
-    let result : any = undefined;
-    try{
+    let result: any = undefined;
+    try {
       result = emulate(
         priceLower,
         priceUpper,
@@ -468,7 +468,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
       console.log('HEllo - ,', result);
     }
-    catch(error){
+    catch (error) {
       setEmulateError(true);
       console.log("Emulate Error", error);
     }
@@ -597,7 +597,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
       const poolDataFromSubgraph: AddLiquidityPoolData = await getPoolData(token0, token1, fee);
       console.log("🚀 ~ fetchPoolData ~ poolDataFromSubgraph:", poolDataFromSubgraph)
 
-      
+
 
       setCurrentPoolData(poolDataFromSubgraph);
 
@@ -607,10 +607,16 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
       if (poolDataFromSubgraph) {
         if (isSorted) {
-          priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
+          if (poolDataFromSubgraph.token1Price === "0")
+            priceCurrentToSet = tickToPrice(Number(poolDataFromSubgraph.tick), decimalDifference);
+          else
+            priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
         }
         else {
-          priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
+          if (poolDataFromSubgraph.token0Price === "0")
+            priceCurrentToSet = 1 / tickToPrice(Number(poolDataFromSubgraph.tick), decimalDifference);
+          else
+            priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
         }
       }
 
@@ -751,19 +757,19 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     checkRange()
   }, [priceLower, priceUpper, priceCurrent])
 
-  useEffect(()=>{
-    const getUserBalances = async ()=>{
-      if(token0 && token1){
+  useEffect(() => {
+    const getUserBalances = async () => {
+      if (token0 && token1) {
         const token0Balance = await getUserBalance(token0);
         const token1Balance = await getUserBalance(token1);
 
         setTokenBalance0(token0Balance);
         setTokenBalance1(token1Balance);
       }
-      
-      getUserBalances();
     }
-  },[amount0Desired, amount1Desired]);
+
+    getUserBalances();
+  }, [amount0Desired, amount1Desired]);
 
   const handleButton = (buttonValue: boolean, fullRangeValue: boolean) => {
 
@@ -804,6 +810,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
   };
 
+
+  console.log("=========== ", tokenBalance0, tokenBalance1);
   return (
     <Box className="AddLiquiditySec">
       <Box className="white_box">
@@ -1386,15 +1394,15 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
                 <Box>
                   <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning || tokenBalance0 < amount0Desired || tokenBalance1 < amount1Desired}>
-                  {addLiquidityRunning ? (
-    <CircularProgress size={25} />
-) : (
-    tokenBalance0 < amount0Desired || tokenBalance1 < amount1Desired ? (
-        <>Insufficient Balance</>
-    ) : (
-        <>Create Liquidity</>
-    )
-)}
+                    {addLiquidityRunning ? (
+                      <CircularProgress size={25} />
+                    ) : (
+                      tokenBalance0 < amount0Desired || tokenBalance1 < amount1Desired ? (
+                        <>Insufficient Balance</>
+                      ) : (
+                        <>Create Liquidity</>
+                      )
+                    )}
 
                   </Button>
                 </Box>

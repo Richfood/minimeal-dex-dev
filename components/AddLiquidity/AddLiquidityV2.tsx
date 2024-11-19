@@ -28,6 +28,7 @@ const { useChainId } = hooks;
 import { hooks } from '../ConnectWallet/connector';
 import { debounce } from '@syncfusion/ej2-base';
 import { flushSync } from 'react-dom';
+import getUserBalance from '@/utils/api/getUserBalance';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -63,7 +64,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   const [amount1Desired, setAmount1Desired] = useState("");
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
   // const [currentV2PoolRatio, setCurrentV2PoolRatio] = useState<number | null>(null);
-  const [reserves, setReserves] = useState<{ reserve0: number; reserve1: number } | null> (null);
+  const [reserves, setReserves] = useState<{ reserve0: number; reserve1: number } | null>(null);
   const [isSorted, setIsSorted] = useState<boolean>(true);
   const [addLiquidityRunning, setAddLiquidityRunning] = useState(false);
   const [slippageTolerance, setSlippageTolerance] = useState<number | null>(1);
@@ -73,6 +74,8 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
 
   const [amount1Loading, setAmount1Loading] = useState(false);
   const [amount0Loading, setAmount0Loading] = useState(false);
+  const [tokenBalance0, setTokenBalance0] = useState<string>("");
+  const [tokenBalance1, setTokenBalance1] = useState<string>("");
 
   console.log("🚀 ~ slippageTolerance:", slippageTolerance)
   console.log("🚀 ~ deadline:", deadline)
@@ -84,8 +87,8 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
     // const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
     // if (tokenData.length > 0 && !tokensSelected) {
-      setToken0(famousTokenTestnet[9]);
-      setToken1(famousTokenTestnet[10]);
+    setToken0(famousTokenTestnet[9]);
+    setToken1(famousTokenTestnet[10]);
     // }
   }, []);
 
@@ -203,55 +206,56 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   const calculate = useCallback(
     debounce(async (value: string, inputBox: number) => {
       console.log("calculate run V2");
-  
+
       if (value === "") {
         setAmount0Desired('');
         setAmount1Desired('');
         return;
       }
-  
+
       if (reserves && token0 && token1) {
         try {
           if (inputBox === 0) {
-            console.log("yooooooooooooooooooooo");
+            setAmount1Desired("");
             setAmount1Loading(true);
-  
+
             const amount1DesiredToSet = await calculateV2Amounts(
-              token0, 
-              token1, 
-              Number(value), 
-              0, 
-              reserves.reserve0, 
-              reserves.reserve1, 
+              token0,
+              token1,
+              Number(value),
+              0,
+              reserves.reserve0,
+              reserves.reserve1,
               isSorted
             );
-  
+
             console.log("🚀 ~ calculate ~ amount1DesiredToSet:", amount1DesiredToSet);
-  
+
             flushSync(() => {
               setAmount1Desired(amount1DesiredToSet?.toString() || "");
             });
-  
+
             setAmount1Loading(false);
           } else {
+            setAmount1Desired("");
             setAmount0Loading(true);
-  
+
             const amount0DesiredToSet = await calculateV2Amounts(
-              token0, 
-              token1, 
-              0, 
-              Number(value), 
-              reserves.reserve0, 
-              reserves.reserve1, 
+              token0,
+              token1,
+              0,
+              Number(value),
+              reserves.reserve0,
+              reserves.reserve1,
               isSorted
             );
-  
+
             console.log("🚀 ~ calculate ~ amount0DesiredToSet:", amount0DesiredToSet);
-  
+
             flushSync(() => {
               setAmount0Desired(amount0DesiredToSet?.toString() || "");
             });
-  
+
             setAmount0Loading(false);
           }
         } catch (error) {
@@ -263,7 +267,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
     }, 2000),
     [token0, token1, reserves, isSorted]
   );
-  
+
 
   const getPoolRatio = async () => {
     let pairRatio: { reserve0: number; reserve1: number } | null = null;
@@ -283,13 +287,27 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   }, [])
 
   useEffect(() => {
-    if(token0 && token1){
+    if (token0 && token1) {
       setIsSorted(token0.address.contract_address < token1.address.contract_address);
     }
     setAmount0Desired("");
     setAmount1Desired("")
     getPoolRatio();
   }, [token0, token1])
+
+  useEffect(() => {
+    const getUserBalances = async () => {
+      if (token0 && token1) {
+        const token0Balance = await getUserBalance(token0);
+        const token1Balance = await getUserBalance(token1);
+
+        setTokenBalance0(token0Balance);
+        setTokenBalance1(token1Balance);
+      }
+    }
+
+    getUserBalances();
+  }, [amount0Desired, amount1Desired]);
 
   const copyToClipboard = (text: string | undefined) => {
     console.log("🚀 ~ copyToClipboard ~ text:", text)
@@ -450,10 +468,9 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
                     </Typography>
                   </Box>
                   <Box className="inputField">
-                    {amount0Loading ? <CircularProgress size={30}/> : (
+                    {amount0Loading ? <CircularProgress size={30} /> : (
                       <input autoComplete="off" onChange={(e) => {
                         setAmount0Desired(e.target.value)
-                        setAmount1Desired("");
                         calculate(e.target.value, 0);
                       }} id="token0" type="number" placeholder='0.0' style={{ textAlign: 'end' }}
                         value={amount0Desired} />
@@ -469,14 +486,13 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
                       onClick={() => copyToClipboard(token1?.address?.contract_address)}>{token1 ? (token1.symbol) : "Select a Currency"} <Typography component="span" sx={{ ml: '5px', cursor: 'pointer' }}><PiCopy /></Typography>
                     </Typography>
                   </Box>
-                  {amount1Loading ? <CircularProgress size={30}/> : (
+                  {amount1Loading ? <CircularProgress size={30} /> : (
                     <Box className="inputField">
-                    <input autoComplete="off" onChange={(e) => {
-                      setAmount0Desired("");
-                      setAmount1Desired(e.target.value)
-                      calculate(e.target.value, 1);
-                    }} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }}
-                      value={amount1Desired} />
+                      <input autoComplete="off" onChange={(e) => {
+                        setAmount1Desired(e.target.value)
+                        calculate(e.target.value, 1);
+                      }} type="number" id='token1' placeholder='0.0' style={{ textAlign: 'end' }}
+                        value={amount1Desired} />
                     </Box>
                   )}
                 </Box>
@@ -484,7 +500,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
 
                 <Box sx={{ display: "flex", justifyContent: 'space-between', width: '100%' }}>
                   <Typography sx={{ fontSize: '14px' }}>Current Price {token0?.symbol} / {token1?.symbol}:</Typography>
-                  <Typography sx={{ fontSize: '14px' }}>{isSorted && reserves? reserves.reserve0 / reserves.reserve1 : reserves ? reserves.reserve1 / reserves.reserve0 : ""}</Typography>
+                  <Typography sx={{ fontSize: '14px' }}>{isSorted && reserves ? reserves.reserve0 / reserves.reserve1 : reserves ? reserves.reserve1 / reserves.reserve0 : ""}</Typography>
                 </Box>
 
                 <Box sx={{ width: '100%' }}>
@@ -493,9 +509,17 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
                     variant="contained"
                     color="secondary"
                     sx={{ width: '100%' }}
-                    disabled={!amount0Desired || !amount1Desired || !token0 || !token1 || addLiquidityRunning}
+                    disabled={!amount0Desired || !amount1Desired || !token0 || !token1 || addLiquidityRunning || tokenBalance0 < amount0Desired || tokenBalance1 < amount1Desired}
                   >
-                    {addLiquidityRunning ? <CircularProgress size={25} /> : <>Create Liquidity</>}
+                    {addLiquidityRunning ? (
+                      <CircularProgress size={25} />
+                    ) : (
+                      tokenBalance0 < amount0Desired || tokenBalance1 < amount1Desired ? (
+                        <>Insufficient Balance</>
+                      ) : (
+                        <>Create Liquidity</>
+                      )
+                    )}
                   </Button>
                 </Box>
 
