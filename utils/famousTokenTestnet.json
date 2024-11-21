@@ -164,7 +164,7 @@
         "name": "MOCK_USDC",
         "symbol": "MUSDC",
         "address": {
-            "contract_address": "0x20f0Be1704c978A3cd367c6BBEc06FdffF63140F",
+            "contract_address": "0x494d9b251853465f595B06D8b67A10d4Cd360Ac0",
             "decimals": 6
         },
         "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png"
