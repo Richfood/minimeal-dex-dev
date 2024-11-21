@@ -509,12 +509,12 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
                     variant="contained"
                     color="secondary"
                     sx={{ width: '100%' }}
-                    disabled={!amount0Desired || !amount1Desired || !token0 || !token1 || addLiquidityRunning || tokenBalance0 < amount0Desired || tokenBalance1 < amount1Desired}
+                    disabled={!amount0Desired || !amount1Desired || !token0 || !token1 || addLiquidityRunning || Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired)}
                   >
                     {addLiquidityRunning ? (
                       <CircularProgress size={25} />
                     ) : (
-                      tokenBalance0 < amount0Desired || tokenBalance1 < amount1Desired ? (
+                      Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired) ? (
                         <>Insufficient Balance</>
                       ) : (
                         <>Create Liquidity</>

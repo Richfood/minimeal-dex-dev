@@ -1393,11 +1393,11 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                 </Box>
 
                 <Box>
-                  <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning || tokenBalance0 < amount0Desired || tokenBalance1 < amount1Desired}>
+                  <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning || Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired)}>
                     {addLiquidityRunning ? (
                       <CircularProgress size={25} />
                     ) : (
-                      tokenBalance0 < amount0Desired || tokenBalance1 < amount1Desired ? (
+                      Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired) ? (
                         <>Insufficient Balance</>
                       ) : (
                         <>Create Liquidity</>
