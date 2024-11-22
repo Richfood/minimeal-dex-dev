@@ -65,7 +65,9 @@ export async function swapV3(
     console.log(path);
 
     amountIn = ethers.utils.parseUnits(expandIfNeeded(amountIn), token0.address.decimals).toString();
+    // console.log("🚀 ~ amountIn:", amountIn)
     amountOut = ethers.utils.parseUnits(expandIfNeeded(amountOut), token1.address.decimals).toString();
+    // console.log("🚀 ~ amountOut:", amountOut)
 
     const SmartRouterAddress = addresses.PancakeRouterAddress;
     const SmartRouterContract = new ethers.Contract(SmartRouterAddress, SMART_ROUTER_ABI, newSigner);
@@ -80,9 +82,9 @@ export async function swapV3(
     let recipient = newSignerAddress;
 
     if (amountIn !== null && slippageTolerance !== null) {
-        let amountOutMinimum = (
+        let amountOutMinimum = expandIfNeeded(Math.round((
             Number(amountOut) - Math.round(adjustForSlippage(amountOut, slippageTolerance))
-        ).toString();
+        )).toString());
         console.log("🚀 ~ slippageTolerance:", slippageTolerance)
         console.log("🚀 ~ amountOutMinimum:", amountOutMinimum)
         console.log("🚀 ~ amountIn:", amountIn)

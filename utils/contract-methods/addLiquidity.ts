@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import emulate from "../emulate-addLiquidity";
 import { FeeAmount } from "@uniswap/v3-sdk";
 import { TokenDetails } from "@/interfaces";
-import { adjustForSlippage, expandIfNeeded, isNative } from "../generalFunctions";
+import { adjustForSlippage, decimalRound, expandIfNeeded, isNative } from "../generalFunctions";
 import v2RouterArtifact from "../../abis/PancakeV2Router.sol/PancakeRouter.json";
 import addresses from "../address.json";
 import nfpmArtifact from "../../abis/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
@@ -80,9 +80,12 @@ export async function addLiquidityV2(
     let amount0Min = amount0Desired;
     // console.log("🚀 ~ amount0Min:", amount0Min)
     let amount1Min = amount1Desired;
+    // console.log("🚀 ~ amount1Min:", amount1Min)
 
-    amount0Min = expandIfNeeded((Number(amount0Min) - adjustForSlippage(amount0Min, slippageTolerance)).toString());
-    amount1Min = expandIfNeeded((Number(amount1Min) - adjustForSlippage(amount1Min, slippageTolerance)).toString());
+    amount0Min = expandIfNeeded(decimalRound((Number(amount0Min) - adjustForSlippage(amount0Min, slippageTolerance)).toString(), 0));
+    // console.log("🚀 ~ amount0Min:", amount0Min)
+    amount1Min = expandIfNeeded(decimalRound((Number(amount1Min) - adjustForSlippage(amount1Min, slippageTolerance)).toString(), 0));
+    // console.log("🚀 ~ amount1Min:", amount1Min)
 
     const pancakeV2RouterAddress = addresses.PancakeV2RouterAddress;
     const pancakeV2RouterContract = new ethers.Contract(pancakeV2RouterAddress, V2_ROUTER_ABI, newSigner);

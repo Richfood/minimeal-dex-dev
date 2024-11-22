@@ -20,5 +20,9 @@
   "NonfungibleTokenPositionDescriptorOffChainAddress": "0xf721ca77F6f853F03d9F4a7ed100Ba7654746186",
   "PancakePositionManagerAddress": "0x98A402eeaCa5c0925169C7Fc281a30d1e73fB509",
   "SmartRouterHelperAddress": "0xba1d840037082A5c17aE6CA2f998e3a417A6F212",
-  "PancakeRouterAddress": "0x05cC6b698460003dB32CAAa7cF21cD702B18eB96"
+  "PancakeRouterAddress": "0x05cC6b698460003dB32CAAa7cF21cD702B18eB96",
+  "MulticallAddress": "0xeaB04A94882c3a71Ae54EB4f3F276101e2c9e694",
+  "QuoterAddress": "0x6146cA13514086E892926eE2d4c4E304A66C9Aca",
+  "MigratorAddress": "",
+  "TickLensAddress": "0xd6A439Ab618FD585aB1Ce365a3578d98345DdCc4"
 }

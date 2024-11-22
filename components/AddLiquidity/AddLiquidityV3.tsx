@@ -608,13 +608,13 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
       if (poolDataFromSubgraph) {
         if (isSorted) {
           if (poolDataFromSubgraph.token1Price === "0")
-            priceCurrentToSet = tickToPrice(Number(poolDataFromSubgraph.tick), decimalDifference);
+            priceCurrentToSet = tickToPrice(Number(poolDataFromSubgraph.tick), Math.abs(decimalDifference));
           else
             priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
         }
         else {
           if (poolDataFromSubgraph.token0Price === "0")
-            priceCurrentToSet = 1 / tickToPrice(Number(poolDataFromSubgraph.tick), decimalDifference);
+            priceCurrentToSet = 1 / tickToPrice(Number(poolDataFromSubgraph.tick), Math.abs(decimalDifference));
           else
             priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
         }
