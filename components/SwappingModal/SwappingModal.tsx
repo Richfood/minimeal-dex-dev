@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -11,7 +11,7 @@ import { swapExactTokensForTokens } from '@/utils/swapV2exacttokensfortokens';
 import { swapV3 } from '@/utils/contract-methods/swapTokens';
 
 import addresses from "@/utils/address.json";
-import { expandIfNeeded } from '@/utils/generalFunctions';
+import { tickToPrice } from '@/utils/utils';
 
 interface SwappingModalProps {
     openSwap: boolean;
@@ -26,14 +26,15 @@ interface SwappingModalProps {
     setAmountOut: React.Dispatch<React.SetStateAction<string>>;
     dataForSwap: any;
     setOpenSwap: React.Dispatch<React.SetStateAction<boolean>>;
-
+    tickPrice: string | null;
+    decimalDiff: number;
 }
 
-const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap, theme, amountIn, amountOut, token0, token1, slippageTolerance, setOpenSwap, setAmountIn, setAmountOut, dataForSwap }) => {
+const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap, theme, amountIn, amountOut, token0, token1, slippageTolerance, setOpenSwap, setAmountIn, setAmountOut, dataForSwap, tickPrice, decimalDiff }) => {
 
     const style = {
         position: 'absolute' as 'absolute',
-        top: '30%',
+        top: '50%',
         left: '50%',
         fontSize: '14px',
         fontWeight: '500',
@@ -47,6 +48,23 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
         maxHeight: '80vh',
         overflowY: 'auto',
     };
+
+    const [price, setPrice] = useState<number | null>(0)
+
+
+    useEffect(() => {
+        if (tickPrice && typeof decimalDiff === 'number') {
+            try {
+                const tick = tickToPrice(Number(tickPrice), decimalDiff);
+                console.log("🚀 ~ calculateTick ~ tick:", tick);
+                setPrice(tick);
+            } catch (error) {
+                console.error("Error calculating tick:", error);
+            }
+        }
+    }, [tickPrice, decimalDiff]);
+
+
 
     const smartRouterAddress = addresses.PancakeRouterAddress;
 
@@ -64,7 +82,7 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
 
             // Execute the swap after approval
             // await swapExactTokensForTokens(token0, token1, amountIn, slippageTolerance, amountOut, routePath)
-            
+
             let txHash: string;
             if (dataForSwap.protocol === "V3")
                 txHash = await swapV3(token0, token1, dataForSwap, amountIn, amountOut, slippageTolerance);
@@ -96,7 +114,6 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
             <Modal
                 open={openSwap}
                 onClose={handleCloseSwap}
-
                 aria-labelledby="settings-modal-title"
                 aria-describedby="settings-modal-description"
             >
@@ -109,6 +126,9 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
                             size={24}
                             style={{ position: 'absolute', right: '10px', top: '5px', cursor: 'pointer' }}
                             aria-label="Close settings modal"
+                            onClick={() => {
+                                handleCloseSwap()
+                            }}
                         />
                     </Box>
                     <Box className="modal_body">
@@ -235,7 +255,7 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
                                     mb: 2,
                                 }}
                             >
-                                1%
+                                {price}
 
                             </Typography>
 

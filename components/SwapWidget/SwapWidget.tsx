@@ -13,7 +13,7 @@ import RecentTransactions from '../../components/RecentTransactions/RecentTransa
 import { BsFire } from "react-icons/bs";
 // import { getAmountOutV3 } from '@/utils/calculateSwap';
 import { BigNumber } from 'ethers';
-import { getPoolData } from '@/utils/api/getPoolData';
+import { getPoolDataByAddress } from '@/utils/api/getPoolDataByAddress';
 import { Protocol, SwapPoolData, TokenDetails } from '@/interfaces';
 import { getSmartOrderRoute } from '@/utils/api/getSmartOrderRoute';
 import { TradeType } from '@uniswap/sdk-core';
@@ -29,6 +29,7 @@ import { getTokenUsdPrice } from "@/utils/api/getTokenUsdPrice"
 import getTokenApproval from '@/utils/contract-methods/getTokenApproval';
 import getUserBalance from '@/utils/api/getUserBalance';
 import { swapExactTokensForTokens } from '@/utils/swapV2exacttokensfortokens';
+import SwappingModal from '../SwappingModal/SwappingModal';
 const { useChainId, useIsActive, useAccounts } = hooks;
 
 const fetchCoinUSDPrice = async (tokenAddress?: string) => {
@@ -52,6 +53,8 @@ const SwapWidget = () => {
     // const [activeItem, setActiveItem] = useState<string | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     const [openToken, setOpenToken] = useState(false);
+    const [openSwap, setOpenSwap] = useState(false);
+
     // const [isOpenRecent, setIsOpenRecent] = useState(false);
     // const [isOpenExpert, setIsOpenExpert] = useState(false);
     // const [selectedGraph, setSelectedGraph] = useState<'graph1' | 'graph2'>('graph1');
@@ -62,6 +65,8 @@ const SwapWidget = () => {
     const [token1, setToken1] = useState<TokenDetails | null>(null);
     const [token0Price, setToken0Price] = useState<string | null>("0");
     const [token1Price, setToken1Price] = useState<string | null>("0");
+    const [tickPrice, setTickPrice] = useState<string | null>("0");
+    const [decimalDiff, setDecimalDiff] = useState<number>(0)
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
     const [routePath, setRoutePath] = useState<TokenDetails[] | null>(null);
     const [amountIn, setAmountIn] = useState("");
@@ -99,8 +104,6 @@ const SwapWidget = () => {
 
     }, [amountIn, isConnected]);
 
-
-    console.log(userBalance, amountIn);
     // Load token data from local storage and set it to state
     useEffect(() => {
         // const isTestnet = chainId === 943;
@@ -110,15 +113,15 @@ const SwapWidget = () => {
         // const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
         // if (tokenData.length > 0 && !tokensSelected) {
-            setToken0(famousTokenTestnet[9]);
-            setToken1(famousTokenTestnet[10]);
+        setToken0(famousTokenTestnet[9]);
+        setToken1(famousTokenTestnet[10]);
         // }
     }, []);
 
     useEffect(() => {
         // Example logic
-        setAmountIn("");   // Reset the amount in field
-        setAmountOut("");  // Reset the amount out field
+        setAmountIn("");
+        setAmountOut("");
 
     }, [token0, token1]);
 
@@ -166,6 +169,7 @@ const SwapWidget = () => {
 
     const settingsModal = useCallback(() => setIsOpen((prev) => !prev), []);
 
+    const handleCloseSwap = useCallback(() => setOpenSwap((prev) => !prev), []);
 
     // const handleOpenRecent = useCallback(() => setIsOpenRecent(prev => !prev), []);
     // const handleCloseRecent = () => setIsOpenRecent(false);
@@ -246,46 +250,46 @@ const SwapWidget = () => {
         }
     };
 
-    const handleSwap = async () => {
-        setIsSwapping(true); // Start loading indicator
+    // const handleSwap = async () => {
+    //     setIsSwapping(true); // Start loading indicator
 
-        if (!token0 || !token1) {
-            console.log("🚀 ~ handleSwap ~ Missing tokens:", token0, token1);
-            setIsSwapping(false); // Stop loading indicator on error
-            return; // Exit early if tokens are missing
-        }
+    //     if (!token0 || !token1) {
+    //         console.log("🚀 ~ handleSwap ~ Missing tokens:", token0, token1);
+    //         setIsSwapping(false); // Stop loading indicator on error
+    //         return; // Exit early if tokens are missing
+    //     }
 
-        try {
-            // Approve token for the swap
-            if (token0.symbol !== "PLS")
-                await getTokenApproval(token0, smartRouterAddress, amountIn);
+    //     try {
+    //         // Approve token for the swap
+    //         if (token0.symbol !== "PLS")
+    //             await getTokenApproval(token0, smartRouterAddress, amountIn);
 
-            // Execute the swap after approval
-            // await swapExactTokensForTokens(token0, token1, amountIn, slippageTolerance, amountOut, routePath)
-            let txHash: string;
-            if (dataForSwap.protocol === "V3")
-                txHash = await swapV3(token0, token1, dataForSwap, amountIn, amountOut, slippageTolerance);
-            else {
-                txHash = await swapExactTokensForTokens(token0, token1, amountIn, slippageTolerance, amountOut, dataForSwap);
-            }
+    //         // Execute the swap after approval
+    //         // await swapExactTokensForTokens(token0, token1, amountIn, slippageTolerance, amountOut, routePath)
+    //         let txHash: string;
+    //         if (dataForSwap.protocol === "V3")
+    //             txHash = await swapV3(token0, token1, dataForSwap, amountIn, amountOut, slippageTolerance);
+    //         else {
+    //             txHash = await swapExactTokensForTokens(token0, token1, amountIn, slippageTolerance, amountOut, dataForSwap);
+    //         }
 
-            alert(`Swapping done! TxHash : ${txHash}`);
+    //         alert(`Swapping done! TxHash : ${txHash}`);
 
-            // Reset input/output values after swap
-            setAmountIn("");
-            setAmountOut("");
+    //         // Reset input/output values after swap
+    //         setAmountIn("");
+    //         setAmountOut("");
 
-        } catch (error) {
-            console.error("Error during swap process:", error);
+    //     } catch (error) {
+    //         console.error("Error during swap process:", error);
 
-            // Reset input/output values in case of an error
-            setAmountIn("");
-            setAmountOut("");
+    //         // Reset input/output values in case of an error
+    //         setAmountIn("");
+    //         setAmountOut("");
 
-        } finally {
-            setIsSwapping(false); // Stop loading indicator regardless of outcome
-        }
-    };
+    //     } finally {
+    //         setIsSwapping(false); // Stop loading indicator regardless of outcome
+    //     }
+    // };
 
 
     const toggleGraph = async () => {
@@ -347,7 +351,39 @@ const SwapWidget = () => {
                 );
 
                 // Check if the response contains a valid token path
+                console.log("🚀 ~fetchSmartOrderRoute data:", data)
                 if (data?.finalRoute?.tokenPath) {
+                    (async () => {
+                        try {
+                            const poolAddresses = await data.finalRoute.poolAddresses;
+                            console.log("🚀 ~fetchSmartOrderRoute poolAddresses:", poolAddresses);
+
+                            if (Array.isArray(poolAddresses) && poolAddresses.length > 0) {
+                                // Use for...of to handle async operations sequentially
+                                for (const address of poolAddresses) {
+                                    console.log("🚀 ~fetchSmartOrderRoute address:", address)
+                                    try {
+                                        const poolData = await getPoolDataByAddress(address);
+                                        console.log("🚀 fetchSmartOrderRoute ~ poolData:", poolData);
+                                        const decimalDiff = Number(poolData?.[0]?.token1.decimals) - Number(poolData?.[0]?.token0.decimals)
+                                        setDecimalDiff(decimalDiff);
+                                        if (poolData?.[0]?.tick !== undefined) {
+                                            setTickPrice(poolData[0].tick);
+                                        } else {
+                                            console.log("No tick data found for address:", address);
+                                        }
+                                    } catch (error) {
+                                        console.error(`Error fetching pool data for address ${address}:`, error);
+                                    }
+                                }
+                            } else {
+                                console.log("fetchSmartOrderRoute: No addresses found in poolAddresses.");
+                            }
+                        } catch (error) {
+                            console.error("fetchSmartOrderRoute: Error fetching pool addresses:", error);
+                        }
+                    })();
+
                     setRoutePath(data.finalRoute.tokenPath);
                     setDataForSwap(data.finalRoute);
 
@@ -367,8 +403,8 @@ const SwapWidget = () => {
                     console.error("Token path not found in response.");
                 }
             } catch (error: any) {
-                console.error("Error fetching route:", error);
-                alert(error.response.data);
+                console.error("fetchSmartOrderRoute Error fetching route:", error);
+                // alert(error.response.data);
                 setAmountIn("");
                 setAmountOut("");
             }
@@ -622,12 +658,11 @@ const SwapWidget = () => {
                     </Box>
 
                     <Box className="slippageSec dsls" sx={{ width: '100%' }}>
-
                         <Button
                             sx={{ width: '100%' }}
                             variant="contained"
                             color="secondary"
-                            onClick={isActive && userBalance && Number(userBalance) >= Number(amountIn) ? handleSwap : handleClick}
+                            onClick={isActive && userBalance && Number(userBalance) >= Number(amountIn) ? handleCloseSwap : handleClick}
                             disabled={
                                 (isActive && (amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn) || !amountIn || !amountOut))
                             }
@@ -642,9 +677,6 @@ const SwapWidget = () => {
                                 "Insufficient Balance"
                             )}
                         </Button>
-
-
-
                     </Box>
                     <Box className="slippageSec msls" sx={{ display: "none" }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
@@ -708,6 +740,23 @@ const SwapWidget = () => {
                     setDeadline={setDeadline}
                 />
 
+                <SwappingModal
+                    openSwap={openSwap}
+                    handleCloseSwap={handleCloseSwap}
+                    theme={theme}
+                    amountIn={amountIn}
+                    amountOut={amountOut}
+                    token0={token0}
+                    token1={token1}
+                    slippageTolerance={slippageTolerance}
+                    setAmountIn={setAmountIn}
+                    setAmountOut={setAmountOut}
+                    dataForSwap={dataForSwap}
+                    setOpenSwap={setOpenSwap}
+                    tickPrice={tickPrice}
+                    decimalDiff={decimalDiff}
+                />
+
 
                 {/* <RecentTransactions open={isOpenRecent} onClose={handleCloseRecent} /> */}
                 <SelectedToken
@@ -728,5 +777,4 @@ const SwapWidget = () => {
 };
 
 export default SwapWidget;
-
 

@@ -7,6 +7,14 @@ export interface AddLiquidityPoolData {
     price0: String,
     price1: String
   },
+  token0: {
+    decimals: number,
+    name: string
+  },
+  token1: {
+    decimals: number,
+    name: string
+  },
   token0Price: String,
   token1Price: String
 }
