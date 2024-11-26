@@ -282,13 +282,13 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   useEffect(() => {
     if (token0 && token1) {
       getPoolRatio();
-      setIsSorted(token0.address.contract_address < token1.address.contract_address);
+      setIsSorted(token0.address.contract_address.toLowerCase() < token1.address.contract_address.toLowerCase());
     }
   }, [])
 
   useEffect(() => {
     if (token0 && token1) {
-      setIsSorted(token0.address.contract_address < token1.address.contract_address);
+      setIsSorted(token0.address.contract_address.toLowerCase() < token1.address.contract_address.toLowerCase());
     }
     setAmount0Desired("");
     setAmount1Desired("")

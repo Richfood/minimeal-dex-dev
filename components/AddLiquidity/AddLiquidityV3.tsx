@@ -295,7 +295,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
   const sortTokens = () => {
     if (token0 && token1) {
-      if (token0.address.contract_address > token1.address.contract_address) {
+      if (token0.address.contract_address.toLowerCase() > token1.address.contract_address.toLowerCase()) {
         const temp = token0;
         setToken0(token1);
         setToken1(temp);
@@ -606,15 +606,18 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
       let priceUpperToSet: number | undefined = undefined;
 
       if (poolDataFromSubgraph) {
+        const tempDecimalDif = poolDataFromSubgraph.token1.decimals - poolDataFromSubgraph.token0.decimals;
+        console.log("Tick = ", poolDataFromSubgraph.tick, "Decimal Difference = ", decimalDifference);
         if (isSorted) {
           if (poolDataFromSubgraph.token1Price === "0")
-            priceCurrentToSet = tickToPrice(Number(poolDataFromSubgraph.tick), Math.abs(decimalDifference));
+            priceCurrentToSet = tickToPrice(Number(poolDataFromSubgraph.tick),  tempDecimalDif);
           else
             priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
         }
         else {
           if (poolDataFromSubgraph.token0Price === "0")
-            priceCurrentToSet = 1 / tickToPrice(Number(poolDataFromSubgraph.tick), Math.abs(decimalDifference));
+            // The reason for -1 * decimal difference is that this price is with respect to another token which is not sorted
+            priceCurrentToSet = 1 / tickToPrice(Number(poolDataFromSubgraph.tick), tempDecimalDif);
           else
             priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
         }
@@ -698,7 +701,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     else {
       fetchAllPoolsData();
       setDecimalDifference(token1.address.decimals - token0.address.decimals);
-      setIsSorted(token0.address.contract_address < token1.address.contract_address);
+      setIsSorted(token0.address.contract_address.toLowerCase() < token1.address.contract_address.toLowerCase());
     }
     //console.log("🚀 ~ token0, token1:")
   }, [token0, token1])

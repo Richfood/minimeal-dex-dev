@@ -7,8 +7,8 @@ import v2FactoryArtifact from "../../abis/PancakeFactory.sol/PancakeFactory.json
 export async function getV2Pair(token0: TokenDetails, token1: TokenDetails) {
     try {
 
-        if (token0.address.contract_address > token1.address.contract_address) {
-            [token0, token1] = [token1, token0];
+        if(token0.address.contract_address.toLowerCase() > token1.address.contract_address.toLowerCase()){
+            [token0,token1] = [token1,token0];
         }
 
         // Create a new provider and signer

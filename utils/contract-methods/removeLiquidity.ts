@@ -33,12 +33,6 @@ export async function removeLiquidityV3(
     const newSigner = newProvider.getSigner();
     const nfpmContract = new ethers.Contract(contractAddress, nfpmAbi, newSigner);
 
-    if(token0.address.contract_address > token1.address.contract_address){
-        const temp = token0;
-        token0 = token1;
-        token1 = temp;
-    }
-
     const is0Native = isNative(token0);
     const is1Native = isNative(token1);
 
