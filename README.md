@@ -81,6 +81,8 @@ run `yarn-install`
             - address
             - startBlock
         - Constants.ts (addresses in lower case)
+        - utils/tick.ts
+            - in the feeTierToTickSpacing function, add if condition for 20,000 fee with tick spacing as 4000
     - Deploy on graph-node -  
         - yarn codegen
         - yarn build
