@@ -13,7 +13,9 @@ import RecentTransactions from '../../components/RecentTransactions/RecentTransa
 import { BsFire } from "react-icons/bs";
 // import { getAmountOutV3 } from '@/utils/calculateSwap';
 import { BigNumber } from 'ethers';
-import { getPoolDataByAddress } from '@/utils/api/getPoolDataByAddress';
+import { getPoolDataByAddressV3 } from '@/utils/api/getPoolDataByAddressV3';
+import { getPoolDataByAddressV2 } from '@/utils/api/getPoolDataByAddressV2';
+
 import { Protocol, SwapPoolData, TokenDetails } from '@/interfaces';
 import { getSmartOrderRoute } from '@/utils/api/getSmartOrderRoute';
 import { TradeType } from '@uniswap/sdk-core';
@@ -66,6 +68,8 @@ const SwapWidget = () => {
     const [token0Price, setToken0Price] = useState<string | null>("0");
     const [token1Price, setToken1Price] = useState<string | null>("0");
     const [tickPrice, setTickPrice] = useState<string | null>("0");
+    const [isPoolV3, setIsPoolV3] = useState<boolean>(false);
+    const [tradingFee, setTradingFee] = useState<number>(0)
     const [decimalDiff, setDecimalDiff] = useState<number>(0)
     const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
     const [routePath, setRoutePath] = useState<TokenDetails[] | null>(null);
@@ -86,7 +90,6 @@ const SwapWidget = () => {
     const [isTestnet, setIsTestnet] = React.useState<boolean | null>(null);
     const [allowSwapForV2, setAllowSwapForV2] = useState<boolean>(true);
     const [allowSwapForV3, setAllowSwapForV3] = useState<boolean>(true);
-    const [isSwapping, setIsSwapping] = useState<boolean>(false);
     const [deadline, setDeadline] = useState("10");
     console.log("🚀 ~ SwapWidget ~ deadline:", deadline)
     const [tokensSelected, setTokensSelected] = useState(false);
@@ -353,36 +356,68 @@ const SwapWidget = () => {
                 // Check if the response contains a valid token path
                 console.log("🚀 ~fetchSmartOrderRoute data:", data)
                 if (data?.finalRoute?.tokenPath) {
-                    (async () => {
-                        try {
-                            const poolAddresses = await data.finalRoute.poolAddresses;
-                            console.log("🚀 ~fetchSmartOrderRoute poolAddresses:", poolAddresses);
-
-                            if (Array.isArray(poolAddresses) && poolAddresses.length > 0) {
-                                // Use for...of to handle async operations sequentially
-                                for (const address of poolAddresses) {
-                                    console.log("🚀 ~fetchSmartOrderRoute address:", address)
-                                    try {
-                                        const poolData = await getPoolDataByAddress(address);
-                                        console.log("🚀 fetchSmartOrderRoute ~ poolData:", poolData);
-                                        const decimalDiff = Number(poolData?.[0]?.token1.decimals) - Number(poolData?.[0]?.token0.decimals)
-                                        setDecimalDiff(decimalDiff);
-                                        if (poolData?.[0]?.tick !== undefined) {
-                                            setTickPrice(poolData[0].tick);
-                                        } else {
-                                            console.log("No tick data found for address:", address);
+                    if (data?.finalRoute?.protocol === "V3") {
+                        (async () => {
+                            try {
+                                const poolAddresses = await data.finalRoute.poolAddresses;
+                                console.log("🚀 ~fetchSmartOrderRoute poolAddresses:", poolAddresses);
+                                setIsPoolV3(true);
+                                if (Array.isArray(poolAddresses) && poolAddresses.length > 0) {
+                                    // Use for...of to handle async operations sequentially
+                                    for (const address of poolAddresses) {
+                                        try {
+                                            const poolData = await getPoolDataByAddressV3(address);
+                                            console.log("🚀 fetchSmartOrderRoute ~ poolData:", poolData);
+                                            const decimalDiff = Number(poolData?.[0]?.token1.decimals) - Number(poolData?.[0]?.token0.decimals)
+                                            console.log("🚀 ~fetchSmartOrderRoute decimalDiff:", decimalDiff)
+                                            setDecimalDiff(decimalDiff);
+                                            const tradingFee = Number(poolData[0].feeTier) / 10000;
+                                            console.log("🚀 ~fetchSmartOrderRoute tradingFee:", tradingFee)
+                                            setTradingFee(tradingFee);
+                                            if (poolData?.[0]?.tick !== undefined) {
+                                                setTickPrice(poolData[0].tick);
+                                            } else {
+                                                console.log("No tick data found for address:", address);
+                                            }
+                                        } catch (error) {
+                                            console.error(`Error fetching pool data for address ${address}:`, error);
                                         }
-                                    } catch (error) {
-                                        console.error(`Error fetching pool data for address ${address}:`, error);
                                     }
+                                } else {
+                                    console.log("fetchSmartOrderRoute: No addresses found in poolAddresses.");
                                 }
-                            } else {
-                                console.log("fetchSmartOrderRoute: No addresses found in poolAddresses.");
+                            } catch (error) {
+                                console.error("fetchSmartOrderRoute: Error fetching pool addresses:", error);
                             }
-                        } catch (error) {
-                            console.error("fetchSmartOrderRoute: Error fetching pool addresses:", error);
-                        }
-                    })();
+                        })();
+                    }
+                    else {
+                        (async () => {
+                            try {
+                                const poolAddresses = await data.finalRoute.poolAddresses;
+                                console.log("🚀 ~fetchSmartOrderRoute poolAddresses:", poolAddresses);
+                                setIsPoolV3(false);
+                                if (Array.isArray(poolAddresses) && poolAddresses.length > 0) {
+                                    // Use for...of to handle async operations sequentially
+                                    for (const address of poolAddresses) {
+                                        console.log("🚀 ~fetchSmartOrderRoute address:", address)
+                                        try {
+                                            const poolData = await getPoolDataByAddressV2(address);
+                                            console.log("🚀 ~fetchSmartOrderRoute poolData:", poolData)
+                                            setTickPrice(poolData[0].token0Price);
+                                            setTradingFee(0.25)
+                                        } catch (error) {
+                                            console.error(`Error fetching pool data for address ${address}:`, error);
+                                        }
+                                    }
+                                } else {
+                                    console.log("fetchSmartOrderRoute: No addresses found in poolAddresses.");
+                                }
+                            } catch (error) {
+                                console.error("fetchSmartOrderRoute: Error fetching pool addresses:", error);
+                            }
+                        })();
+                    }
 
                     setRoutePath(data.finalRoute.tokenPath);
                     setDataForSwap(data.finalRoute);
@@ -667,9 +702,7 @@ const SwapWidget = () => {
                                 (isActive && (amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn) || !amountIn || !amountOut))
                             }
                         >
-                            {isSwapping ? (
-                                <CircularProgress size={24} color="inherit" />
-                            ) : !isActive ? (
+                            {!isActive ? (
                                 "Connect Wallet"
                             ) : userBalance && Number(userBalance) >= Number(amountIn) && amountIn && amountOut ? (
                                 "Swap"
@@ -755,6 +788,8 @@ const SwapWidget = () => {
                     setOpenSwap={setOpenSwap}
                     tickPrice={tickPrice}
                     decimalDiff={decimalDiff}
+                    isPoolV3={isPoolV3}
+                    tradingFee={tradingFee}
                 />
 
 

@@ -1,37 +1,20 @@
 import axios from "axios";
 
-export async function getPoolDataByAddress(poolAddress: string): Promise<any> {
+export async function getPoolDataByAddressV2(poolAddress: string): Promise<any> {
     console.log("🚀 ~ getPoolDataByAddress ~ poolAddress:", poolAddress)
 
-    const subgraphUrl = process.env.NEXT_PUBLIC_V3_SUBGRAPH_API;
+    const subgraphUrl = process.env.NEXT_PUBLIC_V2_SUBGRAPH_API;
     console.log("🚀 ~ getPoolDataByAddress ~ subgraphUrl:", subgraphUrl)
     const query = `
               query {
-        pools(
-          where: {
-            id: "${poolAddress.toLowerCase()}", 
-          }
-        ) {
-            id
-            tick
-            token0Price
-            token1Price
-            liquidity
-            feeTier
-            token0 {
-              name
-              decimals
+        pairs(
+            where: {
+                id: "${poolAddress.toLowerCase()}", 
             }
-            token1 {
-              name
-              decimals
-            }
-            ticks {
-            price0
-            price1
+        )   {
+                token0Price
             }
         }
-      }
     `;
 
     try {
@@ -53,7 +36,7 @@ export async function getPoolDataByAddress(poolAddress: string): Promise<any> {
             throw new Error(JSON.stringify(response.data.errors));
         }
 
-        const allPools = response.data.data.pools; // Get the first pool
+        const allPools = response.data.data.pairs; // Get the first pool
         console.log("🚀 ~ getPoolDataByAddress ~ allPools:", allPools)
 
         return allPools;
