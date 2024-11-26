@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import { Badge, Box, Button, Typography, Link, IconButton } from '@mui/material';
@@ -8,10 +8,14 @@ import Image from 'next/image';
 import { useTheme } from '../../components/ThemeContext'; // Adjust the path to your ThemeContext
 import IOSSwitch from '../../components/IOSSwitch/IOSSwitch';
 import { VscArrowBoth } from "react-icons/vsc";
+import { V3PositionData } from '@/interfaces';
+import { getPositionByTokenId } from '@/utils/api/getPositionByTokenId';
 
+interface PositionProps {
+    tokenId: string;
+  }
 
-
-const Position = () => {
+const Position = ({tokenId} : PositionProps) => {
     const router = useRouter();
     const { theme, toggleTheme } = useTheme();
     const handleThemeToggle = () => {
@@ -22,16 +26,24 @@ const Position = () => {
         router.back();
     };
 
-
     const [checked, setChecked] = useState(false);
+    const [position, setPosition] = useState<V3PositionData | null>(null);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setChecked(event.target.checked);
     };
 
+    useEffect(()=>{
+        const getPosition = async()=>{
+          const positionToUse = await getPositionByTokenId(tokenId);
+        }
+    
+        getPosition()
+    
+      },[])
+
     return (
         <>
-
             <Box component="main" sx={{ minHeight: "calc(100vh - 150px)" }}>
                 <Box sx={{ maxWidth: '800px', margin: '0 auto', py: '50px', px: "16px" }}>
                     <Box sx={{ mb: '15px', display: 'flex', alignItems: 'center' }}>
@@ -79,12 +91,20 @@ const Position = () => {
                                     borderRadius: '30px',
                                     cursor: 'pointer'
                                 }}
-                                component={Link}
-                                href="#"
+
+                                onClick={()=>{
+                                    console.log("PPPPP");
+                                    router.push(`/increaseLiquidity/V3/${tokenId}`)
+                                }}
                             >
                                 Increase liquidity
                             </Button>
-                            <Button variant="contained" color="primary">
+                            <Button variant="contained" color="primary"
+                                onClick={()=>{
+                                    console.log("PPPPP");
+                                    router.push(`/removeLiquidity/V3/${tokenId}`)
+                                }}
+                            >
                                 Remove liquidity
                             </Button>
                         </Box>

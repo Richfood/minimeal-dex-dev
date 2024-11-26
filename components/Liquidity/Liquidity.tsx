@@ -54,6 +54,15 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
     setValue(newValue);
   };
 
+  const handlePositionClick = (protocol : string, tokenId: string)=>{
+    if(protocol === "V3"){
+      router.push(`/position/${tokenId}`)
+    }
+    else{
+
+    }
+  }
+
   useEffect(() => {
     const runGetPositionsData = async () => {
       setIsLoadingPosition(true);
@@ -150,7 +159,9 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
                   {v3Positions.length ? (
                     <List sx={{ width: '100%', maxWidth: 'screen' }}>
                       {v3Positions.map((elem) => (
-                        <PositionListV3 theme={theme} data={elem}/>
+                        <Box onClick={()=>handlePositionClick("V3", elem.id)}>
+                          <PositionListV3 theme={theme} data={elem}/>
+                        </Box>
                       ))}
                     </List>
                   ) : (
