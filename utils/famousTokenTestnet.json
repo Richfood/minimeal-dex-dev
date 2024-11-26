@@ -178,5 +178,15 @@
         },
         "symbol": "WPLS",
         "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png"
+    },
+    {
+        "chainId": 943,
+        "name": "Two Decimal Token",
+        "address": {
+            "contract_address": "0xC684ae078DA2FCE90F410C6F65afDb26f27994fA",
+            "decimals": 2
+        },
+        "symbol": "TWD",
+        "logoURI": "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png"
     }
 ]
