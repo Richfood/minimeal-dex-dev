@@ -4,7 +4,7 @@ import Header from '../../../components/Header/Header';
 import Footer from '../../../components/Footer/Footer';
 import IncreaseLiquidityV3 from '@/components/IncreaseLiquidity/IncreaseLiquidityV3';
 import { useRouter } from 'next/router';
-import Position from '@/components/position';
+import Position from '@/components/Position/Position';
 
 const Index = () => {
 
