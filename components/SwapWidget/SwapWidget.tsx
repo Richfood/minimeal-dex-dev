@@ -24,13 +24,12 @@ import famousToken from "../../utils/famousToken.json";
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import { hooks, metaMask } from '../ConnectWallet/connector';
 import tokenList from "../../utils/tokenList.json";
-import { swapV3 } from '@/utils/contract-methods/swapTokens';
+import { swapV3, swapExactTokensForTokens } from '@/utils/contract-methods/swapTokens';
 import addresses from "@/utils/address.json";
 import { flushSync } from 'react-dom';
 import { getTokenUsdPrice } from "@/utils/api/getTokenUsdPrice"
 import getTokenApproval from '@/utils/contract-methods/getTokenApproval';
 import getUserBalance from '@/utils/api/getUserBalance';
-import { swapExactTokensForTokens } from '@/utils/swapV2exacttokensfortokens';
 import SwappingModal from '../SwappingModal/SwappingModal';
 const { useChainId, useIsActive, useAccounts } = hooks;
 

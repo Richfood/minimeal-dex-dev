@@ -14,7 +14,7 @@ import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import { decimalRound } from '@/utils/generalFunctions';
 import { ethers } from 'ethers';
 import { calculatePositionData } from '@/utils/calculatePositionData';
-import { collectFees } from '@/utils/collectFees';
+import { collectFees } from '@/utils/contract-methods/collectFees';
 
 interface PositionProps {
     tokenId: string;

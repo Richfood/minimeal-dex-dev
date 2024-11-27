@@ -1,8 +1,8 @@
 import { ethers } from "ethers";
 import { TokenDetails } from "@/interfaces";
-import { adjustForSlippage } from "./generalFunctions";
-import NFPM_ARTIFACT from "../abis/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
-import addresses from "./address.json"
+import { adjustForSlippage } from "../generalFunctions";
+import NFPM_ARTIFACT from "../../abis/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
+import addresses from "../address.json"
 
 const NFPM_ABI = NFPM_ARTIFACT.abi;
 
