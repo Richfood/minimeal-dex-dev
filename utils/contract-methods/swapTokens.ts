@@ -99,7 +99,7 @@ export async function swapV3(
 
         const combinedData = [exactInputData];
         if(valueToSend){
-            combinedData.push(refundETH);
+            combinedData.push(refundETHData);
         }
 
         const SmartRouterContractExactInputMulticallTx = await SmartRouterContract["multicall(uint256,bytes[])"](deadline, combinedData, { value: valueToSend });
