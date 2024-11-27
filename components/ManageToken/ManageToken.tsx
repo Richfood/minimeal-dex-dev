@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -9,6 +9,7 @@ import { TabContext, TabPanel } from '@mui/lab';
 import { Tabs, Tab, Button } from '@mui/material';
 import { FaRegQuestionCircle } from 'react-icons/fa';
 import ImportTokens from '../ImportTokens/ImportTokens';
+import { ethers } from "ethers";
 
 interface ManageTokenProps {
     open: boolean;
@@ -73,6 +74,40 @@ const ManageToken: React.FC<ManageTokenProps> = ({ open, handleClose, mode }) =>
         },
     }));
 
+    const provider = new ethers.JsonRpcProvider("https://pulsechain-testnet-rpc.publicnode.com");
+    
+    // Replace with your token's contract address
+    const tokenAddress = "0xYourTokenContractAddress";
+    
+    // Minimum ERC20 ABI to fetch token details
+    const abi = [
+        "function name() view returns (string)",
+        "function symbol() view returns (string)",
+        "function decimals() view returns (uint8)",
+        "function totalSupply() view returns (uint256)"
+    ];
+    
+    const fetchTokenInfo = async (tokenAddress: string) => {
+        try {
+            const tokenContract = new ethers.Contract(tokenAddress, abi, provider);
+    
+            const name = await tokenContract.name();
+            const symbol = await tokenContract.symbol();
+            const decimals = await tokenContract.decimals();
+            const totalSupply = await tokenContract.totalSupply();
+    
+            console.log(`Token Address: ${tokenAddress}`);
+            console.log("Token Name:", name);
+            console.log("Token Symbol:", symbol);
+            console.log("Token Decimals:", decimals);
+            console.log("Total Supply:", ethers.formatUnits(totalSupply, decimals));
+        } catch (error) {
+            console.error("Error fetching token info:", error);
+        }
+    };
+    
+    fetchTokenInfo(tokenAddress);
+    
     return (
         <>
             <Modal

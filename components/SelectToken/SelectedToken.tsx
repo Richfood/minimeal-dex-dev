@@ -169,9 +169,9 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
         boxShadow: 'rgba(0, 0, 0, 0.24) -40px 40px 80px -8px',
         borderRadius: '16px',
         color: mode === 'light' ? 'var(--primary)' : 'var(--white)',
-        maxHeight: '90vh',
-        overflow: 'hidden'
-    };
+        maxHeight: '100vh',
+        overflowY: 'auto',
+        overflowX: 'hidden',    };
 
     const Search = styled('div')(({ theme }) => ({
         position: 'relative',
@@ -470,15 +470,16 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                 </Box>)}
 
 
-                            <Box sx={{ textAlign: 'center', mt: '20px' }}>
-                                <Typography
-                                    variant="h6"
-                                    sx={{ color: 'var(--cream)', cursor: 'pointer' }}
-                                    onClick={handleOpenManage}
-                                >
-                                    Manage Tokens
-                                </Typography>
-                            </Box>
+
+                        </Box>
+                        <Box sx={{ textAlign: 'center', mt: '20px' }}>
+                            <Typography
+                                variant="h6"
+                                sx={{ color: 'var(--cream)', cursor: 'pointer',}}
+                                onClick={handleOpenManage}
+                            >
+                                Manage Tokens
+                            </Typography>
                         </Box>
                     </Box>
                 </Box>

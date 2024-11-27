@@ -41,6 +41,7 @@ import famousToken from "../../utils/famousToken.json";
 const { useChainId } = hooks;
 import { hooks } from '../ConnectWallet/connector';
 import getUserBalance from '@/utils/api/getUserBalance';
+import AddLiquidityModal from '../AddLIquidityModal/AddLIquidityModal';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -72,6 +73,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   // const [vTwo, setVTwo] = useState(activeProtocol === Protocol.V2 ? true : false);
   const [openToken, setOpenToken] = useState(false);
   const [tier, setTier] = useState<string>('0.01%');
+  const [openAddLiquidity, setOpenAddLiquidity] = useState(false);
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -93,6 +95,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [priceLower, setPriceLower] = useState("");
   const [priceUpper, setPriceUpper] = useState("");
   const [priceCurrent, setPriceCurrent] = useState("");
+  console.log("🚀 ~ priceCurrent:", priceCurrent)
   const [fee, setFee] = useState<FeeAmount | null>(null);
   const [approvalAmount0, setApprovalAmount0] = useState("");
   const [approvalAmount1, setApprovalAmount1] = useState("");
@@ -109,8 +112,11 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [amountAt1, setAmountAt1] = useState("");
 
   const [priceLowerEntered, setPriceLowerEntered] = useState("");
+  console.log("🚀 ~ priceLowerEntered:", priceLowerEntered)
   const [priceUpperEntered, setPriceUpperEntered] = useState("");
+  console.log("🚀 ~ priceUpperEntered:", priceUpperEntered)
   const [priceCurrentEntered, setPriceCurrentEntered] = useState("");
+  console.log("🚀 ~ priceCurrentEntered:", priceCurrentEntered)
 
   const [currentPoolData, setCurrentPoolData] = useState<AddLiquidityPoolData | null>(null);
   // const [currentV2PoolRatio, setCurrentV2PoolRatio] = useState<number | null>(null);
@@ -327,7 +333,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
         setFee(FeeAmount.HIGH);
         break;
 
-      case (4):
+      case (4): 
         setFee(FeeAmount.HIGHEST);
         break;
 
@@ -368,7 +374,9 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     setOpenToken(prev => !prev)
   }, []);
 
+
   const handleCloseToken = () => setOpenToken(false);
+  const handleCloseAddLiquidity = () => setOpenAddLiquidity(prev => !prev);
 
   const router = useRouter();
 
@@ -1396,7 +1404,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                 </Box>
 
                 <Box>
-                  <Button onClick={handleAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning || Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired)}>
+                  <Button onClick={handleCloseAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning || Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired)}>
                     {addLiquidityRunning ? (
                       <CircularProgress size={25} />
                     ) : (
@@ -1436,6 +1444,21 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
           setSlippageTolerance={setSlippageTolerance}
           deadline={deadline}
           setDeadline={setDeadline}
+        />
+
+        <AddLiquidityModal
+          isOpen={openAddLiquidity}
+          handleCloseAddLiquidity={handleCloseAddLiquidity}
+          theme={theme}
+          amountInDesired={amount0Desired}
+          amountOutDesired={amount1Desired}
+          token0={token0}
+          token1={token1}
+          tradingFee={tier}
+          priceLowerEntered={priceLowerEntered}
+          priceUpperEntered={priceUpperEntered}
+          priceCurrent={priceCurrent}
+
         />
         <style jsx>{`
         .greyed-out {
