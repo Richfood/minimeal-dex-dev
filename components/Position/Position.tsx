@@ -14,6 +14,7 @@ import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import { decimalRound } from '@/utils/generalFunctions';
 import { ethers } from 'ethers';
 import { calculatePositionData } from '@/utils/calculatePositionData';
+import { collectFees } from '@/utils/collectFees';
 
 interface PositionProps {
     tokenId: string;
@@ -48,6 +49,19 @@ const Position = ({ tokenId }: PositionProps) => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setChecked(event.target.checked);
     };
+
+    const handleCollectFees = async()=>{
+        try{
+            await collectFees(
+                feesEarned0,
+                feesEarned1,
+                tokenId
+            )
+        }
+        catch(error){
+            console.log(error);
+        }
+    }
 
     useEffect(() => {
         const getPosition = async () => {
@@ -216,51 +230,138 @@ const Position = ({ tokenId }: PositionProps) => {
 
 
 
-                        <Box className="white_box" sx={{ p: 3, borderRadius: 2, boxShadow: 1, mb: '15px' }}>
+                        <Box
+                            className="white_box"
+                            sx={{ p: 3, borderRadius: 2, boxShadow: 1, mb: '15px' }}
+                        >
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '15px' }}>
+                                <Typography sx={{ fontWeight: '600' }}>Unclaimed Fees</Typography>
+                                <Button
+                                    variant="contained"
+                                    sx={{
+                                        backgroundColor: 'var(--primary)',
+                                        color: 'white',
+                                        borderRadius: '8px',
+                                        textTransform: 'none',
+                                        fontWeight: '600',
+                                        '&:hover': {
+                                            backgroundColor: 'var(--primary)',
+                                        },
+                                    }}
+                                    onClick={handleCollectFees}
+                                >
+                                    Claim Fees
+                                </Button>
+                            </Box>
+                            <Typography sx={{ fontSize: '24px', fontWeight: '600', mb: '15px' }}>
+                                {feesEarned1 + ' ' + token1?.symbol}
+                            </Typography>
+
+                            <Box
+                                sx={{
+                                    background: theme === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)',
+                                    padding: '10px',
+                                    borderRadius: '10px',
+                                }}
+                            >
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        mb: '15px',
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            color: 'var(--primary)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '10px',
+                                        }}
+                                    >
+                                        <Image
+                                            src={token0?.logoURI || ''}
+                                            width={30}
+                                            height={30}
+                                            alt="Token"
+                                        />
+                                        <Typography
+                                            sx={{
+                                                fontSize: '18px',
+                                                fontWeight: '600',
+                                                color:
+                                                    theme === 'light'
+                                                        ? 'var(--primary)'
+                                                        : 'var(--white)',
+                                            }}
+                                        >
+                                            {token0?.symbol}
+                                            <BsArrowUpRight />
+                                        </Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', gap: '10px' }}>
+                                        <Typography sx={{ fontWeight: '600' }}>{feesEarned0}</Typography>
+                                    </Box>
+                                </Box>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            color: 'var(--primary)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '10px',
+                                        }}
+                                    >
+                                        <Image
+                                            src={token1?.logoURI || ''}
+                                            width={30}
+                                            height={30}
+                                            alt="Token"
+                                        />
+                                        <Typography
+                                            sx={{
+                                                fontSize: '18px',
+                                                fontWeight: '600',
+                                                color:
+                                                    theme === 'light'
+                                                        ? 'var(--primary)'
+                                                        : 'var(--white)',
+                                            }}
+                                        >
+                                            {token1?.symbol}
+                                            <BsArrowUpRight />
+                                        </Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', gap: '10px' }}>
+                                        <Typography sx={{ fontWeight: '600' }}>{feesEarned1}</Typography>
+                                    </Box>
+                                </Box>
+                            </Box>
+
+                        {/* <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: '15px' }}>
                             <Box>
-                                <Typography sx={{ mb: '15px', fontWeight: '600' }}>Unclaimed fees</Typography>
-                                <Typography sx={{ fontSize: '24px', fontWeight: '600', mb: '15px' }}>{feesEarned1 + " " + token1?.symbol}</Typography>
-
-                                <Box sx={{ background: theme === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)', padding: '10px', borderRadius: '10px' }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '15px' }}>
-                                        <Box sx={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            <Image src={token0?.logoURI || ""} width={30} height={30} alt="Token" />
-                                            <Typography sx={{ fontSize: '18px', fontWeight: '600', color: theme === 'light' ? 'var(--primary)' : 'var(--white)' }}>{token0?.symbol}<BsArrowUpRight /></Typography>
-                                        </Box>
-                                        <Box sx={{ display: 'flex', gap: '10px' }}>
-                                            <Typography sx={{ fontWeight: '600' }}>{feesEarned0}</Typography>
-
-                                        </Box>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <Box sx={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            <Image src={token1?.logoURI || ""} width={30} height={30} alt="Token" />
-                                            <Typography sx={{ fontSize: '18px', fontWeight: '600', color: theme === 'light' ? 'var(--primary)' : 'var(--white)' }}>{token1?.symbol}<BsArrowUpRight /></Typography>
-                                        </Box>
-                                        <Box sx={{ display: 'flex', gap: '10px' }}>
-                                            <Typography sx={{ fontWeight: '600' }}>{feesEarned1}</Typography>
-
-                                        </Box>
-                                    </Box>
-                                </Box>
+                                <Typography sx={{ fontWeight: '600' }}>Collect as WETH</Typography>
                             </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: '15px' }}>
-                                <Box>
-                                    <Typography sx={{ fontWeight: '600' }}>Collect as WETH</Typography>
-                                </Box>
-                                <Box>
-                                    <IOSSwitch
-                                        checked={checked}
-                                        onChange={handleChange}
-                                        color="default"
-                                    />
-                                </Box>
+                            <Box>
+                                <IOSSwitch
+                                    checked={checked}
+                                    onChange={handleChange}
+                                    color="default"
+                                />
                             </Box>
-                        </Box>
+                        </Box> */}
+                    </Box>
 
 
 
-                        {/* <Box className="white_box" sx={{ p: 3, borderRadius: 2, boxShadow: 1, mb: '15px' }}>
+                    {/* <Box className="white_box" sx={{ p: 3, borderRadius: 2, boxShadow: 1, mb: '15px' }}>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
                             <Box>
@@ -300,8 +401,8 @@ const Position = ({ tokenId }: PositionProps) => {
 
 
 
-                    </Box>
                 </Box>
+                </Box >
             )}
         </>
     );

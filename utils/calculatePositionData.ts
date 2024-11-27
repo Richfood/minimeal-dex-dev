@@ -1,5 +1,5 @@
 import { V3PositionData } from "@/interfaces";
-import { BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 
 function feeGrowthInsideX128(
     lowerFeeGrowthOutsideX128: BigNumber,

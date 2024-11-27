@@ -97,7 +97,10 @@ export async function swapV3(
 
         const valueToSend = token0.symbol === "PLS" ? amountIn : 0;
 
-        const combinedData = [exactInputData, refundETHData];
+        const combinedData = [exactInputData];
+        if(valueToSend){
+            combinedData.push(refundETH);
+        }
 
         const SmartRouterContractExactInputMulticallTx = await SmartRouterContract["multicall(uint256,bytes[])"](deadline, combinedData, { value: valueToSend });
 
