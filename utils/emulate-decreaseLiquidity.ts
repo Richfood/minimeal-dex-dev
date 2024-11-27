@@ -15,11 +15,12 @@ import {
 import { ethers } from "ethers";
 import { TokenDetails } from "@/interfaces";
 import { adjustForSlippage, decimalRound, expandIfNeeded, roundToPrecision } from "./generalFunctions";
+import JSBI from "jsbi";
  
-function emulate(
-    priceLower: string, 
-    priceUpper: string, 
-    priceCurrent: string, 
+function emulateDecreaseLiquidity(
+    tickLower: number, 
+    tickUpper: number, 
+    tickCurrent: number, 
     fee: FeeAmount, 
     token0Details: TokenDetails,
     token1Details: TokenDetails,
@@ -33,31 +34,15 @@ function emulate(
     const token0 = new Token(31337, token0Address, token0Details.address.decimals);
     const token1 = new Token(31337, token1Address, token1Details.address.decimals);
 
-    const tickSpacing = TICK_SPACINGS[fee];
-
-    const decimalDifference = token1.decimals - token0.decimals;
-
-    // Required constants
-    const tickLower = nearestUsableTick(priceToTick(priceLower, decimalDifference), tickSpacing); //priceToClosestTick(newPriceLower)//
-    const tickUpper = nearestUsableTick(priceToTick(priceUpper, decimalDifference), tickSpacing);
-    const currentTick = nearestUsableTick(priceToTick(priceCurrent, decimalDifference), tickSpacing);
-
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 minutes
-
-    let amount0Desired: string;
-    let amount1Desired: string;
     let amount0Min: string;
     let amount1Min: string;
 
-    // console.log(`
-    //     After - 
-    //     Lower Tick : ${tickLower},
-    //     Upper tick : ${tickUpper},
-    //     Curr  tick : ${currentTick}
-    // `)
+    const currentSqrtPrice = TickMath.getSqrtRatioAtTick(tickCurrent).toString();
 
-    // Price calculations
-    const currentSqrtPrice = TickMath.getSqrtRatioAtTick(currentTick).toString();
+    const liquidityToBeRemoved = BigInt(totalLiquidity) * BigInt(percentLiquidityToRemove) / BigInt(100);
+    // console.log("🚀 ~ percentLiquidityToRemove:", percentLiquidityToRemove)
+    // const liquidityToBeRemoved = BigInt(totalLiquidity)- BigInt(adjustForSlippage(totalLiquidity, percentLiquidityToRemove));
+
 
     try {
         // Create Pool instance
@@ -66,21 +51,27 @@ function emulate(
             token1,
             fee,
             currentSqrtPrice.toString(),
-            totalLiquidity,
-            currentTick
+            liquidityToBeRemoved.toString(),
+            tickCurrent
         );
 
         // Create Position instance
         const position = new Position({
             pool,
-            liquidity: pool.liquidity.toString(),
+            liquidity: liquidityToBeRemoved.toString(),
             tickLower: tickLower,
             tickUpper: tickUpper
         });
 
         // Calculate mint amounts
         const slippageTolerancePercent = new Percent(slippageTolerance, 100);
-        const { amount0: amount0DesiredFromPosition, amount1: amount1DesiredFromPosition } = position.burnAmountsWithSlippage(slippageTolerancePercent);
+
+        // Extract the amounts from the returned Readonly object
+const { amount0, amount1 }: Readonly<{ amount0: JSBI; amount1: JSBI }> = position.burnAmountsWithSlippage(slippageTolerancePercent);
+
+
+        let amount0DesiredFromPosition = JSBI.toNumber(amount0);
+        let amount1DesiredFromPosition = JSBI.toNumber(amount1);
 
         //console.log(amount0DesiredFromPosition.toString(), amount1DesiredFromPosition.toString());
 
@@ -94,31 +85,12 @@ function emulate(
         amount1Min = roundToPrecision((Number(amount1Min)).toFixed(0) , token1.decimals).toString()//(roundToPrecision(amount1Min,6) - roundToPrecision("0.000001",6)).toString();
         console.log("🚀 ~ amount1Min:", amount1Min)
 
-        amount0Min = ethers.utils.formatUnits(amount0Min,token0.decimals);
-        amount1Min = ethers.utils.formatUnits(amount1Min,token1.decimals);
-
-        amount0Min = decimalRound(amount0Min, token0.decimals);
-        amount1Min = decimalRound(amount1Min, token1.decimals);
-
-        const liquidityToBeRemoved = BigInt(totalLiquidity)- BigInt(adjustForSlippage(totalLiquidity, percentLiquidityToRemove));
-
-        //console.log(amount0Desired, amount1Desired);
-        //console.log(amount0Min, amount1Min);
-
-        // if(!isSorted){
-        //     let temp1 = amount0Min;
-        //     amount0Min = amount1Min;
-        //     amount1Min = temp1;
-
-        //     let temp2 = amount0Desired;
-        //     amount0Desired = amount1Desired;
-        //     amount1Desired = temp2;
-        // }
+        // console.log("Formatted ", ethers.utils.formatUnits(amount0DesiredFromPosition, token0.decimals));
 
         // Return the final parameters
         return {//ethers.utils.parseUnits(amount1Desired?.toString() || "0", 6).toString(), //amount1Desired?.toString(),
-            amount0Min: amount0Min?.toString(),//ethers.utils.parseUnits(amount0Min?.toString() || "0", 6).toString(),
-            amount1Min: amount1Min?.toString(),//ethers.utils.parseUnits(amount1Min?.toString() || "0", 6).toString(),
+            amount0Min: amount0Min?.toString(),
+            amount1Min: amount1Min?.toString(),
             liquidityToRemove : liquidityToBeRemoved.toString()
         };
     } catch (error) {
@@ -127,7 +99,7 @@ function emulate(
     }
 }
 
-export default emulate;
+export default emulateDecreaseLiquidity;
 
 /*
 79244113692861321940131

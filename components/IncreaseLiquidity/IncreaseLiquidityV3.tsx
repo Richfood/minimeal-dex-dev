@@ -254,57 +254,32 @@ const IncreaseLiquidityV3: React.FC<IncreaseLiquidityProps> = ({
     }
   }
 
-  const handleTokenAmountChange = useCallback(
-    debounce(async (amountAtIndex: number, value: string) => {
-      if (!token0 || !token1) return;
-
-      // if (!value) {
-      //   flushSync(() => {
-      //     setAmount0ToEmulate("");
-      //     setAmount1ToEmulate("");
-      //   });
-      //   return;
-      // }
-
-      // let amountAt0ToEmulate = "";
-      // let amountAt1ToEmulate = "";
-
-      // if (amountAtIndex === 0) {
-      //   amountAt0ToEmulate = value;
-      //   amountAt1ToEmulate = "0";
-      // } else {
-      //   amountAt0ToEmulate = "0";
-      //   amountAt1ToEmulate = value;
-      // }
-
-      // flushSync(() => {
-      //   setAmount0ToEmulate(amountAt0ToEmulate);
-      //   setAmount1ToEmulate(amountAt1ToEmulate);
-      // });
-    }, 1000),
-    [token0, token1]
-  );
 
   useEffect(()=>{
     const getPosition = async()=>{
-      const positionToUse = await getPositionByTokenId(tokenId);
+      try{
+        const positionToUse = await getPositionByTokenId(tokenId);
 
-      if(!positionToUse) return;
+        if(!positionToUse) return;
 
-      const token0ToUse : TokenDetails = famousTokenTestnet.filter((token)=>token.address.contract_address.toLowerCase() === positionToUse.token0.id)[0];
-      const token1ToUse : TokenDetails = famousTokenTestnet.filter((token)=>token.address.contract_address.toLowerCase() === positionToUse.token1.id)[0];
-  
-      const decimalDifference = Number(positionToUse.token1.decimals) - Number(positionToUse.token0.decimals);
-      const currentTick = Number(positionToUse.pool.tick);
-      const lowerTick = Number(positionToUse.tickLower.tickIdx);
-      const upperTick = Number(positionToUse.tickUpper.tickIdx);
-  
-      setToken0(token0ToUse);
-      setToken1(token1ToUse);
-      setPriceCurrent(tickToPrice(currentTick, decimalDifference).toString());
-      setPriceLower(tickToPrice(lowerTick, decimalDifference).toString());
-      setPriceUpper(tickToPrice(upperTick, decimalDifference).toString());
-      setFee(getFeeAmountFromFee(positionToUse.pool.feeTier));
+        const token0ToUse : TokenDetails = famousTokenTestnet.filter((token)=>token.address.contract_address.toLowerCase() === positionToUse.token0.id)[0];
+        const token1ToUse : TokenDetails = famousTokenTestnet.filter((token)=>token.address.contract_address.toLowerCase() === positionToUse.token1.id)[0];
+    
+        const decimalDifference = Number(positionToUse.token1.decimals) - Number(positionToUse.token0.decimals);
+        const currentTick = Number(positionToUse.pool.tick);
+        const lowerTick = Number(positionToUse.tickLower.tickIdx);
+        const upperTick = Number(positionToUse.tickUpper.tickIdx);
+    
+        setToken0(token0ToUse);
+        setToken1(token1ToUse);
+        setPriceCurrent(tickToPrice(currentTick, decimalDifference).toString());
+        setPriceLower(tickToPrice(lowerTick, decimalDifference).toString());
+        setPriceUpper(tickToPrice(upperTick, decimalDifference).toString());
+        setFee(getFeeAmountFromFee(positionToUse.pool.feeTier));
+      }
+      catch(error){
+        console.log(error);
+      }
     }
 
     getPosition()

@@ -159,7 +159,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
                   {v3Positions.length ? (
                     <List sx={{ width: '100%', maxWidth: 'screen' }}>
                       {v3Positions.map((elem) => (
-                        <Box onClick={()=>handlePositionClick("V3", elem.id)}>
+                        <Box onClick={()=>handlePositionClick("V3", elem.id)} sx={{cursor:"pointer"}}>
                           <PositionListV3 theme={theme} data={elem}/>
                         </Box>
                       ))}
