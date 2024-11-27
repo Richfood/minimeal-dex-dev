@@ -88,7 +88,7 @@ run `yarn-install`
         - yarn build
         - yarn create-local
         - yarn deploy-local
-    - To add additional stable tokens and WPLS-stable tokens
+    - To add additional stable tokens and WPLS-stable pool addresses
         - Add Stable Token addresses and WPLS-{stable token} addresses in Constants.ts
         - Add the tokens from the Constants.ts to the WHITELIST_TOKENS array
         - Add the stable token addresses to the STABLE_COINS array
