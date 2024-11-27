@@ -74,7 +74,7 @@ const ManageToken: React.FC<ManageTokenProps> = ({ open, handleClose, mode }) =>
         },
     }));
 
-    const provider = new ethers.JsonRpcProvider("https://pulsechain-testnet-rpc.publicnode.com");
+    const provider = new ethers.providers.JsonRpcProvider("https://pulsechain-testnet-rpc.publicnode.com");
     
     // Replace with your token's contract address
     const tokenAddress = "0xYourTokenContractAddress";
@@ -100,7 +100,7 @@ const ManageToken: React.FC<ManageTokenProps> = ({ open, handleClose, mode }) =>
             console.log("Token Name:", name);
             console.log("Token Symbol:", symbol);
             console.log("Token Decimals:", decimals);
-            console.log("Total Supply:", ethers.formatUnits(totalSupply, decimals));
+            console.log("Total Supply:", ethers.utils.formatUnits(totalSupply, decimals));
         } catch (error) {
             console.error("Error fetching token info:", error);
         }
