@@ -21,11 +21,13 @@ import { debounce } from '@syncfusion/ej2-base';
 import { ethers } from 'ethers';
 
 interface RemoveLiquidityProps {
-    tokenId : string;
+    tokenId: string;
 }
 
-const RemoveLiquidity = ({tokenId} : RemoveLiquidityProps) => {
+const RemoveLiquidity = ({ tokenId }: RemoveLiquidityProps) => {
+    console.log("🚀 ~ RemoveLiquidity ~ tokenId:", tokenId)
     const router = useRouter();
+
     const { theme, toggleTheme } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
     const [slippageTolerance, setSlippageTolerance] = useState<number | null>(1);
@@ -45,6 +47,9 @@ const RemoveLiquidity = ({tokenId} : RemoveLiquidityProps) => {
     const [tickUpper, setTickUpper] = useState<number | null>(null);
     const [tickCurrent, setTickCurrent] = useState<number | null>(null);
     const [fee, setFee] = useState<FeeAmount | null>(null);
+
+    const [positionLoading, setPositionLoading] = useState(true);
+    const [positionLoadingError, setPositionLoadingError] = useState(false);
 
     const [removeLiquidityRunning, setRemoveLiquidityRunning] = useState(false);
 
@@ -72,8 +77,8 @@ const RemoveLiquidity = ({tokenId} : RemoveLiquidityProps) => {
         setPercentLiquidityToRemove(newValue);
     };
 
-    const convertToReadable = (value : string, decimals: number | null) : string =>{
-        if(value && decimals){
+    const convertToReadable = (value: string, decimals: number | null): string => {
+        if (value && decimals) {
             return decimalRound(ethers.utils.formatUnits(value, decimals), 2);
         }
         else return ""
@@ -83,73 +88,73 @@ const RemoveLiquidity = ({tokenId} : RemoveLiquidityProps) => {
 
         console.log("calculate run");
 
-        if (!token0 || !token1 || slippageTolerance===null || tickCurrent === null || tickUpper === null || tickLower===null || !fee) return;
+        if (!token0 || !token1 || slippageTolerance === null || tickCurrent === null || tickUpper === null || tickLower === null || !fee) return;
 
         console.log("Passed If");
-    
+
         let result: any = undefined;
         try {
-          result = emulateDecreaseLiquidity(
-            tickLower,
-            tickUpper,
-            tickCurrent,
-            fee,
-            token0,
-            token1,
-            slippageTolerance,
-            totalLiquidty,
-            percentLiquidityToRemove
-          );
-    
-          console.log('HEllo - ,', result);
+            result = emulateDecreaseLiquidity(
+                tickLower,
+                tickUpper,
+                tickCurrent,
+                fee,
+                token0,
+                token1,
+                slippageTolerance,
+                totalLiquidty,
+                percentLiquidityToRemove
+            );
+
+            console.log('HEllo - ,', result);
         }
         catch (error) {
-          console.log("Emulate Error", error);
+            console.log("Emulate Error", error);
         }
         if (result) {
-          if (result.amount0Desired !== "0" && result.amount1Desired !== "0") {
-            let {
-              amount0Min,
-              amount1Min,
-              liquidityToRemove
-            } = result
-    
-            setAmount0Min(expandIfNeeded(amount0Min));
-            setAmount1Min(expandIfNeeded(amount1Min));
-            setLiquidityToBeRemoved(liquidityToRemove);
-          }
+            if (result.amount0Desired !== "0" && result.amount1Desired !== "0") {
+                let {
+                    amount0Min,
+                    amount1Min,
+                    liquidityToRemove
+                } = result
+
+                setAmount0Min(expandIfNeeded(amount0Min));
+                setAmount1Min(expandIfNeeded(amount1Min));
+                setLiquidityToBeRemoved(liquidityToRemove);
+            }
         }
         else {
 
         }
     }
 
-    const getFeeAmountFromFee = (fee: string) : FeeAmount => {
-        switch(fee){
-          case "100":
-            return FeeAmount.LOWEST;
-          case "500":
-            return FeeAmount.LOW;
-          case "2500":
-            return FeeAmount.MEDIUM;
-          case "10000":
-            return FeeAmount.HIGH;                      
-          case "20000":
-            return FeeAmount.HIGHEST;                      
-          default:
-            return FeeAmount.HIGH;
+    const getFeeAmountFromFee = (fee: string): FeeAmount => {
+        switch (fee) {
+            case "100":
+                return FeeAmount.LOWEST;
+            case "500":
+                return FeeAmount.LOW;
+            case "2500":
+                return FeeAmount.MEDIUM;
+            case "10000":
+                return FeeAmount.HIGH;
+            case "20000":
+                return FeeAmount.HIGHEST;
+            default:
+                return FeeAmount.HIGH;
         }
-      }
+    }
 
 
-    const handleRemoveLiquidity = async() => {
-        
-        if(!token0 || !token1 || !tokenId) return;
+    const handleRemoveLiquidity = async () => {
+
+        if (!token0 || !token1 || !tokenId) return;
 
         const unixDeadline = (Math.floor((Date.now() + Number(deadline) * 60 * 1000) / 1000)).toString();
 
         setRemoveLiquidityRunning(true);
-        try{
+        try {
             const removeLiquidityTx = await removeLiquidityV3(
                 NFPMAddress,
                 token0,
@@ -163,7 +168,7 @@ const RemoveLiquidity = ({tokenId} : RemoveLiquidityProps) => {
 
             alert(`Liquidity Removed. Tx Hash : ${removeLiquidityTx}`)
         }
-        catch(error){
+        catch (error) {
             console.log("Error Removing liquidity", error);
             alert("Error Removing Liquidity");
             setRemoveLiquidityRunning(false);
@@ -171,22 +176,23 @@ const RemoveLiquidity = ({tokenId} : RemoveLiquidityProps) => {
 
         setRemoveLiquidityRunning(false);
 
-    }   
+    }
 
-    useEffect(()=>{
-        const getPosition = async()=>{
-            try{
+    useEffect(() => {
+        const getPosition = async () => {
+            try {
+                setPositionLoading(true);
                 console.log("Token Id", tokenId);
 
-                const positionToUse : V3PositionData = await getPositionByTokenId(tokenId);
+                const positionToUse: V3PositionData = await getPositionByTokenId(tokenId);
 
                 console.log(positionToUse);
-            
-                if(!positionToUse) return;
-            
-                const token0ToUse : TokenDetails = famousTokenTestnet.filter((token)=>token.address.contract_address.toLowerCase() === positionToUse.token0.id)[0];
-                const token1ToUse : TokenDetails = famousTokenTestnet.filter((token)=>token.address.contract_address.toLowerCase() === positionToUse.token1.id)[0];
-            
+
+                if (!positionToUse) return;
+
+                const token0ToUse: TokenDetails = famousTokenTestnet.filter((token) => token.address.contract_address.toLowerCase() === positionToUse.token0.id)[0];
+                const token1ToUse: TokenDetails = famousTokenTestnet.filter((token) => token.address.contract_address.toLowerCase() === positionToUse.token1.id)[0];
+
                 const currentTick = Number(positionToUse.pool.tick);
                 const lowerTick = Number(positionToUse.tickLower.tickIdx);
                 const upperTick = Number(positionToUse.tickUpper.tickIdx);
@@ -203,183 +209,222 @@ const RemoveLiquidity = ({tokenId} : RemoveLiquidityProps) => {
                 setTotalLiquidity(liquidity);
                 setFee(feeToUse);
             }
-            catch(error){
+            catch (error) {
                 console.log(error);
+                setPositionLoadingError(true);
+                setPositionLoading(false);
             }
-        }
-    
-        getPosition()
-    
-      },[])
 
-    useEffect(()=>{
-        // console.log("inside useeffec")
-        const runCalculate = async()=>{
-          await calculate();
+            setPositionLoading(false);
+            setPositionLoadingError(false);
         }
-    
+
+        getPosition();
+    }, [tokenId])
+
+    useEffect(() => {
+        // console.log("inside useeffec")
+        const runCalculate = async () => {
+            await calculate();
+        }
+
         runCalculate();
-      },[percentLiquidityToRemove])
+    }, [percentLiquidityToRemove, token0])
 
 
     return (
         <>
-            <Box component="main" sx={{ minHeight: "calc(100vh - 150px)" }}>
-                <Box sx={{ maxWidth: '800px', margin: '0 auto', py: '50px', px: '15px' }}>
-
-                    <Box className="white_box">
-                        <Box sx={{ mb: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Typography
-                                onClick={handleGoBack}
-                                variant="h6"
-                                sx={{
-                                    fontSize: '16px',
-                                    fontWeight: '600',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '10px',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                <BsArrowLeft size={20} /> Remove liquidity
-                            </Typography>
-                            <Box onClick={settingsModal}
-                            >
-                                <IoSettingsOutline style={{ width: '24px', height: '24px', color: theme === 'light' ? 'var(--primary)' : 'var(--cream)', cursor: 'pointer' }} />
-                            </Box>
-                        </Box>
-
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', mb: "15px" }}>
-                            <Box sx={{ position: 'relative' }}>
-                                <Image src="/images/9mm.png" width={30} height={30} alt="Token" />
-                                <Image src="/images/9mm.png" width={30} height={30} alt="Token" style={{ marginLeft: '-15px' }} />
-                            </Box>
-                            <Box sx={{ display: "flex", gap: '5px' }}>
-                                {token0 && token1 ? <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>{`${token0.symbol} / ${token1.symbol}`}</Typography> : null}
-                            </Box>
-                        </Box>
-
-                        <Box sx={{ background: theme === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)', padding: '15px', borderRadius: '10px', mb: '15px' }}>
-                            <Typography sx={{ mb: '15px', fontWeight: '600' }}>Liquidity</Typography>
-
-                            <Box sx={{ my: '20px' }}>
-                                <Typography component="span" sx={{ fontSize: '16px', fontWeight: '600', marginRight: '10px', maxWidth: '50px', width: '100%', display: 'inline-block' }}>{percentLiquidityToRemove}%</Typography>
-
-                                <Button
-                                    onClick={() => handleButtonClick(25)}
-                                    sx={{
-                                        marginRight: '10px',
-                                        border: `1px solid ${theme === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                                        color: theme === 'light' ? 'var(--primary)' : 'var(--cream)',
-                                    }}
-                                >
-                                    25%
-                                </Button>
-                                <Button
-                                    onClick={() => handleButtonClick(50)}
-                                    sx={{
-                                        marginRight: '10px',
-                                        border: `1px solid ${theme === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                                        color: theme === 'light' ? 'var(--primary)' : 'var(--cream)',
-                                    }}
-                                >
-                                    50%
-                                </Button>
-                                <Button
-                                    onClick={() => handleButtonClick(75)}
-                                    sx={{
-                                        marginRight: '10px',
-                                        border: `1px solid ${theme === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                                        color: theme === 'light' ? 'var(--primary)' : 'var(--cream)',
-                                    }}
-                                >
-                                    75%
-                                </Button>
-                                <Button sx={{
-                                    marginRight: '10px',
-                                    border: `1px solid ${theme === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
-                                    color: theme === 'light' ? 'var(--primary)' : 'var(--cream)',
-                                }} onClick={() => handleButtonClick(100)}>
-                                    Max
-                                </Button>
-                            </Box>
-
-                            <Box>
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="100"
-                                    step="1"
-                                    value={percentLiquidityToRemove}
-                                    className='custom-range-slider'
-                                    onChange={handleSliderChange}
-                                    style={{ width: '100%' }}
-                                />
-                            </Box>
-                        </Box>
-
-                        
-
-                        <Box sx={{ background: theme === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)', padding: '15px', borderRadius: '10px' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '15px' }}>
-
-                                <Box sx={{ display: 'flex', gap: '10px' }}>
-                                    <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>Pooled {token0?.symbol}:</Typography>
-
-                                </Box>
-                                <Box sx={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <Typography sx={{ fontSize: '18px', fontWeight: '600', color: theme === 'light' ? 'var(--primary)' : 'var(--white)' }}>{convertToReadable(amount0Min, token0?.address.decimals || null)}</Typography>
-                                    <Image src="/images/9mm.png" width={30} height={30} alt="Token" />
-                                </Box>
-                            </Box>
-
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', }}>
-
-                                <Box sx={{ display: 'flex', gap: '10px' }}>
-                                    <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>Pooled {token1?.symbol}:</Typography>
-
-                                </Box>
-                                <Box sx={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <Typography sx={{ fontSize: '18px', fontWeight: '600', color: theme === 'light' ? 'var(--primary)' : 'var(--white)' }}>{convertToReadable(amount1Min, token1?.address.decimals || null)}</Typography>
-                                    <Image src="/images/9mm.png" width={30} height={30} alt="Token" />
-                                </Box>
-                            </Box>
-
-
-
-                        </Box>
-
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', my: '15px' }}>
-                            <Box>
-                                <Typography sx={{ fontWeight: '600' }}>Collect as WETH</Typography>
-                            </Box>
-                            <Box>
-                                <IOSSwitch
-                                    checked={checked}
-                                    onChange={handleChange}
-                                    color="default"
-                                />
-                            </Box>
-                        </Box>
-
-                        <Box>
-                            <Button variant="contained" color="secondary" sx={{ width: '100%' }} onClick={handleRemoveLiquidity} disabled={removeLiquidityRunning}>
-                                {removeLiquidityRunning ? <CircularProgress size={20}/> : "Remove"}
-                            </Button>
-                        </Box>
-
+            {positionLoading || positionLoadingError ? (
+                <Box component="main" sx={{ minHeight: "calc(100vh - 150px)" }}>
+                    <Box
+                        sx={{
+                            maxWidth: "800px",
+                            margin: "0 auto",
+                            py: "50px",
+                            px: "16px",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            textAlign: "center",
+                        }}
+                    >
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontSize: "16px",
+                                fontWeight: "600",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                                cursor: "pointer",
+                            }}
+                        >
+                            {positionLoadingError
+                                ? "Can't Fetch Position Data. Please Refresh to try again"
+                                : <>Loading Position... <CircularProgress size={20} /></>}
+                        </Typography>
                     </Box>
                 </Box>
-            </Box>
-            <SettingsModal
-                isOpen={isOpen}
-                handleClose={settingsModal}
-                theme="light"
-                slippageTolerance={slippageTolerance}
-                setSlippageTolerance={setSlippageTolerance}
-                deadline={deadline}
-                setDeadline={setDeadline}
-            />
+            ) : (
+                <>
+                    <Box component="main" sx={{ minHeight: "calc(100vh - 150px)" }}>
+                        <Box sx={{ maxWidth: '800px', margin: '0 auto', py: '50px', px: '15px' }}>
+
+                            <Box className="white_box">
+                                <Box sx={{ mb: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Typography
+                                        onClick={handleGoBack}
+                                        variant="h6"
+                                        sx={{
+                                            fontSize: '16px',
+                                            fontWeight: '600',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '10px',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        <BsArrowLeft size={20} /> Remove liquidity
+                                    </Typography>
+                                    <Box onClick={settingsModal}
+                                    >
+                                        <IoSettingsOutline style={{ width: '24px', height: '24px', color: theme === 'light' ? 'var(--primary)' : 'var(--cream)', cursor: 'pointer' }} />
+                                    </Box>
+                                </Box>
+
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', mb: "15px" }}>
+                                    <Box sx={{ position: 'relative' }}>
+                                        <Image src={token0?.logoURI || ""} width={30} height={30} alt="Token" />
+                                        <Image src={token1?.logoURI || ""} width={30} height={30} alt="Token" style={{ marginLeft: '-15px' }} />
+                                    </Box>
+                                    <Box sx={{ display: "flex", gap: '5px' }}>
+                                        {token0 && token1 ? <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>{`${token0.symbol} / ${token1.symbol}`}</Typography> : null}
+                                    </Box>
+                                </Box>
+
+                                <Box sx={{ background: theme === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)', padding: '15px', borderRadius: '10px', mb: '15px' }}>
+                                    <Typography sx={{ mb: '15px', fontWeight: '600' }}>Liquidity</Typography>
+
+                                    <Box sx={{ my: '20px' }}>
+                                        <Typography component="span" sx={{ fontSize: '16px', fontWeight: '600', marginRight: '10px', maxWidth: '50px', width: '100%', display: 'inline-block' }}>{percentLiquidityToRemove}%</Typography>
+
+                                        <Button
+                                            onClick={() => handleButtonClick(25)}
+                                            sx={{
+                                                marginRight: '10px',
+                                                border: `1px solid ${theme === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                                                color: theme === 'light' ? 'var(--primary)' : 'var(--cream)',
+                                            }}
+                                        >
+                                            25%
+                                        </Button>
+                                        <Button
+                                            onClick={() => handleButtonClick(50)}
+                                            sx={{
+                                                marginRight: '10px',
+                                                border: `1px solid ${theme === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                                                color: theme === 'light' ? 'var(--primary)' : 'var(--cream)',
+                                            }}
+                                        >
+                                            50%
+                                        </Button>
+                                        <Button
+                                            onClick={() => handleButtonClick(75)}
+                                            sx={{
+                                                marginRight: '10px',
+                                                border: `1px solid ${theme === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                                                color: theme === 'light' ? 'var(--primary)' : 'var(--cream)',
+                                            }}
+                                        >
+                                            75%
+                                        </Button>
+                                        <Button sx={{
+                                            marginRight: '10px',
+                                            border: `1px solid ${theme === 'light' ? 'var(--primary)' : 'var(--cream)'}`,
+                                            color: theme === 'light' ? 'var(--primary)' : 'var(--cream)',
+                                        }} onClick={() => handleButtonClick(100)}>
+                                            Max
+                                        </Button>
+                                    </Box>
+
+                                    <Box>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="100"
+                                            step="1"
+                                            value={percentLiquidityToRemove}
+                                            className='custom-range-slider'
+                                            onChange={handleSliderChange}
+                                            style={{ width: '100%' }}
+                                        />
+                                    </Box>
+                                </Box>
+
+
+
+                                <Box sx={{ background: theme === 'light' ? 'var(--light_clr)' : 'var(--secondary-dark)', padding: '15px', borderRadius: '10px' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '15px' }}>
+
+                                        <Box sx={{ display: 'flex', gap: '10px' }}>
+                                            <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>Pooled {token0?.symbol}:</Typography>
+
+                                        </Box>
+                                        <Box sx={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <Typography sx={{ fontSize: '18px', fontWeight: '600', color: theme === 'light' ? 'var(--primary)' : 'var(--white)' }}>{convertToReadable(amount0Min, token0?.address.decimals || null)}</Typography>
+                                            <Image src={token0?.logoURI || ""} width={30} height={30} alt="Token" />
+                                        </Box>
+                                    </Box>
+
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', }}>
+
+                                        <Box sx={{ display: 'flex', gap: '10px' }}>
+                                            <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>Pooled {token1?.symbol}:</Typography>
+
+                                        </Box>
+                                        <Box sx={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <Typography sx={{ fontSize: '18px', fontWeight: '600', color: theme === 'light' ? 'var(--primary)' : 'var(--white)' }}>{convertToReadable(amount1Min, token1?.address.decimals || null)}</Typography>
+                                            <Image src={token1?.logoURI || ""} width={30} height={30} alt="Token" />
+                                        </Box>
+                                    </Box>
+
+
+
+                                </Box>
+
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', my: '15px' }}>
+                                    <Box>
+                                        <Typography sx={{ fontWeight: '600' }}>Collect as WETH</Typography>
+                                    </Box>
+                                    <Box>
+                                        <IOSSwitch
+                                            checked={checked}
+                                            onChange={handleChange}
+                                            color="default"
+                                        />
+                                    </Box>
+                                </Box>
+
+                                <Box>
+                                    <Button variant="contained" color="secondary" sx={{ width: '100%' }} onClick={handleRemoveLiquidity} disabled={removeLiquidityRunning}>
+                                        {removeLiquidityRunning ? <CircularProgress size={20} /> : "Remove"}
+                                    </Button>
+                                </Box>
+
+                            </Box>
+                        </Box>
+                    </Box>
+                    <SettingsModal
+                        isOpen={isOpen}
+                        handleClose={settingsModal}
+                        theme="light"
+                        slippageTolerance={slippageTolerance}
+                        setSlippageTolerance={setSlippageTolerance}
+                        deadline={deadline}
+                        setDeadline={setDeadline}
+                    />
+                </>
+            )}
         </>
     );
 };
