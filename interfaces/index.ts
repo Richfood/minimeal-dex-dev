@@ -92,6 +92,25 @@ export interface V2PositionsData {
   timestamp: string
 }
 
+export interface V2PairData {
+  token0Price : string
+  token1Price : string
+  token0: {
+      id: string
+      name: string
+      symbol: string;
+      decimals: string;
+  }
+  token1: {
+      id: string
+      name: string
+      symbol: string
+      decimals: string
+  }
+  totalSupply: string
+  id: string
+}
+
 
 export interface TokenDetails {
   name: string;

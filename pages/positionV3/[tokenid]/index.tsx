@@ -4,7 +4,7 @@ import Header from '../../../components/Header/Header';
 import Footer from '../../../components/Footer/Footer';
 import IncreaseLiquidityV3 from '@/components/IncreaseLiquidity/IncreaseLiquidityV3';
 import { useRouter } from 'next/router';
-import Position from '@/components/Position/Position';
+import PositionV3 from '@/components/Position/PositionV3';
 
 const Index = () => {
 
@@ -19,7 +19,7 @@ const Index = () => {
             <Header />
                 <Container>
                     <Box className="AddLiquidity" sx={{ minHeight: 'calc(100vh - 149px)', py: '50px' }}>
-                        <Position tokenId={tokenId}/>
+                        <PositionV3 tokenId={tokenId}/>
                     </Box>
                 </Container>
             <Footer/>

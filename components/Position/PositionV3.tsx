@@ -20,7 +20,7 @@ interface PositionProps {
     tokenId: string;
 }
 
-const Position = ({ tokenId }: PositionProps) => {
+const PositionV3 = ({ tokenId }: PositionProps) => {
     const router = useRouter();
     const { theme, toggleTheme } = useTheme();
     const handleThemeToggle = () => {
@@ -408,4 +408,4 @@ const Position = ({ tokenId }: PositionProps) => {
     );
 };
 
-export default Position;
+export default PositionV3;

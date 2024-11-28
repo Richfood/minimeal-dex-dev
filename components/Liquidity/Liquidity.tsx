@@ -54,12 +54,12 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
     setValue(newValue);
   };
 
-  const handlePositionClick = (protocol : string, tokenId: string)=>{
+  const handlePositionClick = (protocol : string, id: string)=>{
     if(protocol === "V3"){
-      router.push(`/position/${tokenId}`)
+      router.push(`/positionV3/${id}`)
     }
     else{
-
+      router.push(`/positionV2/${id}`)
     }
   }
 
@@ -172,12 +172,12 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
               {value === '2' && (
                 <Box sx={{ py: '15px', textAlign: 'center' }}>
                   {v2Positions.length ? (
-                    <List sx={{ width: '100%', maxWidth: 'screen' }}> {/* Set a max width for uniformity */}
-                      {v2Positions.map((elem) => {
-                        return (
+                    <List sx={{ width: '100%', maxWidth: 'screen' }}> 
+                      {v2Positions.map((elem) => (
+                        <Box onClick={()=>handlePositionClick("V2", elem.pair.id)} sx={{cursor:"pointer"}}>
                           <PositionListV2 theme={theme} data={elem}/>
-                        );
-                      })}
+                        </Box>
+                      ))}
                     </List>
                   ) : (
                     <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
