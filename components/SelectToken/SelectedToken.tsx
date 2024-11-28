@@ -270,7 +270,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
         <>
             <Modal
                 open={openToken}
-                onClose={()=>{
+                onClose={() => {
                     setSearchTerm("");
                     handleCloseToken()
                 }}
@@ -280,7 +280,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                 <Box sx={style}>
                     <Box className="modal_head" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="h6">Select a Token</Typography>
-                        <IoCloseOutline onClick={()=>{
+                        <IoCloseOutline onClick={() => {
                             setSearchTerm("");
                             handleCloseToken();
                         }} size={24} style={{ cursor: 'pointer' }} />
@@ -414,52 +414,55 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                             })}
                                         </Box>
 
+                                        {existingImportedTokens.length > 0 ? (
+                                            <Box>
+                                                <Typography sx={{ fontWeight: '500', fontSize: '14px', marginTop: '20px' }}>Imported Tokens</Typography>
+                                                <Box
+                                                    className="token_Outer"
+                                                    sx={{
+                                                        display: 'flex',
+                                                        flexWrap: 'wrap',
+                                                        gap: '10px',
+                                                        backgroundColor: '#fdf5e6', // Light cream color
+                                                        padding: '10px', // Optional: Add some padding for spacing
+                                                        borderRadius: '8px', // Optional: Rounded corners for a smoother look
+                                                        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', // Optional: Add a subtle shadow for depth
+                                                    }}
+                                                >
+                                                    {existingImportedTokens?.map((token, index) => {
+                                                        const selectedToken = tokenNumber === 0 ? token0 : token1;
 
-                                        <Typography sx={{ fontWeight: '500', fontSize: '14px', marginTop: '20px' }}>Imported Tokens</Typography>
-                                        <Box
-                                            className="token_Outer"
-                                            sx={{
-                                                display: 'flex',
-                                                flexWrap: 'wrap',
-                                                gap: '10px',
-                                                backgroundColor: '#fdf5e6', // Light cream color
-                                                padding: '10px', // Optional: Add some padding for spacing
-                                                borderRadius: '8px', // Optional: Rounded corners for a smoother look
-                                                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', // Optional: Add a subtle shadow for depth
-                                            }}
-                                        >
-                                            {existingImportedTokens?.map((token, index) => {
-                                                const selectedToken = tokenNumber === 0 ? token0 : token1;
+                                                        // Check if the token should be disabled
+                                                        const isTokenDisabled = token.address === selectedToken?.address;
 
-                                                // Check if the token should be disabled
-                                                const isTokenDisabled = token.address === selectedToken?.address;
-
-                                                return (
-                                                    <Box
-                                                        key={index}
-                                                        className="token_box"
-                                                        sx={{
-                                                            cursor: isTokenDisabled ? "default" : "pointer",
-                                                            opacity: isTokenDisabled ? 0.4 : 1,
-                                                            backgroundColor: isTokenDisabled ? '#f5f5f5' : 'white', // Subtle background for tokens
-                                                            padding: '8px', // Optional: Add padding inside each token box
-                                                            borderRadius: '6px', // Optional: Rounded corners for individual tokens
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            boxShadow: isTokenDisabled ? 'none' : '0px 2px 4px rgba(0, 0, 0, 0.1)', // Subtle shadow for active tokens
-                                                        }}
-                                                        onClick={!isTokenDisabled ? () => handleSelectToken(token) : undefined} // Allow click only if token is not disabled
-                                                    >
-                                                        <img
-                                                            src={token.logoURI}
-                                                            alt={`${token.symbol} logo`}
-                                                            style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
-                                                        />
-                                                        <Typography>{token.symbol.toUpperCase()}</Typography>
-                                                    </Box>
-                                                );
-                                            })}
-                                        </Box>
+                                                        return (
+                                                            <Box
+                                                                key={index}
+                                                                className="token_box"
+                                                                sx={{
+                                                                    cursor: isTokenDisabled ? "default" : "pointer",
+                                                                    opacity: isTokenDisabled ? 0.4 : 1,
+                                                                    backgroundColor: isTokenDisabled ? '#f5f5f5' : 'white', // Subtle background for tokens
+                                                                    padding: '8px', // Optional: Add padding inside each token box
+                                                                    borderRadius: '6px', // Optional: Rounded corners for individual tokens
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    boxShadow: isTokenDisabled ? 'none' : '0px 2px 4px rgba(0, 0, 0, 0.1)', // Subtle shadow for active tokens
+                                                                }}
+                                                                onClick={!isTokenDisabled ? () => handleSelectToken(token) : undefined} // Allow click only if token is not disabled
+                                                            >
+                                                                <img
+                                                                    src={token.logoURI}
+                                                                    alt={`${token.symbol} logo`}
+                                                                    style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
+                                                                />
+                                                                <Typography>{token.symbol.toUpperCase()}</Typography>
+                                                            </Box>
+                                                        );
+                                                    })}
+                                                </Box>
+                                            </Box>
+                                        ) : null}
                                         <Typography sx={{ fontWeight: '500', fontSize: '14px', marginTop: '20px' }}>All Tokens</Typography>
                                         <Box className="token_list">
                                             <List>
