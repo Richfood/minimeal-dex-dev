@@ -111,6 +111,14 @@ export interface V2PairData {
   id: string
 }
 
+export interface TokenRpcData {
+  address: string
+  decimals: string
+  icon_url: string | null
+  name: string
+  symbol: string
+  type: string
+}
 
 export interface TokenDetails {
   name: string;

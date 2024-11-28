@@ -16,7 +16,7 @@ import { BigNumber } from 'ethers';
 import { getPoolDataByAddressV3 } from '@/utils/api/getPoolDataByAddressV3';
 import { getPoolDataByAddressV2 } from '@/utils/api/getPoolDataByAddressV2';
 
-import { Protocol, SwapPoolData, TokenDetails } from '@/interfaces';
+import { Protocol, SwapPoolData, TokenDetails, V2PairData } from '@/interfaces';
 import { getSmartOrderRoute } from '@/utils/api/getSmartOrderRoute';
 import { TradeType } from '@uniswap/sdk-core';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -116,8 +116,6 @@ const SwapWidget = () => {
         // const tokenData = isTestnet ? famousTokenTestnet : famousToken;
 
         // if (tokenData.length > 0 && !tokensSelected) {
-        setToken0(famousTokenTestnet[9]);
-        setToken1(famousTokenTestnet[10]);
         setToken0(famousTokenTestnet[9]);
         setToken1(famousTokenTestnet[10]);
         // }
@@ -429,9 +427,10 @@ const SwapWidget = () => {
                                     for (const address of poolAddresses) {
                                         console.log("🚀 ~fetchSmartOrderRoute address:", address)
                                         try {
-                                            const poolData = await getPoolDataByAddressV2(address);
+                                            const poolData : V2PairData | null = await getPoolDataByAddressV2(address);
+                                            if(!poolData) return;
                                             console.log("🚀 ~fetchSmartOrderRoute poolData:", poolData)
-                                            setTickPrice(poolData[0].token0Price);
+                                            setTickPrice(poolData.token0Price);
                                             setTradingFee(0.25)
                                         } catch (error) {
                                             console.error(`Error fetching pool data for address ${address}:`, error);

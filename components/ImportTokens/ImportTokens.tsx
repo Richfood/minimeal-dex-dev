@@ -12,28 +12,42 @@ import { FiAlertCircle } from "react-icons/fi";
 import { BsQuestionCircle } from "react-icons/bs";
 import { IoMdRefreshCircle } from "react-icons/io";
 import Customcheckbox from '../Customcheckbox/Customcheckbox';
+import { TokenDetails } from '@/interfaces';
+import { truncateAddress } from '@/utils/generalFunctions';
 
 
 interface ImportTokensProps {
     open: boolean;
     handleClose: () => void;
     mode: 'light' | 'dark';
+    token: TokenDetails | null;
+    CONSTANT_IMPORT_STRING : string;
+    handleSelectTokens : (token: TokenDetails) => void
+    reset: () => void;
 }
 
-const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode }) => {
+const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode, token, CONSTANT_IMPORT_STRING, handleSelectTokens, reset }) => {
+    console.log("🚀 ~ImportTokens token:", token)
     const [value, setValue] = useState("0");
-    const [tokenAddress, setTokenAddress] = useState("");
-    const [importedTokens, setImportedTokens] = useState<string[]>([]);
+    const [understand, setUnderstand] = useState(false);
 
     const handleChange = (event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
     };
 
+    const handleCheckboxChange = () => {
+        setUnderstand((prev) => !prev); // Toggle the state
+    };
+
     const handleImportToken = () => {
-        if (tokenAddress && !importedTokens.includes(tokenAddress)) {
-            setImportedTokens([...importedTokens, tokenAddress]);
-            setTokenAddress("");
-        }
+        if(!token) return;
+        localStorage.setItem(CONSTANT_IMPORT_STRING+token.address.contract_address, JSON.stringify(token));
+        alert("Token Imported");
+        handleSelectTokens(token);
+
+        handleCheckboxChange()
+        reset();
+        handleClose();
     };
 
     const style = {
@@ -96,7 +110,7 @@ const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode }) 
                             <GoAlertFill />
                         </Box>
                         <Box sx={{ width: 'calc(100% - 30px)', color: 'var(--primary)    ' }}>
-                            <Typography>Anyone can create a PRC20 token on PulseChain with any name, including creating fake versions of existing tokens and tokens that claim to represent projects that do not have a token.
+                            <Typography>Anyone can create a ERC20 token on PulseChain with any name, including creating fake versions of existing tokens and tokens that claim to represent projects that do not have a token.
                             </Typography>
                             <br />
                             <Typography>If you purchase an arbitrary token, you may be unable to sell it back.
@@ -111,15 +125,15 @@ const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode }) 
                                 <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>Unknown Source </Typography>
                             </Box>
                             <Box sx={{ display: 'flex', gap: '5px', mt: '10px' }}>
-                                <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>SUN Minimeal</Typography>
-                                <Typography sx={{ fontSize: '16px', fontWeight: '600' }}> &#40; Soil &#x29;</Typography>
+                                <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>{token?.name}</Typography>
+                                <Typography sx={{ fontSize: '16px', fontWeight: '600' }}> &#40; {token?.symbol} &#x29;</Typography>
                             </Box>
                             <Box>
-                                <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>0x13...9769</Typography>
+                                <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>{token ? truncateAddress(token.address.contract_address) : ""}</Typography>
                             </Box>
-                            <Box>
+                            {/* <Box>
                                 <Typography sx={{ fontSize: '16px', fontWeight: '600', color: 'var(--cream)' }}>&#40; View on 9mmScan &#x29;</Typography>
-                            </Box>
+                            </Box> */}
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                             <Tooltip title="A Risk scan results are provided by a third party AvengerDAO is reporting a risk level of Unknown Slippage nderstand However, this token has been labelled Unknown Risk due to not being listed on any of the built-in token lists. Please proceed with caution and always do your own research.dd" arrow>
@@ -135,7 +149,7 @@ const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode }) 
                         <FormGroup sx={{ my: '10px' }}>
                             <FormControlLabel
                                 sx={{ m: '0' }}
-                                control={<Customcheckbox />}
+                                control={<Customcheckbox checked={understand} onChange={handleCheckboxChange}/>}
                                 label={
                                     <>
                                         <Typography sx={{ ml: '5px', fontSize: '14px', mt: '3px', fontWeight: '600' }}>
@@ -146,7 +160,7 @@ const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode }) 
                             />
                         </FormGroup>
                         <Box>
-                            <Button variant="contained" color="secondary" sx={{ display: 'block', width: '100%' }}>
+                            <Button variant="contained" color="secondary" sx={{ display: 'block', width: '100%' }} disabled={!understand} onClick={handleImportToken}>
                                 Import
                             </Button>
                         </Box>
