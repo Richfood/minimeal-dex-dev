@@ -14,7 +14,7 @@ import { calculatePositionData } from '@/utils/calculatePositionData';
 import { V3PositionData, TokenDetails, V2PositionsData } from '@/interfaces';
 import Link from 'next/link';
 
-import tokenList from "@/utils/tokenList.json";
+import tokenList from "@/utils/famousToken.json";
 import { getV2Positions } from '@/utils/api/getV2Positions';
 import postionDataV2 from "@/utils/positionsDataV2.json";
 // import postionDataV3 from "@/utils/positionsDataV3.json";
@@ -47,8 +47,8 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
   const handleOpenRecent = useCallback(() => setIsOpenRecent(true), []);
   const handleCloseRecent = () => setIsOpenRecent(false);
 
-  const [startToken0, setStartToken0] = useState<TokenDetails>(tokenList.TokenB);
-  const [startToken1, setStartToken1] = useState<TokenDetails>(tokenList.TokenA);
+  const [startToken0, setStartToken0] = useState<TokenDetails>(tokenList.filter((token)=>token.symbol === "SOIL")[0]);
+  const [startToken1, setStartToken1] = useState<TokenDetails>(tokenList.filter((token)=>token.symbol === "STBL")[0]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -90,6 +90,8 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
 
   const color = theme === 'light' ? 'var(--primary)' : 'var(--cream)';
 
+
+  console.log(value !== '2' && PositionListV3.length>3)
   return (
     <>
       <Box className="white_box">
@@ -115,37 +117,49 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
         </Box>
 
         <Box className="Liq_mid">
-          {/* <Box>
-            <FormGroup>
-              <FormControlLabel
-                sx={{ m: '0' }}
-                control={<Customcheckbox />}
-                label={
-                  <Typography sx={{ ml: '5px', fontSize: '12px', mt: '3px', fontWeight: '400', color: 'var(--cream)' }}>
-                    Hide closed positions
-                  </Typography>
-                }
-              />
-            </FormGroup>
-          </Box> */}
-          <Box>
-            <TabContext value={value}>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                variant="scrollable"
-                scrollButtons="auto"
-                aria-label="connect-wallet-tabs"
-                sx={{ border: 'unset', minHeight: 'unset' }}
-                className="tabsOuter"
-              >
-                <Tab label="All" value="0" />
-                <Tab label="V3" value="1" />
-                <Tab label="V2" value="2" />
-              </Tabs>
-            </TabContext>
-          </Box>
-        </Box>
+  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <TabContext value={value}>
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        variant="scrollable"
+        scrollButtons="auto"
+        aria-label="connect-wallet-tabs"
+        sx={{ border: 'unset', minHeight: 'unset' }}
+        className="tabsOuter"
+      >
+        <Tab label="All" value="0" />
+        <Tab label="V3" value="1" />
+        <Tab label="V2" value="2" />
+      </Tabs>
+    </TabContext>
+  </Box>
+    {(value === '2' && v2Positions.length>3) || (value !== '2' && v3Positions.length>3) ? (
+      <Box>
+        <Button
+          onClick={() => {
+            const pathVal = value === '2' ? "V2" : "V3";
+            const path = `/add/${pathVal}/${startToken0.address.contract_address}/${startToken1.address.contract_address}`;
+            router.push(path);
+          }}
+          variant="contained"
+          color="secondary"
+          sx={{           
+            padding: '12px 12px',
+            fontSize: '12px',
+            gap: '5px',
+            minWidth: 'auto',
+            display: 'flex',
+            alignItems: 'center'
+          }}
+        >
+          Add Liquidity
+        </Button>
+    </Box>
+    ) : null}
+</Box>
+
+
 
         <Box className="tabsContent">
           {isLoadingPosition ? 
