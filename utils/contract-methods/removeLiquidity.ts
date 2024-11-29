@@ -89,10 +89,14 @@ export async function removeLiquidityV2(
     amount1Min : string,
     deadline : string
 ){
+    console.log("🚀 ~ liquidity:", liquidity)
+    console.log("🚀 ~ amount0Min:", amount0Min)
+    console.log("🚀 ~ amount1Min:", amount1Min)
     if(!window.ethereum) return;
 
     const newProvider = new ethers.providers.Web3Provider(window.ethereum);
     const newSigner = newProvider.getSigner();
+    const userAddress = await newSigner.getAddress();
     const v2RouterContract = new ethers.Contract(v2RouterContractAddress, v2RouterAbi, newSigner);
 
     const removeLiquidityTx = await v2RouterContract.removeLiquidity(
@@ -101,13 +105,14 @@ export async function removeLiquidityV2(
         liquidity,
         amount0Min,
         amount1Min,
+        userAddress,
         deadline
     )
     console.log("🚀 ~ removeLiquidityTx:", removeLiquidityTx)
-    const txHash = removeLiquidityTx.wait();
-    console.log("🚀 ~ txHash:", txHash)
+    await removeLiquidityTx.wait()
+    
 
-    return txHash;
+    return removeLiquidityTx.hash;
 }
 
 /*
@@ -145,5 +150,5 @@ export async function removeLiquidityETHV2(
     const txHash = await removeLiquidityETHTx.wait();
     console.log("🚀 ~ txHash:", txHash)
 
-    return txHash;
+    return txHash.hash;
 }

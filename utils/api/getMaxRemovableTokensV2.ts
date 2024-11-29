@@ -14,7 +14,7 @@ export const getMaxRemovableTokensV2 = async (
     const pairContract = new ethers.Contract(pairAddress, PAIR_ABI, newProvider);
 
     const userBalance = await pairContract.balanceOf(userAddress);
-    console.log("🚀 ~ userBalance:", userBalance)
+    console.log("🚀 ~ userBalance:", userBalance.toString())
 
     // Fetch total supply of LP tokens
     const totalSupply = await pairContract.totalSupply();
@@ -28,5 +28,5 @@ export const getMaxRemovableTokensV2 = async (
     const amount0 = share * _reserve0;
     const amount1 = share * _reserve1;
 
-    return { amount0, amount1 };
+    return { amount0, amount1, liquidity: userBalance.toString(), totalSupply: totalSupply.toString() };
 };

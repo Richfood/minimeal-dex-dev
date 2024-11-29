@@ -11,7 +11,7 @@ import { VscArrowBoth } from "react-icons/vsc";
 import { TokenDetails, V2PairData, V2PositionsData, V3PositionData } from '@/interfaces';
 import { getPositionByTokenId } from '@/utils/api/getPositionByTokenId';
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
-import { decimalRound } from '@/utils/generalFunctions';
+import { decimalRound, expandIfNeeded } from '@/utils/generalFunctions';
 import { ethers } from 'ethers';
 import { calculatePositionData } from '@/utils/calculatePositionData';
 import { collectFees } from '@/utils/contract-methods/collectFees';
@@ -58,7 +58,7 @@ const PositionV2 = ({ pairAddress }: PositionProps) => {
             return "";
         }
 
-        return parseFloat(decimalRound(ethers.utils.formatUnits(decimalRound(amount,0), decimal),2));
+        return parseFloat(decimalRound(ethers.utils.formatUnits(expandIfNeeded(decimalRound(amount,0)), decimal),2));
     }
 
     useEffect(() => {

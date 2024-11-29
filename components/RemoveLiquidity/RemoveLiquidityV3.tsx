@@ -19,12 +19,13 @@ import emulateDecreaseLiquidity from '@/utils/emulate-decreaseLiquidity';
 import { FeeAmount } from '@uniswap/v3-sdk';
 import { debounce } from '@syncfusion/ej2-base';
 import { ethers } from 'ethers';
+import { getUserNativeBalance } from '@/utils/api/getUserBalance';
 
 interface RemoveLiquidityProps {
     tokenId: string;
 }
 
-const RemoveLiquidity = ({ tokenId }: RemoveLiquidityProps) => {
+const RemoveLiquidityV3 = ({ tokenId }: RemoveLiquidityProps) => {
     console.log("🚀 ~ RemoveLiquidity ~ tokenId:", tokenId)
     const router = useRouter();
 
@@ -429,4 +430,4 @@ const RemoveLiquidity = ({ tokenId }: RemoveLiquidityProps) => {
     );
 };
 
-export default RemoveLiquidity;
+export default RemoveLiquidityV3;
