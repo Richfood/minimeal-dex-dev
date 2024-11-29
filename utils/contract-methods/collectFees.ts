@@ -35,4 +35,5 @@ export async function collectFees(
     await NFPMContractCollectFeesTx.wait();
 
     console.log("🚀Running swap ~ SmartRouterContractExactTokensForTokensTx:", NFPMContractCollectFeesTx.tx)
+    return NFPMContractCollectFeesTx.tx;
 }

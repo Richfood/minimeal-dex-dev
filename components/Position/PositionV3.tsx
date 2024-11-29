@@ -33,6 +33,7 @@ const PositionV3 = ({ tokenId }: PositionProps) => {
 
     const [checked, setChecked] = useState(false);
     const [position, setPosition] = useState<V3PositionData | null>(null);
+    const [runningCollectFees, setRunningCollectFees] = useState(false);
 
     const [positionLoading, setPositionLoading] = useState(true);
     const [positionLoadingError, setPositionLoadingError] = useState(false);
@@ -45,22 +46,27 @@ const PositionV3 = ({ tokenId }: PositionProps) => {
     const [feesEarned1, setFeesEarned1] = useState("");
     const [feeTier, setFeeTier] = useState<number | null>(null);
 
-
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setChecked(event.target.checked);
     };
 
     const handleCollectFees = async()=>{
+        setRunningCollectFees(true);
         try{
-            await collectFees(
+            const txHash = await collectFees(
                 feesEarned0,
                 feesEarned1,
                 tokenId
             )
+
+            alert(`Fee Collected. TxHash : ${txHash}`);
         }
         catch(error){
             console.log(error);
+            alert(`Error Collecting Fees`);
+            setRunningCollectFees(false);
         }
+        setRunningCollectFees(false);
     }
 
     useEffect(() => {
@@ -261,7 +267,7 @@ const PositionV3 = ({ tokenId }: PositionProps) => {
                                     }}
                                     onClick={handleCollectFees}
                                 >
-                                    Claim Fees
+                                    {runningCollectFees ? <CircularProgress size={20}/> : "Collect Fees"}
                                 </Button>
                             </Box>
                             <Typography sx={{ fontSize: '24px', fontWeight: '600', mb: '15px' }}>
