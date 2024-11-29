@@ -19,7 +19,7 @@ import { expandIfNeeded, isNative, truncateAddress } from '@/utils/generalFuncti
 import { priceToTick, tickToPrice } from '@/utils/utils';
 import Default from '../CustomChart/Default';
 import { getV2Pair } from '@/utils/api/getV2Pair';
-import { AddLiquidityPoolData, TokenDetails, Protocol } from '@/interfaces';
+import { AddLiquidityPoolData, TokenDetails, Protocol, V2PairData } from '@/interfaces';
 import SettingsModal from '../SettingModal/SettingModal-addLiquidity';
 import { calculateV2Amounts } from '@/utils/calculateV2TokenAmounts';
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
@@ -29,10 +29,11 @@ import { hooks } from '../ConnectWallet/connector';
 import { debounce } from '@syncfusion/ej2-base';
 import { flushSync } from 'react-dom';
 import {getUserBalance, getUserNativeBalance} from '@/utils/api/getUserBalance';
+import { getPoolDataByAddressV2 } from '@/utils/api/getPoolDataByAddressV2';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
-  defaultActiveProtocol: Protocol;
+  pairAddress: string;
 }
 
 // interface AddLiquidityLoader {
@@ -47,7 +48,7 @@ interface AddLiquidityProps {
 //   ABOVE_RANGE
 // }
 
-const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
+const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, pairAddress }) => {
 
   const { palette } = useTheme();
   const [isActive, setIsActive] = useState(true);
@@ -270,10 +271,23 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
 
 
   const getPoolRatio = async () => {
+
+    if(!pairAddress) return;
+
+    const positionToUse : V2PairData | null = await getPoolDataByAddressV2(pairAddress);
+
+    if(!positionToUse) return;
+
+    const token0ToUse: TokenDetails = famousTokenTestnet.filter((token) => token.address.contract_address.toLowerCase() === positionToUse.token0.id)[0];
+    const token1ToUse: TokenDetails = famousTokenTestnet.filter((token) => token.address.contract_address.toLowerCase() === positionToUse.token1.id)[0];
+
+    setToken0(token0ToUse);
+    setToken1(token1ToUse);
+
     let pairRatio: { reserve0: number; reserve1: number } | null = null;
 
-    if (token0 && token1) {
-      pairRatio = await getV2Pair(token0, token1) || null;
+    if (token0ToUse && token1ToUse) {
+      pairRatio = await getV2Pair(token0ToUse, token1ToUse) || null;
     }
     console.log("🚀 ~ getPoolRatio ~ pairRatio:", pairRatio)
     setReserves(pairRatio);
@@ -293,7 +307,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
     setAmount0Desired("");
     setAmount1Desired("")
     getPoolRatio();
-  }, [token0, token1])
+  }, [pairAddress])
 
   useEffect(() => {
     const getUserBalances = async () => {
@@ -517,7 +531,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
                       Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired) ? (
                         <>Insufficient Balance</>
                       ) : (
-                        <>Create Liquidity</>
+                        <>Increase Liquidity</>
                       )
                     )}
                   </Button>
