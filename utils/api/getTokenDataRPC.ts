@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export async function getTokenData(tokenAddress : string){
-    const RPC_URL = process.env.NEXT_PUBLIC_TOKEN_DATA_RPC + tokenAddress;
+    const RPC_URL = process.env.NEXT_PUBLIC_TOKEN_DATA_API + tokenAddress;
 
     const tokenDataResponse = await axios.get(RPC_URL);
     console.log("🚀 ~ getTokenData ~ tokenData:", tokenDataResponse.data);

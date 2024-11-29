@@ -1,9 +1,11 @@
 import { TokenDetails } from "@/interfaces";
 import { ethers } from "ethers";
 import { expandIfNeeded } from "../generalFunctions";
+import axios from "axios";
+import { useBalance } from "wagmi";
 const tokenAbi = require("../../abis/TokenA.sol/TokenA.json").abi;
 
-const getUserBalance = async (token: TokenDetails) => {
+export async function getUserBalance (token: TokenDetails) {
     try {
         // Ensure MetaMask is available
         if (!window.ethereum) {
@@ -44,4 +46,21 @@ const getUserBalance = async (token: TokenDetails) => {
     }
 };
 
-export default getUserBalance;
+
+export async function getUserNativeBalance () {
+    const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+    const newSigner = newProvider.getSigner();
+    const userAddress = await newSigner.getAddress();
+
+    const nativeBalanceApi = process.env.NEXT_PUBLIC_NATIVE_TOKEN_BALANCE_API+userAddress;
+
+    const userDetails = await axios.get(nativeBalanceApi);
+
+    console.log("User Details = ",userDetails);
+
+    let userBalance = userDetails.data.coin_balance;
+
+    userBalance = ethers.utils.formatEther(userBalance);
+
+    return userBalance;
+}

@@ -147,7 +147,7 @@ const PositionV3 = ({ tokenId }: PositionProps) => {
                                     cursor: 'pointer'
                                 }}
                             >
-                                <BsArrowLeft size={20} /> Back to pools
+                                <BsArrowLeft size={20} /> Back to Positions
                             </Typography>
                         </Box>
 

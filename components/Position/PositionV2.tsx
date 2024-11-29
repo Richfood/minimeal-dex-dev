@@ -144,7 +144,7 @@ const PositionV2 = ({ pairAddress }: PositionProps) => {
                                     cursor: 'pointer'
                                 }}
                             >
-                                <BsArrowLeft size={20} /> Back to pools
+                                <BsArrowLeft size={20} /> Back to Positions
                             </Typography>
                         </Box>
 

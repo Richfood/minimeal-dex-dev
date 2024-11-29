@@ -29,8 +29,9 @@ import addresses from "@/utils/address.json";
 import { flushSync } from 'react-dom';
 import { getTokenUsdPrice } from "@/utils/api/getTokenUsdPrice"
 import getTokenApproval from '@/utils/contract-methods/getTokenApproval';
-import getUserBalance from '@/utils/api/getUserBalance';
+import {getUserBalance, getUserNativeBalance} from '@/utils/api/getUserBalance';
 import SwappingModal from '../SwappingModal/SwappingModal';
+import { isNative } from '@/utils/generalFunctions';
 const { useChainId, useIsActive, useAccounts } = hooks;
 
 // const fetchCoinUSDPrice = async (tokenAddress?: string) => {
@@ -99,7 +100,7 @@ const SwapWidget = () => {
         if (!token0) return;
 
         const runGetUserBalance = async () => {
-            const balance = await getUserBalance(token0);
+            const balance = isNative(token0) ? await getUserNativeBalance() : await getUserBalance(token0);
             setUserBalance(balance);
         }
 

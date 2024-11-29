@@ -97,7 +97,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
       <Box className="white_box">
         <Box className="Liq_top">
           <Box>
-            <Typography variant="h4" className='sec_title' sx={{ mb: '10px' }}>Your Liquidity</Typography>
+            <Typography variant="h4" className='sec_title' sx={{ mb: '10px' }}>Your Positions</Typography>
             <Typography sx={{ color: 'var(--cream)', fontSize: '14px', fontWeight: '500' }}>List of your liquidity positions</Typography>
           </Box>
           <Box>

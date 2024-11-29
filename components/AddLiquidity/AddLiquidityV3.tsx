@@ -40,7 +40,7 @@ import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import famousToken from "../../utils/famousToken.json";
 const { useChainId } = hooks;
 import { hooks } from '../ConnectWallet/connector';
-import getUserBalance from '@/utils/api/getUserBalance';
+import {getUserBalance, getUserNativeBalance} from '@/utils/api/getUserBalance';
 import AddLiquidityModal from '../AddLIquidityModal/AddLIquidityModal';
 
 interface AddLiquidityProps {
@@ -771,8 +771,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   useEffect(() => {
     const getUserBalances = async () => {
       if (token0 && token1) {
-        const token0Balance = await getUserBalance(token0);
-        const token1Balance = await getUserBalance(token1);
+        const token0Balance = isNative(token0) ? await getUserNativeBalance() : await getUserBalance(token0);
+        const token1Balance = isNative(token1) ? await getUserNativeBalance() : await getUserBalance(token1);
 
         setTokenBalance0(token0Balance);
         setTokenBalance1(token1Balance);

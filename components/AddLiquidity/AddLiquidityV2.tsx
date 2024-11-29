@@ -28,7 +28,7 @@ const { useChainId } = hooks;
 import { hooks } from '../ConnectWallet/connector';
 import { debounce } from '@syncfusion/ej2-base';
 import { flushSync } from 'react-dom';
-import getUserBalance from '@/utils/api/getUserBalance';
+import {getUserBalance, getUserNativeBalance} from '@/utils/api/getUserBalance';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -298,8 +298,8 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   useEffect(() => {
     const getUserBalances = async () => {
       if (token0 && token1) {
-        const token0Balance = await getUserBalance(token0);
-        const token1Balance = await getUserBalance(token1);
+        const token0Balance = isNative(token0) ? await getUserNativeBalance() : await getUserBalance(token0);
+        const token1Balance = isNative(token1) ? await getUserNativeBalance() : await getUserBalance(token1);
 
         setTokenBalance0(token0Balance);
         setTokenBalance1(token1Balance);
