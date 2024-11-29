@@ -200,7 +200,7 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
               )}
               {value === '0' && (
                 <Box sx={{ py: '15px', display: 'flex', justifyContent: 'center' }}>
-                  {v3Positions.length && v2Positions.length ? (
+                  {v3Positions.length || v2Positions.length ? (
                       <List sx={{ width: '100%', maxWidth: 'screen' }}>
                         {v3Positions.map((elem) => (
                           <PositionListV3 theme={theme} data={elem}/>
