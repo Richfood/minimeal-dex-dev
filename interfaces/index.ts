@@ -139,6 +139,15 @@ export interface PoolDetails {
   fee: number;
 }
 
+export interface TokenInfoFromAPI {
+  name : string;
+  symbol : string;
+  address : string;
+  decimals : string;
+  icon_url? : string;
+  type?: string;
+}
+
 export enum Protocol {
   V2 = "V2",
   V3 = "V3",

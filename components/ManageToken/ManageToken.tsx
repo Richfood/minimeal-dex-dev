@@ -11,8 +11,9 @@ import { FaRegQuestionCircle } from 'react-icons/fa';
 import ImportTokens from '../ImportTokens/ImportTokens';
 import { ethers } from "ethers";
 import { getTokenData } from '@/utils/api/getTokenDataRPC';
-import { TokenDetails, TokenRpcData } from '@/interfaces';
+import { TokenDetails, TokenInfoFromAPI, TokenRpcData } from '@/interfaces';
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
+import { CONSTANT_IMPORT_STRING, DEFAULT_LOGO_URL, makeTokenFromInfo } from '@/utils/generalFunctions';
 
 console.log("🚀 ~ updateExistingTokens famousTokenTestnet:", famousTokenTestnet)
 
@@ -24,9 +25,6 @@ interface ManageTokenProps {
     existingImportedTokens: TokenDetails[]
     updateImportedTokens: () => void
 }
-
-const DEFAULT_LOGO_URL = "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png";
-const CONSTANT_IMPORT_STRING = "Imported Token : ";
 
 const ManageToken: React.FC<ManageTokenProps> = ({ open, handleClose, mode, handleSelectTokens, existingImportedTokens, updateImportedTokens}) => {
     const [value, setValue] = useState('1');
@@ -124,19 +122,11 @@ const ManageToken: React.FC<ManageTokenProps> = ({ open, handleClose, mode, hand
                 setIsExistingToken(true);
             }
             else{
-                const tokenDetails : TokenRpcData = await getTokenData(tokenAddress);
+                const tokenDetails : TokenInfoFromAPI = await getTokenData(tokenAddress);
 
                 if(!tokenDetails || tokenDetails.type !== "ERC-20") throw("Token not fetched or not ERC20");
 
-                tokenToSet = {
-                    name: tokenDetails.name,
-                    symbol: tokenDetails.symbol,
-                    logoURI : tokenDetails.icon_url || DEFAULT_LOGO_URL,
-                    address : {
-                        contract_address : tokenAddress,
-                        decimals : Number(tokenDetails.decimals)
-                    }
-                }
+                tokenToSet = makeTokenFromInfo(tokenDetails)
                 setIsExistingToken(false);
             }
             console.log("🚀 ~ ManageToken ~ token:", tokenToSet)
@@ -272,7 +262,7 @@ const ManageToken: React.FC<ManageTokenProps> = ({ open, handleClose, mode, hand
                 </Box>
             </Modal>
 
-            <ImportTokens open={importOpen} handleClose={handleCloseImport} mode={mode} token={token} CONSTANT_IMPORT_STRING={CONSTANT_IMPORT_STRING} handleSelectTokens={handleSelectTokens} reset={reset}/>
+            <ImportTokens open={importOpen} handleClose={handleCloseImport} mode={mode} token={token} handleSelectTokens={handleSelectTokens} reset={reset}/>
         </>
     );
 };

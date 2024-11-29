@@ -13,7 +13,7 @@ import { BsQuestionCircle } from "react-icons/bs";
 import { IoMdRefreshCircle } from "react-icons/io";
 import Customcheckbox from '../Customcheckbox/Customcheckbox';
 import { TokenDetails } from '@/interfaces';
-import { truncateAddress } from '@/utils/generalFunctions';
+import { CONSTANT_IMPORT_STRING, truncateAddress } from '@/utils/generalFunctions';
 
 
 interface ImportTokensProps {
@@ -21,12 +21,11 @@ interface ImportTokensProps {
     handleClose: () => void;
     mode: 'light' | 'dark';
     token: TokenDetails | null;
-    CONSTANT_IMPORT_STRING : string;
     handleSelectTokens : (token: TokenDetails) => void
     reset: () => void;
 }
 
-const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode, token, CONSTANT_IMPORT_STRING, handleSelectTokens, reset }) => {
+const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode, token, handleSelectTokens, reset }) => {
     console.log("🚀 ~ImportTokens token:", token)
     const [value, setValue] = useState("0");
     const [understand, setUnderstand] = useState(false);

@@ -11,7 +11,7 @@ import { VscArrowBoth } from "react-icons/vsc";
 import { TokenDetails, V2PairData, V2PositionsData, V3PositionData } from '@/interfaces';
 import { getPositionByTokenId } from '@/utils/api/getPositionByTokenId';
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
-import { decimalRound, expandIfNeeded } from '@/utils/generalFunctions';
+import { decimalRound, expandIfNeeded, makeTokenFromInfo } from '@/utils/generalFunctions';
 import { ethers } from 'ethers';
 import { calculatePositionData } from '@/utils/calculatePositionData';
 import { collectFees } from '@/utils/contract-methods/collectFees';
@@ -72,8 +72,19 @@ const PositionV2 = ({ pairAddress }: PositionProps) => {
 
                 console.log(tokenResult)
 
-                const token0ToUse: TokenDetails = famousTokenTestnet.filter((token) => token.address.contract_address.toLowerCase() === positionToUse.token0.id)[0];
-                const token1ToUse: TokenDetails = famousTokenTestnet.filter((token) => token.address.contract_address.toLowerCase() === positionToUse.token1.id)[0];
+                const token0ToUse: TokenDetails = makeTokenFromInfo({
+                    name : positionToUse.token0.name,
+                    symbol : positionToUse.token0.symbol,
+                    address : positionToUse.token0.id,
+                    decimals : positionToUse.token0.decimals
+                  })
+              
+                  const token1ToUse: TokenDetails = makeTokenFromInfo({
+                    name : positionToUse.token1.name,
+                    symbol : positionToUse.token1.symbol,
+                    address : positionToUse.token1.id,
+                    decimals : positionToUse.token1.decimals
+                  })
 
                 setToken0(token0ToUse);
                 setToken1(token1ToUse);

@@ -14,7 +14,7 @@ import { TokenDetails, V3PositionData } from '@/interfaces';
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import { getPositionByTokenId } from '@/utils/api/getPositionByTokenId';
 import addresses from "../../utils/address.json";
-import { decimalRound, expandIfNeeded } from '@/utils/generalFunctions';
+import { decimalRound, expandIfNeeded, makeTokenFromInfo } from '@/utils/generalFunctions';
 import emulateDecreaseLiquidity from '@/utils/emulate-decreaseLiquidity';
 import { FeeAmount } from '@uniswap/v3-sdk';
 import { debounce } from '@syncfusion/ej2-base';
@@ -191,8 +191,19 @@ const RemoveLiquidityV3 = ({ tokenId }: RemoveLiquidityProps) => {
 
                 if (!positionToUse) return;
 
-                const token0ToUse: TokenDetails = famousTokenTestnet.filter((token) => token.address.contract_address.toLowerCase() === positionToUse.token0.id)[0];
-                const token1ToUse: TokenDetails = famousTokenTestnet.filter((token) => token.address.contract_address.toLowerCase() === positionToUse.token1.id)[0];
+                const token0ToUse: TokenDetails = makeTokenFromInfo({
+                    name : positionToUse.token0.name,
+                    symbol : positionToUse.token0.symbol,
+                    address : positionToUse.token0.id,
+                    decimals : positionToUse.token0.decimals
+                  })
+              
+                  const token1ToUse: TokenDetails = makeTokenFromInfo({
+                    name : positionToUse.token1.name,
+                    symbol : positionToUse.token1.symbol,
+                    address : positionToUse.token1.id,
+                    decimals : positionToUse.token1.decimals
+                  })
 
                 const currentTick = Number(positionToUse.pool.tick);
                 const lowerTick = Number(positionToUse.tickLower.tickIdx);

@@ -14,10 +14,9 @@ const { useChainId, useAccounts } = hooks;
 
 // import famousToken from "../../utils/famousToken.json";
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
-const CONSTANT_IMPORT_STRING = "Imported Token : ";
 
 import { TokenDetails } from '@/interfaces';
-import ImportTokens from '../ImportTokens/ImportTokens';
+import { CONSTANT_IMPORT_STRING } from '@/utils/generalFunctions';
 
 interface SelectedTokenProps {
     openToken: boolean;

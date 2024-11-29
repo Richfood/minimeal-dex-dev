@@ -23,7 +23,7 @@ import { addLiquidityV3, addLiquidityV2, addLiquidityETH } from '@/utils/contrac
 import emulate from '@/utils/emulate-addLiquidity';
 import { FeeAmount, nearestUsableTick, TICK_SPACINGS } from '@uniswap/v3-sdk';
 import addresses from "../../utils/address.json";
-import { expandIfNeeded, isNative, truncateAddress } from '@/utils/generalFunctions';
+import { expandIfNeeded, isNative, makeTokenFromInfo, truncateAddress } from '@/utils/generalFunctions';
 import { priceToTick, tickToPrice } from '@/utils/utils';
 import Default from '../CustomChart/Default';
 import { getPoolData } from '@/utils/api/getPoolData';
@@ -266,8 +266,19 @@ const IncreaseLiquidityV3: React.FC<IncreaseLiquidityProps> = ({
 
         if (!positionToUse) return;
 
-        const token0ToUse: TokenDetails = famousTokenTestnet.filter((token) => token.address.contract_address.toLowerCase() === positionToUse.token0.id)[0];
-        const token1ToUse: TokenDetails = famousTokenTestnet.filter((token) => token.address.contract_address.toLowerCase() === positionToUse.token1.id)[0];
+        const token0ToUse: TokenDetails = makeTokenFromInfo({
+          name : positionToUse.token0.name,
+          symbol : positionToUse.token0.symbol,
+          address : positionToUse.token0.id,
+          decimals : positionToUse.token0.decimals
+        })
+    
+        const token1ToUse: TokenDetails = makeTokenFromInfo({
+          name : positionToUse.token1.name,
+          symbol : positionToUse.token1.symbol,
+          address : positionToUse.token1.id,
+          decimals : positionToUse.token1.decimals
+        })
 
         const decimalDifference = Number(positionToUse.token1.decimals) - Number(positionToUse.token0.decimals);
         const currentTick = Number(positionToUse.pool.tick);
