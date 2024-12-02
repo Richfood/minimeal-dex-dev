@@ -447,7 +447,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
                 </Box>
                 <Box className="ftcardBoxOuter" sx={{ display: isActive ? "block" : "none" }}>
                   <Box className="fiFooter" sx={{ display: 'block', mt: '30px' }}>
-                    <Link onClick={toggleV2Class} sx={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer', p: "8px 16px", borderRadius: "30px", background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', textDecoration: 'none' }}>Add V3 Liquidity</Link>
+                    <Link onClick={toggleV2Class} sx={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer', p: "8px 16px", borderRadius: "30px", background: 'transparent', border: palette.mode === 'light' ? '1px solid var(--primary)' : '1px solid var(--cream)', color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)', textDecoration: 'none' }}>Add V3 Liquidity</Link>
                   </Box>
                 </Box>
               </Box>
@@ -533,7 +533,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
         <SelectedToken
           openToken={openToken}
           handleCloseToken={handleCloseToken}
-          mode={theme}
+          mode={palette.mode}
           setToken0={setToken0}
           setToken1={setToken1}
           tokenNumber={tokenBeingChosen}

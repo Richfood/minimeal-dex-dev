@@ -397,7 +397,7 @@ const RemoveLiquidityV2 = ({ pairAddress }: RemoveLiquidityProps) => {
 
                                 </Box>
 
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', my: '15px' }}>
+                                {/* <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', my: '15px' }}>
                                     <Box>
                                         <Typography sx={{ fontWeight: '600' }}>Collect as WETH</Typography>
                                     </Box>
@@ -408,9 +408,9 @@ const RemoveLiquidityV2 = ({ pairAddress }: RemoveLiquidityProps) => {
                                             color="default"
                                         />
                                     </Box>
-                                </Box>
+                                </Box> */}
 
-                                <Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', my: '15px' }}>
                                     <Button variant="contained" color="secondary" sx={{ width: '100%' }} onClick={handleRemoveLiquidity} disabled={removeLiquidityRunning}>
                                         {removeLiquidityRunning ? <CircularProgress size={20} /> : "Remove"}
                                     </Button>

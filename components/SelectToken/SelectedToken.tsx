@@ -98,6 +98,7 @@ const fetchStablecoins = async (): Promise<any> => {
 const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode, setToken0, setToken1, tokenNumber, token0, token1, setTokensSelected
 
 }) => {
+    console.log("🚀 ~ mode:", mode)
     console.log("🚀 ~SelectedToken token1:", token1)
     console.log("🚀 ~SelectedToken token0:", token0)
     const [openManage, setOpenManage] = useState(false);
@@ -163,7 +164,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
         bgcolor: mode === 'light' ? 'var(--white)' : 'var(--primary)',
         boxShadow: 'rgba(0, 0, 0, 0.24) -40px 40px 80px -8px',
         borderRadius: '16px',
-        color: mode === 'light' ? 'var(--primary)' : 'var(--white)',
+        color: mode === 'light' ? 'var(--primary)' : 'white',
         maxHeight: '100vh',
         overflowY: 'auto',
         overflowX: 'hidden',
@@ -374,10 +375,10 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                                 display: 'flex',
                                                 flexWrap: 'wrap',
                                                 gap: '10px',
-                                                backgroundColor: '#fdf5e6', // Light cream color
-                                                padding: '10px', // Optional: Add some padding for spacing
-                                                borderRadius: '8px', // Optional: Rounded corners for a smoother look
-                                                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', // Optional: Add a subtle shadow for depth
+                                                // backgroundColor: mode === 'light' ? '#fdf5e6' : "var(--cream)", // Light cream color
+                                                // padding: '10px', // Optional: Add some padding for spacing
+                                                // borderRadius: '8px', // Optional: Rounded corners for a smoother look
+                                                // boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', // Optional: Add a subtle shadow for depth
                                             }}
                                         >
                                             {tokens?.map((token, index) => {
@@ -393,7 +394,8 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                                         sx={{
                                                             cursor: isTokenDisabled ? "default" : "pointer",
                                                             opacity: isTokenDisabled ? 0.4 : 1,
-                                                            backgroundColor: isTokenDisabled ? '#f5f5f5' : 'white', // Subtle background for tokens
+                                                            backgroundColor: isTokenDisabled ? '#f5f5f5' : mode === 'light' ? 'var(--white)' : '#fdf5e6', // Subtle background for tokens
+                                                            color:'var(--primary)',
                                                             padding: '8px', // Optional: Add padding inside each token box
                                                             borderRadius: '6px', // Optional: Rounded corners for individual tokens
                                                             display: 'flex',
@@ -413,59 +415,10 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                             })}
                                         </Box>
 
-                                        {existingImportedTokens.length > 0 ? (
-                                            <Box>
-                                                <Typography sx={{ fontWeight: '500', fontSize: '14px', marginTop: '20px' }}>Imported Tokens</Typography>
-                                                <Box
-                                                    className="token_Outer"
-                                                    sx={{
-                                                        display: 'flex',
-                                                        flexWrap: 'wrap',
-                                                        gap: '10px',
-                                                        backgroundColor: '#fdf5e6', // Light cream color
-                                                        padding: '10px', // Optional: Add some padding for spacing
-                                                        borderRadius: '8px', // Optional: Rounded corners for a smoother look
-                                                        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', // Optional: Add a subtle shadow for depth
-                                                    }}
-                                                >
-                                                    {existingImportedTokens?.map((token, index) => {
-                                                        const selectedToken = tokenNumber === 0 ? token0 : token1;
-
-                                                        // Check if the token should be disabled
-                                                        const isTokenDisabled = token.address === selectedToken?.address;
-
-                                                        return (
-                                                            <Box
-                                                                key={index}
-                                                                className="token_box"
-                                                                sx={{
-                                                                    cursor: isTokenDisabled ? "default" : "pointer",
-                                                                    opacity: isTokenDisabled ? 0.4 : 1,
-                                                                    backgroundColor: isTokenDisabled ? '#f5f5f5' : 'white', // Subtle background for tokens
-                                                                    padding: '8px', // Optional: Add padding inside each token box
-                                                                    borderRadius: '6px', // Optional: Rounded corners for individual tokens
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    boxShadow: isTokenDisabled ? 'none' : '0px 2px 4px rgba(0, 0, 0, 0.1)', // Subtle shadow for active tokens
-                                                                }}
-                                                                onClick={!isTokenDisabled ? () => handleSelectToken(token) : undefined} // Allow click only if token is not disabled
-                                                            >
-                                                                <img
-                                                                    src={token.logoURI}
-                                                                    alt={`${token.symbol} logo`}
-                                                                    style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
-                                                                />
-                                                                <Typography>{token.symbol.toUpperCase()}</Typography>
-                                                            </Box>
-                                                        );
-                                                    })}
-                                                </Box>
-                                            </Box>
-                                        ) : null}
                                         <Typography sx={{ fontWeight: '500', fontSize: '14px', marginTop: '20px' }}>All Tokens</Typography>
                                         <Box className="token_list">
                                             <List>
-                                                {tokens?.map((token) => {
+                                                {tokens.concat(existingImportedTokens)?.map((token) => {
                                                     // Select the relevant token based on tokenNumber
                                                     const selectedToken = tokenNumber === 0 ? token0 : token1;
 
@@ -480,7 +433,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                                                 flexDirection: "column",
                                                                 alignItems: "flex-start",
                                                                 transition: "background-color 0.3s",
-                                                                '&:hover': { backgroundColor: 'rgb(248 250 252)' },
+                                                                '&:hover': { backgroundColor: mode==='light' ? 'rgb(248 250 252)' : 'grey' },
                                                                 padding: 1,
                                                             }}
                                                             onClick={!isTokenDisabled ? () => handleSelectToken(token) : undefined} // Only enable click if not disabled

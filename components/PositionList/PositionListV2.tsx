@@ -89,7 +89,7 @@ export const PositionListV2 : React.FC<PositionList> = ({theme, data})=>{
         },
     }}
 >
-    <Typography sx={{ color: theme === 'light' ? 'var(--cream)' : 'var(--white)' }}>Price : <Typography sx={{ color: theme === 'light' ? 'var(--primary)' : 'var(--cream)' }} component="span">{parseFloat(Number(data.pair.token0Price).toFixed(3))} {data.pair.token0.symbol} / {data.pair.token1.symbol}</Typography></Typography>
+    <Typography sx={{ color: theme === 'light' ? 'var(--cream)' : 'var(--white)' }}>Price : <Typography  component="span">{parseFloat(Number(data.pair.token0Price).toFixed(3))} {data.pair.token0.symbol} / {data.pair.token1.symbol}</Typography></Typography>
 </Box>
 </Box>
     )

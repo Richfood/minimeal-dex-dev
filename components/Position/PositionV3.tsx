@@ -297,17 +297,29 @@ const PositionV3 = ({ tokenId }: PositionProps) => {
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '15px' }}>
                                 <Typography sx={{ fontWeight: '600' }}>Unclaimed Fees</Typography>
                                 <Button
-                                    variant="contained"
                                     sx={{
-                                        backgroundColor: 'var(--primary)',
-                                        color: 'white',
-                                        borderRadius: '8px',
-                                        textTransform: 'none',
-                                        fontWeight: '600',
+                                        border: '1px solid',
+                                        lineHeight: '12px',
+                                        backgroundColor: theme === 'light' ? `var(--primary)` : `var(--cream)`,
+                                        color: theme === 'light' ? `white` : `black`,
+                                        padding: '10px 20px',
+                                        textDecoration: 'none',
+                                        borderRadius: '30px',
+                                        cursor: 'pointer',
                                         '&:hover': {
-                                            backgroundColor: 'var(--primary)',
+                                            backgroundColor: theme === 'light' ? `var(--primary)` : `var(--secondary)`,
                                         },
                                     }}
+                                    // sx={{
+                                    //     backgroundColor: theme === 'light' ? `var(--primary)` : `var(--cream)`,
+                                    //     color: theme === 'light' ? `white` : `black`,
+                                    //     borderRadius: '8px',
+                                    //     textTransform: 'none',
+                                    //     fontWeight: '600',
+                                    //     '&:hover': {
+                                    //         backgroundColor: theme === 'light' ? `var(--primary)` : `var(--secondary)`,
+                                    //     },
+                                    // }}
                                     onClick={handleCollectFees}
                                 >
                                     {runningCollectFees ? <CircularProgress size={20}/> : "Collect Fees"}

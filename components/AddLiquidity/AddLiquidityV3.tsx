@@ -970,7 +970,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                   </Box>
 
                   <Box className="fiFooter" sx={{ display: 'block', mt: '30px' }}>
-                    <Typography onClick={toggleV2Class} sx={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer', p: "8px 16px", borderRadius: "30px", background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', textDecoration: 'none' }}>Add V2 Liquidity</Typography>
+                    <Typography onClick={toggleV2Class} sx={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer', p: "8px 16px", borderRadius: "30px", background: 'transparent', border: palette.mode === 'light' ? '1px solid var(--primary)' : '1px solid var(--cream)', color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)', textDecoration: 'none' }}>Add V2 Liquidity</Typography>
                   </Box>
                 </Box>
               </Box>
@@ -1357,7 +1357,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
         <SelectedToken
           openToken={openToken}
           handleCloseToken={handleCloseToken}
-          mode={theme}
+          mode={palette.mode}
           setToken0={setToken0}
           setToken1={setToken1}
           tokenNumber={tokenBeingChosen}

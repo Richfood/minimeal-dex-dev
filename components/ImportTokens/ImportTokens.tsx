@@ -121,7 +121,7 @@ const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode, to
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                             <Box sx={{ border: '1px solid var(--cream)', padding: '5px 7px', borderRadius: '30px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                                 <FiAlertCircle style={{ color: 'var(--cream)', width: '18px', height: '18px' }} />
-                                <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>Unknown Source </Typography>
+                                <Typography sx={{ fontSize: '12px', color: `var(--cream)` }}>Unknown Source </Typography>
                             </Box>
                             <Box sx={{ display: 'flex', gap: '5px', mt: '10px' }}>
                                 <Typography sx={{ fontSize: '16px', fontWeight: '600' }}>{token?.name}</Typography>
@@ -136,7 +136,12 @@ const ImportTokens: React.FC<ImportTokensProps> = ({ open, handleClose, mode, to
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                             <Tooltip title="A Risk scan results are provided by a third party AvengerDAO is reporting a risk level of Unknown Slippage nderstand However, this token has been labelled Unknown Risk due to not being listed on any of the built-in token lists. Please proceed with caution and always do your own research.dd" arrow>
-                                <Box className="unknown_sec">
+                            <Box 
+                                className="unknown_sec"
+                                sx={{
+                                    color: 'var(--primary)',
+                                }}
+                            >
                                     Unknown <BsQuestionCircle />
                                 </Box>
                             </Tooltip>
