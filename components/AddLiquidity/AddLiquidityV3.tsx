@@ -151,10 +151,10 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     if (Number(priceLower) >= Number(priceUpper)) {
       setPriceRangeErrorIndex(PriceRangeError.INVALID);
     }
-    else if (Number(priceLower) >= Number(priceUpper)) {
+    else if (Number(priceLower) >= Number(priceCurrent)) {
       setPriceRangeErrorIndex(PriceRangeError.BELOW_RANGE);
     }
-    else if (Number(priceLower) >= Number(priceUpper)) {
+    else if (Number(priceCurrent) >= Number(priceUpper)) {
       setPriceRangeErrorIndex(PriceRangeError.ABOVE_RANGE);
     }
     else {
