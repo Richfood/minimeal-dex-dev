@@ -549,17 +549,17 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
         const tempDecimalDif = poolDataFromSubgraph.token1.decimals - poolDataFromSubgraph.token0.decimals;
         console.log("Tick = ", poolDataFromSubgraph.tick, "Decimal Difference = ", decimalDifference);
         if (isSorted) {
-          if (poolDataFromSubgraph.token1Price === "0")
-            priceCurrentToSet = tickToPrice(Number(poolDataFromSubgraph.tick), tempDecimalDif);
-          else
-            priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
+          // if (poolDataFromSubgraph.token1Price === "0")
+            priceCurrentToSet = tickToPrice(Number(poolDataFromSubgraph.tick),  tempDecimalDif);
+          // else
+          //   priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
         }
         else {
-          if (poolDataFromSubgraph.token0Price === "0")
+          // if (poolDataFromSubgraph.token0Price === "0")
             // The reason for -1 * decimal difference is that this price is with respect to another token which is not sorted
             priceCurrentToSet = 1 / tickToPrice(Number(poolDataFromSubgraph.tick), tempDecimalDif);
-          else
-            priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
+          // else
+          //   priceCurrentToSet = Number(poolDataFromSubgraph.token0Price);
         }
       }
 
