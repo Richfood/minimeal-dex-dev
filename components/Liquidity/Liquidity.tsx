@@ -109,25 +109,43 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
     const runGetPositionsData = async () => {
       setIsLoadingPosition(true);
 
-      if(value === "0" && (v2Positions.length === 0 || v3Positions.length === 0 || userAddress !== prevUserAddress)){
-        let newV3Positions: V3PositionData[] = await getV3PositionsData();
-        setV3Positions(newV3Positions);
-
-        let newV2Positions: V2PositionsData[] = await getV2Positions();
-        setV2Positions(newV2Positions)
-        
-        setPrevUserAddress(userAddress);
-      }
-      else if (value === "2" && v2Positions.length === 0 || userAddress !== prevUserAddress) {
-        let newPositions: V2PositionsData[] = await getV2Positions();
-        setV2Positions(newPositions)
-        setPrevUserAddress(userAddress);
-      }
-      else if(value === "1" && v3Positions.length === 0 || userAddress !== prevUserAddress){
-        let newPositions: V3PositionData[] = await getV3PositionsData();
-        setV3Positions(newPositions);
-        setPrevUserAddress(userAddress);
-      }
+      try {
+        if (value === "0" && (v2Positions.length === 0 || v3Positions.length === 0 || userAddress !== prevUserAddress)) {
+          try {
+            let newV3Positions: V3PositionData[] = await getV3PositionsData();
+            setV3Positions(newV3Positions);
+          } catch (error) {
+            console.error("Error fetching V3 positions:", error);
+          }
+      
+          try {
+            let newV2Positions: V2PositionsData[] = await getV2Positions();
+            setV2Positions(newV2Positions);
+          } catch (error) {
+            console.error("Error fetching V2 positions:", error);
+          }
+      
+          setPrevUserAddress(userAddress);
+        } else if (value === "2" && v2Positions.length === 0 || userAddress !== prevUserAddress) {
+          try {
+            let newPositions: V2PositionsData[] = await getV2Positions();
+            setV2Positions(newPositions);
+            setPrevUserAddress(userAddress);
+          } catch (error) {
+            console.error("Error fetching V2 positions:", error);
+          }
+        } else if (value === "1" && v3Positions.length === 0 || userAddress !== prevUserAddress) {
+          try {
+            let newPositions: V3PositionData[] = await getV3PositionsData();
+            setV3Positions(newPositions);
+            setPrevUserAddress(userAddress);
+          } catch (error) {
+            console.error("Error fetching V3 positions:", error);
+          }
+        }
+      } catch (error) {
+        console.error("Unexpected error:", error);
+      }      
 
       setIsLoadingPosition(false);
     }
