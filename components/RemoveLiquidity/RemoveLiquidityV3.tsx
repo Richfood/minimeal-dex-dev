@@ -53,6 +53,7 @@ const RemoveLiquidityV3 = ({ tokenId }: RemoveLiquidityProps) => {
     const [positionLoadingError, setPositionLoadingError] = useState(false);
 
     const [removeLiquidityRunning, setRemoveLiquidityRunning] = useState(false);
+    const [userAddress, setUserAddress] = useState("");
 
     const handleThemeToggle = () => {
         toggleTheme();
@@ -180,12 +181,49 @@ const RemoveLiquidityV3 = ({ tokenId }: RemoveLiquidityProps) => {
     }
 
     useEffect(() => {
+        const getUserAddress = async () => {
+            try {
+                const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+                const newSigner = newProvider.getSigner();
+                const userAddressToSet = await newSigner.getAddress();
+                setUserAddress(userAddressToSet);
+            } catch (error) {
+                console.error("Error fetching user address:", error);
+                setUserAddress("");
+            }
+        };
+
+        if (window.ethereum) {
+            getUserAddress();
+
+            // Listen for account changes
+            const handleAccountsChanged = (accounts : any[]) => {
+                if (accounts.length > 0) {
+                    setUserAddress(accounts[0]);
+                } else {
+                    setUserAddress(""); // User disconnected wallet
+                }
+            };
+
+            // Add event listener
+            window.ethereum.on("accountsChanged", handleAccountsChanged);
+
+            // Cleanup the event listener on unmount
+            return () => {
+                window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+            };
+        } else {
+            setUserAddress("");
+        }
+    }, []); // Dependency array empty so it runs once on mount
+
+    useEffect(() => {
         const getPosition = async () => {
             try {
                 setPositionLoading(true);
                 console.log("Token Id", tokenId);
 
-                const positionToUse: V3PositionData = await getPositionByTokenId(tokenId);
+                const positionToUse: V3PositionData = await getPositionByTokenId(tokenId, userAddress);
 
                 console.log(positionToUse);
 
@@ -232,7 +270,7 @@ const RemoveLiquidityV3 = ({ tokenId }: RemoveLiquidityProps) => {
         }
 
         getPosition();
-    }, [tokenId])
+    }, [tokenId, userAddress])
 
     useEffect(() => {
         // console.log("inside useeffec")

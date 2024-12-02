@@ -46,6 +46,8 @@ const PositionV3 = ({ tokenId }: PositionProps) => {
     const [feesEarned1, setFeesEarned1] = useState("");
     const [feeTier, setFeeTier] = useState<number | null>(null);
 
+    const [userAddress, setUserAddress] = useState("");
+
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setChecked(event.target.checked);
     };
@@ -70,10 +72,47 @@ const PositionV3 = ({ tokenId }: PositionProps) => {
     }
 
     useEffect(() => {
+        const getUserAddress = async () => {
+            try {
+                const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+                const newSigner = newProvider.getSigner();
+                const userAddressToSet = await newSigner.getAddress();
+                setUserAddress(userAddressToSet);
+            } catch (error) {
+                console.error("Error fetching user address:", error);
+                setUserAddress("");
+            }
+        };
+
+        if (window.ethereum) {
+            getUserAddress();
+
+            // Listen for account changes
+            const handleAccountsChanged = (accounts : any[]) => {
+                if (accounts.length > 0) {
+                    setUserAddress(accounts[0]);
+                } else {
+                    setUserAddress(""); // User disconnected wallet
+                }
+            };
+
+            // Add event listener
+            window.ethereum.on("accountsChanged", handleAccountsChanged);
+
+            // Cleanup the event listener on unmount
+            return () => {
+                window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+            };
+        } else {
+            setUserAddress("");
+        }
+    }, []); // Dependency array empty so it runs once on mount
+
+    useEffect(() => {
         const getPosition = async () => {
             setPositionLoading(true);
             try {
-                const positionToUse: V3PositionData = await getPositionByTokenId(tokenId);
+                const positionToUse: V3PositionData = await getPositionByTokenId(tokenId, userAddress);
 
                 const token0ToUse: TokenDetails = makeTokenFromInfo({
                     name : positionToUse.token0.name,
@@ -113,7 +152,7 @@ const PositionV3 = ({ tokenId }: PositionProps) => {
 
         getPosition()
 
-    }, [tokenId])
+    }, [tokenId, userAddress])
 
     return (
         <>

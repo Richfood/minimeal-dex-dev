@@ -3,14 +3,14 @@ import { FeeAmount } from "@uniswap/v3-sdk";
 import {ethers} from "ethers";
 import axios from "axios";
 
-export async function getPositionByTokenId(tokenId : string): Promise<any> {
+export async function getPositionByTokenId(tokenId : string, userAddress : string): Promise<any> {
   try {
       const subgraphUrl = process.env.NEXT_PUBLIC_V3_SUBGRAPH_API;
       
       const query = `
         query {
           positions(
-            where: {id: "${tokenId}"}
+            where: {id: "${tokenId}" owner: "${userAddress.toLowerCase()}"}
           ) {
               id
               liquidity
@@ -22,6 +22,7 @@ export async function getPositionByTokenId(tokenId : string): Promise<any> {
               depositedToken1
               withdrawnToken0
               withdrawnToken1
+              owner
               pool {
                 feeGrowthGlobal0X128
                 feeGrowthGlobal1X128

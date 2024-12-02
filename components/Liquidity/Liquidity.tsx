@@ -20,6 +20,7 @@ import postionDataV2 from "@/utils/positionsDataV2.json";
 // import postionDataV3 from "@/utils/positionsDataV3.json";
 import { PositionListV3 } from '../PositionList/PositionListV3';
 import { PositionListV2 } from '../PositionList/PositionListV2';
+import { ethers } from 'ethers';
 
 
 interface LiquidityProps {
@@ -36,6 +37,8 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
   const [v3Positions, setV3Positions] = useState<V3PositionData[]>([]);
   const [v2Positions, setV2Positions] = useState<V2PositionsData[]>([]);
 
+  const [userAddress, setUserAddress] = useState("");
+
   const [isLoadingPosition, setIsLoadingPosition] = useState(false);
 
   const handleOpen = useCallback(() => setIsOpen(true), []);
@@ -49,6 +52,8 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
 
   const [startToken0, setStartToken0] = useState<TokenDetails>(tokenList.filter((token)=>token.symbol === "SOIL")[0]);
   const [startToken1, setStartToken1] = useState<TokenDetails>(tokenList.filter((token)=>token.symbol === "STBL")[0]);
+
+  const [prevUserAddress, setPrevUserAddress] = useState("");
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -64,29 +69,70 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
   }
 
   useEffect(() => {
+    const getUserAddress = async () => {
+        try {
+            const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+            const newSigner = newProvider.getSigner();
+            const userAddressToSet = await newSigner.getAddress();
+            setUserAddress(userAddressToSet);
+        } catch (error) {
+            console.error("Error fetching user address:", error);
+            setUserAddress("");
+        }
+    };
+
+    if (window.ethereum) {
+        getUserAddress();
+
+        // Listen for account changes
+        const handleAccountsChanged = (accounts : any[]) => {
+            if (accounts.length > 0) {
+                setUserAddress(accounts[0]);
+            } else {
+                setUserAddress(""); // User disconnected wallet
+            }
+        };
+
+        // Add event listener
+        window.ethereum.on("accountsChanged", handleAccountsChanged);
+
+        // Cleanup the event listener on unmount
+        return () => {
+            window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+        };
+    } else {
+        setUserAddress("");
+    }
+}, []); // Dependency array empty so it runs once on mount
+
+  useEffect(() => {
     const runGetPositionsData = async () => {
       setIsLoadingPosition(true);
 
-      if(value === "0" && (v2Positions.length === 0 || v3Positions.length === 0)){
+      if(value === "0" && (v2Positions.length === 0 || v3Positions.length === 0 || userAddress !== prevUserAddress)){
         let newV3Positions: V3PositionData[] = await getV3PositionsData();
         setV3Positions(newV3Positions);
 
         let newV2Positions: V2PositionsData[] = await getV2Positions();
         setV2Positions(newV2Positions)
+        
+        setPrevUserAddress(userAddress);
       }
-      else if (value === "2" && v2Positions.length === 0) {
+      else if (value === "2" && v2Positions.length === 0 || userAddress !== prevUserAddress) {
         let newPositions: V2PositionsData[] = await getV2Positions();
         setV2Positions(newPositions)
+        setPrevUserAddress(userAddress);
       }
-      else if(value === "1" && v3Positions.length === 0){
+      else if(value === "1" && v3Positions.length === 0 || userAddress !== prevUserAddress){
         let newPositions: V3PositionData[] = await getV3PositionsData();
         setV3Positions(newPositions);
+        setPrevUserAddress(userAddress);
       }
 
       setIsLoadingPosition(false);
     }
     runGetPositionsData();
-  }, [value])
+  }, [value, userAddress])
 
   const color = theme === 'light' ? 'var(--primary)' : 'var(--cream)';
 
@@ -203,10 +249,14 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
                   {v3Positions.length || v2Positions.length ? (
                       <List sx={{ width: '100%', maxWidth: 'screen' }}>
                         {v3Positions.map((elem) => (
-                          <PositionListV3 theme={theme} data={elem}/>
+                          <Box onClick={()=>handlePositionClick("V3", elem.id)} sx={{cursor:"pointer"}}>
+                            <PositionListV3 theme={theme} data={elem}/>
+                          </Box>
                         ))}
                         {v2Positions.map((elem)=>
-                          <PositionListV2 theme={theme} data={elem}/>
+                          <Box onClick={()=>handlePositionClick("V2", elem.pair.id)} sx={{cursor:"pointer"}}>
+                            <PositionListV2 theme={theme} data={elem}/>
+                          </Box>
                         )
                       }
                       </List>

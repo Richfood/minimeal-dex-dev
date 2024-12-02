@@ -43,6 +43,7 @@ import { hooks } from '../ConnectWallet/connector';
 import {getUserBalance, getUserNativeBalance} from '@/utils/api/getUserBalance';
 import { increaseLiquidityV3 } from '@/utils/contract-methods/increaseLiquidity';
 import { getPositionByTokenId } from '@/utils/api/getPositionByTokenId';
+import { ethers } from 'ethers';
 
 interface IncreaseLiquidityProps {
   theme: 'light' | 'dark';
@@ -124,6 +125,7 @@ const IncreaseLiquidityV3: React.FC<IncreaseLiquidityProps> = ({
   const [deadline, setDeadline] = useState("10");
 
   const [increaseLiquidityRunning, setIncreaseLiquidityRunning] = useState(false);
+  const [userAddress, setUserAddress] = useState("");
 
   const toggleClass = () => {
     setIsActive(!isActive);
@@ -257,12 +259,49 @@ const IncreaseLiquidityV3: React.FC<IncreaseLiquidityProps> = ({
     }
   }
 
+  useEffect(() => {
+    const getUserAddress = async () => {
+        try {
+            const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+            const newSigner = newProvider.getSigner();
+            const userAddressToSet = await newSigner.getAddress();
+            setUserAddress(userAddressToSet);
+        } catch (error) {
+            console.error("Error fetching user address:", error);
+            setUserAddress("");
+        }
+    };
+
+    if (window.ethereum) {
+        getUserAddress();
+
+        // Listen for account changes
+        const handleAccountsChanged = (accounts : any[]) => {
+            if (accounts.length > 0) {
+                setUserAddress(accounts[0]);
+            } else {
+                setUserAddress(""); // User disconnected wallet
+            }
+        };
+
+        // Add event listener
+        window.ethereum.on("accountsChanged", handleAccountsChanged);
+
+        // Cleanup the event listener on unmount
+        return () => {
+            window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+        };
+    } else {
+        setUserAddress("");
+    }
+}, []); // Dependency array empty so it runs once on mount
+
 
   useEffect(() => {
     const getPosition = async () => {
       try {
         setPositionLoading(true);
-        const positionToUse = await getPositionByTokenId(tokenId);
+        const positionToUse = await getPositionByTokenId(tokenId, userAddress);
 
         if (!positionToUse) return;
 
@@ -304,7 +343,7 @@ const IncreaseLiquidityV3: React.FC<IncreaseLiquidityProps> = ({
 
     getPosition()
 
-  }, [tokenId])
+  }, [tokenId,userAddress])
 
   useEffect(() => {
     const getUserBalances = async () => {

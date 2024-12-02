@@ -39,6 +39,7 @@ export interface V3PositionData {
   depositedToken1: string;
   withdrawnToken0: string;
   withdrawnToken1: string;
+  owner: string;
   pool: {
     feeTier: string
     tick: string

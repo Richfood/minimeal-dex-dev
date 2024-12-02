@@ -48,6 +48,8 @@ const PositionV2 = ({ pairAddress }: PositionProps) => {
     const [feesEarned1, setFeesEarned1] = useState("");
     const [feeTier, setFeeTier] = useState<number | null>(0.25);
 
+    const [userAddress, setUserAddress] = useState("");
+
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setChecked(event.target.checked);
@@ -60,6 +62,43 @@ const PositionV2 = ({ pairAddress }: PositionProps) => {
 
         return parseFloat(decimalRound(ethers.utils.formatUnits(expandIfNeeded(decimalRound(amount,0)), decimal),2));
     }
+
+    useEffect(() => {
+        const getUserAddress = async () => {
+            try {
+                const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+                const newSigner = newProvider.getSigner();
+                const userAddressToSet = await newSigner.getAddress();
+                setUserAddress(userAddressToSet);
+            } catch (error) {
+                console.error("Error fetching user address:", error);
+                setUserAddress("");
+            }
+        };
+
+        if (window.ethereum) {
+            getUserAddress();
+
+            // Listen for account changes
+            const handleAccountsChanged = (accounts : any[]) => {
+                if (accounts.length > 0) {
+                    setUserAddress(accounts[0]);
+                } else {
+                    setUserAddress(""); // User disconnected wallet
+                }
+            };
+
+            // Add event listener
+            window.ethereum.on("accountsChanged", handleAccountsChanged);
+
+            // Cleanup the event listener on unmount
+            return () => {
+                window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+            };
+        } else {
+            setUserAddress("");
+        }
+    }, []); // Dependency array empty so it runs once on mount
 
     useEffect(() => {
         const getPosition = async () => {
@@ -104,7 +143,7 @@ const PositionV2 = ({ pairAddress }: PositionProps) => {
 
         getPosition()
 
-    }, [pairAddress])
+    }, [pairAddress, userAddress])
 
     return (
         <>

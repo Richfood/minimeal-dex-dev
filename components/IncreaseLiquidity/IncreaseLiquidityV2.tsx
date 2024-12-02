@@ -30,6 +30,7 @@ import { debounce } from '@syncfusion/ej2-base';
 import { flushSync } from 'react-dom';
 import {getUserBalance, getUserNativeBalance} from '@/utils/api/getUserBalance';
 import { getPoolDataByAddressV2 } from '@/utils/api/getPoolDataByAddressV2';
+import { ethers } from 'ethers';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -77,6 +78,8 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, pairAddress }) => 
   const [amount0Loading, setAmount0Loading] = useState(false);
   const [tokenBalance0, setTokenBalance0] = useState<string>("");
   const [tokenBalance1, setTokenBalance1] = useState<string>("");
+
+  const [userAddress, setUserAddress] = useState("");
 
   console.log("🚀 ~ slippageTolerance:", slippageTolerance)
   console.log("🚀 ~ deadline:", deadline)
@@ -305,6 +308,43 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, pairAddress }) => 
   }
 
   useEffect(() => {
+    const getUserAddress = async () => {
+        try {
+            const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+            const newSigner = newProvider.getSigner();
+            const userAddressToSet = await newSigner.getAddress();
+            setUserAddress(userAddressToSet);
+        } catch (error) {
+            console.error("Error fetching user address:", error);
+            setUserAddress("");
+        }
+    };
+
+    if (window.ethereum) {
+        getUserAddress();
+
+        // Listen for account changes
+        const handleAccountsChanged = (accounts : any[]) => {
+            if (accounts.length > 0) {
+                setUserAddress(accounts[0]);
+            } else {
+                setUserAddress(""); // User disconnected wallet
+            }
+        };
+
+        // Add event listener
+        window.ethereum.on("accountsChanged", handleAccountsChanged);
+
+        // Cleanup the event listener on unmount
+        return () => {
+            window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+        };
+    } else {
+        setUserAddress("");
+    }
+}, []); // Dependency array empty so it runs once on mount
+
+  useEffect(() => {
     if (token0 && token1) {
       getPoolRatio();
       setIsSorted(token0.address.contract_address.toLowerCase() < token1.address.contract_address.toLowerCase());
@@ -318,7 +358,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, pairAddress }) => 
     setAmount0Desired("");
     setAmount1Desired("")
     getPoolRatio();
-  }, [pairAddress])
+  }, [pairAddress, userAddress])
 
   useEffect(() => {
     const getUserBalances = async () => {

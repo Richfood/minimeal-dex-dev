@@ -230,6 +230,7 @@ const ManageToken: React.FC<ManageTokenProps> = ({ open, handleClose, mode, hand
                                          : <CircularProgress size={20}/>}
                                         
                                         <Box>
+                                            <Typography sx={{ fontWeight: '500', fontSize: '14px' }}>Imported tokens</Typography>
                                             {
                                                 existingImportedTokens?.map((importedToken)=>{
                                                     return (
