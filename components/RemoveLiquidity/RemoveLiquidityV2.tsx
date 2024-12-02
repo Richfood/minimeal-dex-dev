@@ -186,7 +186,7 @@ const RemoveLiquidityV2 = ({ pairAddress }: RemoveLiquidityProps) => {
                 const tokenResult : {amount0:number,amount1:number,liquidity:string,totalSupply:string} | null = await getMaxRemovableTokensV2(pairAddress);
                 const positionToUse : V2PairData | null = await getPoolDataByAddressV2(pairAddress);
 
-                if(!tokenResult || !positionToUse) throw("No data for this position");
+                if(!tokenResult || !positionToUse) throw("Position not found");
 
                 console.log(tokenResult)
 
@@ -265,7 +265,7 @@ const RemoveLiquidityV2 = ({ pairAddress }: RemoveLiquidityProps) => {
                             }}
                         >
                             {positionLoadingError
-                                ? "Can't Fetch Position Data. Please Refresh to try again"
+                                ? "Unable to Fetch Position. Please Refresh to Try Again"
                                 : <>Loading Position... <CircularProgress size={20} /></>}
                         </Typography>
                     </Box>

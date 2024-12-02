@@ -107,7 +107,7 @@ const PositionV2 = ({ pairAddress }: PositionProps) => {
                 const tokenResult : {amount0:number,amount1:number} | null = await getMaxRemovableTokensV2(pairAddress);
                 const positionToUse : V2PairData | null = await getPoolDataByAddressV2(pairAddress);
 
-                if(!tokenResult || !positionToUse) throw("No data for this position");
+                if(!tokenResult || !positionToUse) throw("Position not found");
 
                 console.log(tokenResult)
 
@@ -173,7 +173,7 @@ const PositionV2 = ({ pairAddress }: PositionProps) => {
                             }}
                         >
                             {positionLoadingError
-                                ? "Can't Fetch Position Data. Please Refresh to try again"
+                                ? "Unable to Fetch Position. Please Refresh to Try Again"
                                 : <>Loading Position... <CircularProgress size={20} /></>}
                         </Typography>
                     </Box>

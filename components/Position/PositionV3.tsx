@@ -111,8 +111,11 @@ const PositionV3 = ({ tokenId }: PositionProps) => {
     useEffect(() => {
         const getPosition = async () => {
             setPositionLoading(true);
+            setPositionLoadingError(false);
             try {
                 const positionToUse: V3PositionData = await getPositionByTokenId(tokenId, userAddress);
+
+                if(!positionToUse) throw("Position not found");
 
                 const token0ToUse: TokenDetails = makeTokenFromInfo({
                     name : positionToUse.token0.name,
@@ -140,14 +143,15 @@ const PositionV3 = ({ tokenId }: PositionProps) => {
                 setFeesEarned1(humanReadableFeesToken1);
 
                 setFeeTier(Number(positionToUse.pool.feeTier) / 10000)
+
+                setPositionLoading(false);
+                setPositionLoadingError(false);
             }
             catch (error) {
                 console.log(error);
                 setPositionLoadingError(true);
                 setPositionLoading(false);
             }
-            setPositionLoading(false);
-            setPositionLoadingError(false);
         }
 
         getPosition()
@@ -182,7 +186,7 @@ const PositionV3 = ({ tokenId }: PositionProps) => {
                             }}
                         >
                             {positionLoadingError
-                                ? "Can't Fetch Position Data. Please Refresh to try again"
+                                ? "Unable to Fetch Position. Please Refresh to Try Again"
                                 : <>Loading Position... <CircularProgress size={20} /></>}
                         </Typography>
                     </Box>

@@ -279,7 +279,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, pairAddress }) => 
 
     const positionToUse : V2PairData | null = await getPoolDataByAddressV2(pairAddress);
 
-    if(!positionToUse) return;
+    if(!positionToUse) throw("Position not found");
 
     const token0ToUse: TokenDetails = makeTokenFromInfo({
       name : positionToUse.token0.name,

@@ -303,7 +303,7 @@ const IncreaseLiquidityV3: React.FC<IncreaseLiquidityProps> = ({
         setPositionLoading(true);
         const positionToUse = await getPositionByTokenId(tokenId, userAddress);
 
-        if (!positionToUse) return;
+        if (!positionToUse) throw("Position not found");
 
         const token0ToUse: TokenDetails = makeTokenFromInfo({
           name : positionToUse.token0.name,
@@ -427,7 +427,7 @@ const IncreaseLiquidityV3: React.FC<IncreaseLiquidityProps> = ({
               }}
             >
               {positionLoadingError
-                ? "Can't Fetch Position Data. Please Refresh to try again"
+                ? "Unable to Fetch Position. Please Refresh to Try Again"
                 : <>Loading Position... <CircularProgress size={20} /></>}
             </Typography>
           </Box>
