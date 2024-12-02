@@ -18,7 +18,6 @@ import { SlGraph } from "react-icons/sl";
 import { useRouter } from 'next/router';
 import RoiCalculator from '../RoiCalculator/RoiCalculator'
 import { toast, ToastContainer } from 'react-toastify';
-import getTokenApproval from "../../utils/contract-methods/getTokenApproval";
 import { addLiquidityV3, addLiquidityV2, addLiquidityETH } from '@/utils/contract-methods/addLiquidity';
 import emulate from '@/utils/emulate-addLiquidity';
 import { FeeAmount, nearestUsableTick, TICK_SPACINGS } from '@uniswap/v3-sdk';
@@ -74,19 +73,16 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [openToken, setOpenToken] = useState(false);
   const [tier, setTier] = useState<string>('0.01%');
   const [openAddLiquidity, setOpenAddLiquidity] = useState(false);
-
+  console.log("🚀 ~ openAddLiquidity:", openAddLiquidity)
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
   const NFPMAddress = addresses.PancakePositionManagerAddress;
   // const v2RouterAddress = addresses.PancakeV2RouterAddress;
   // const tempToken0 = tokenList.MOCK_USDC;
   // const tempToken1 = tokenList.Pulse;
   const [token0, setToken0] = useState<TokenDetails | null>(null);
-  console.log("🚀 ~AddLiquidityV3 token0:", token0)
   const [token1, setToken1] = useState<TokenDetails | null>(null);
-  console.log("🚀 ~AddLiquidityV3 token1:", token1)
   const [tokenBeingChosen, setTokenBeingChosen] = useState(0);
   const [isFullRange, setIsFullRange] = useState(false);
   const [isButton, setIsButton] = useState(false);
@@ -95,7 +91,6 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [priceLower, setPriceLower] = useState("");
   const [priceUpper, setPriceUpper] = useState("");
   const [priceCurrent, setPriceCurrent] = useState("");
-  console.log("🚀 ~ priceCurrent:", priceCurrent)
   const [fee, setFee] = useState<FeeAmount | null>(null);
   const [approvalAmount0, setApprovalAmount0] = useState("");
   const [approvalAmount1, setApprovalAmount1] = useState("");
@@ -107,20 +102,15 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [emulateError, setEmulateError] = useState(false);
   const [amount0ToEmulate, setAmount0ToEmulate] = useState<number | string>("");
   const [amount1ToEmulate, setAmount1ToEmulate] = useState<number | string>("");
-
+  const [isLiquidityAdded, setIsLiquidityAdded] = useState<boolean>(false);
+  console.log("🚀 ~ isLiquidityAdded:", isLiquidityAdded)
   const [amountAt0, setAmountAt0] = useState("");
   const [amountAt1, setAmountAt1] = useState("");
-
   const [priceLowerEntered, setPriceLowerEntered] = useState("");
-  console.log("🚀 ~ priceLowerEntered:", priceLowerEntered)
   const [priceUpperEntered, setPriceUpperEntered] = useState("");
-  console.log("🚀 ~ priceUpperEntered:", priceUpperEntered)
   const [priceCurrentEntered, setPriceCurrentEntered] = useState("");
-  console.log("🚀 ~ priceCurrentEntered:", priceCurrentEntered)
-
   const [currentPoolData, setCurrentPoolData] = useState<AddLiquidityPoolData | null>(null);
   // const [currentV2PoolRatio, setCurrentV2PoolRatio] = useState<number | null>(null);
-
   const [decimalDifference, setDecimalDifference] = useState(0);
   const [tokenToggleOccured, setTokenToggleOccured] = useState<boolean | null>(true);
   // console.log("🚀 ~ tokenToggleOccured:", tokenToggleOccured)
@@ -129,7 +119,6 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [addLiquidityRunning, setAddLiquidityRunning] = useState(false);
   const [slippageTolerance, setSlippageTolerance] = useState<number | null>(1);
   const [rangeButtonSelected, setRangeButtonSelected] = useState<string | null>(null);
-
   const [pickPercent100, setPickPercent100] = useState(0);
   const [pickPercent500, setPickPercent500] = useState(0);
   const [pickPercent2500, setPickPercent2500] = useState(0);
@@ -137,17 +126,11 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
   const [pickPercent20000, setPickPercent20000] = useState(0);
   const chainId = useChainId();
   const [tokensSelected, setTokensSelected] = useState(false);
-
   const [priceRangeErrorIndex, setPriceRangeErrorIndex] = useState<PriceRangeError | null>(null);
-
   const [tokenBalance0, setTokenBalance0] = useState<string>("");
   const [tokenBalance1, setTokenBalance1] = useState<string>("");
-
-  console.log("🚀 ~ rangeButtonSelected:", rangeButtonSelected)
-
-  console.log("🚀 ~ slippageTolerance:", slippageTolerance)
   const [deadline, setDeadline] = useState("10");
-  console.log("🚀 ~ deadline:", deadline)
+
   useEffect(() => {
     // const isTestnet = chainId === 943;
     // console.log("🚀 ~ useEffect ~ isTestnet:", isTestnet)
@@ -333,7 +316,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
         setFee(FeeAmount.HIGH);
         break;
 
-      case (4): 
+      case (4):
         setFee(FeeAmount.HIGHEST);
         break;
 
@@ -376,7 +359,12 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
 
   const handleCloseToken = () => setOpenToken(false);
-  const handleCloseAddLiquidity = () => setOpenAddLiquidity(prev => !prev);
+  const handleCloseAddLiquidity = () => {
+    setOpenAddLiquidity(prev => {
+      console.log("🚀 ~ prev:", prev)
+      return !prev
+    })
+  }
 
   const router = useRouter();
 
@@ -384,62 +372,6 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     router.replace("/liquidity");
     router.back();
   };
-
-  const handleAddLiquidity = async () => {
-    if (!token0 || !token1 || !slippageTolerance) return;
-
-    setAddLiquidityRunning(true);
-    try {
-
-      const addressToApprove = NFPMAddress;
-
-      if (!isNative(token0)) {
-        await getTokenApproval(token0, addressToApprove, approvalAmount0);
-      }
-      if (!isNative(token1)) {
-        await getTokenApproval(token1, addressToApprove, approvalAmount1);
-      }
-
-      alert("Tokens Approved!");
-    }
-    catch (error) {
-      setAddLiquidityRunning(false);
-      alert("Error approving tokens");
-      console.log(error)
-      return;
-    }
-
-    const unixDeadline = (Math.floor((Date.now() + Number(deadline) * 60 * 1000) / 1000)).toString();
-    try {
-      if (fee && token0 && token1) {
-        const addLiquidityTxHash = await addLiquidityV3(
-          NFPMAddress,
-          token0,
-          token1,
-          tickLower,
-          tickUpper,
-          amount0Desired,
-          amount1Desired,
-          amount0Min,
-          amount1Min,
-          unixDeadline,
-          sqrtPriceX96,
-          fee,
-          isFullRange
-        )
-
-        alert(`Liquidity added. tx hash : ${addLiquidityTxHash} `)
-
-        reset();
-      }
-    }
-    catch (error) {
-      //console.log("Error adding liquidity", error);
-      setAddLiquidityRunning(false);
-      alert(`Error adding liquidity`);
-    }
-    setAddLiquidityRunning(false);
-  }
 
   const handleGettingPoolData = async () => {
     await fetchPoolData();
@@ -618,7 +550,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
         console.log("Tick = ", poolDataFromSubgraph.tick, "Decimal Difference = ", decimalDifference);
         if (isSorted) {
           if (poolDataFromSubgraph.token1Price === "0")
-            priceCurrentToSet = tickToPrice(Number(poolDataFromSubgraph.tick),  tempDecimalDif);
+            priceCurrentToSet = tickToPrice(Number(poolDataFromSubgraph.tick), tempDecimalDif);
           else
             priceCurrentToSet = Number(poolDataFromSubgraph.token1Price);
         }
@@ -1404,7 +1336,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
                 </Box>
 
                 <Box>
-                  <Button onClick={handleCloseAddLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning || Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired)}>
+                  <Button onClick={handleCloseAddLiquidity}
+                    variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning || Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired)}>
                     {addLiquidityRunning ? (
                       <CircularProgress size={25} />
                     ) : (
@@ -1448,6 +1381,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
 
         <AddLiquidityModal
           isOpen={openAddLiquidity}
+          setOpenAddLiquidity={setOpenAddLiquidity}
           handleCloseAddLiquidity={handleCloseAddLiquidity}
           theme={theme}
           amountInDesired={amount0Desired}
@@ -1458,7 +1392,21 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
           priceLowerEntered={priceLowerEntered}
           priceUpperEntered={priceUpperEntered}
           priceCurrent={priceCurrent}
-
+          slippageTolerance={slippageTolerance}
+          setAddLiquidityRunning={setAddLiquidityRunning}
+          approvalAmount0={approvalAmount0}
+          approvalAmount1={approvalAmount1}
+          deadline={deadline}
+          fee={fee}
+          amount0Desired={amount0Desired}
+          amount1Desired={amount1Desired}
+          amount0Min={amount0Min}
+          amount1Min={amount1Min}
+          tickLower={tickLower}
+          tickUpper={tickUpper}
+          sqrtPriceX96={sqrtPriceX96}
+          isFullRange={isFullRange}
+          reset={reset}
         />
         <style jsx>{`
         .greyed-out {

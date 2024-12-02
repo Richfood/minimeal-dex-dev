@@ -7,9 +7,15 @@ import { TokenDetails } from '@/interfaces';
 import { Button, Divider } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { tickToPrice } from '@/utils/utils';
+import { isNative } from '@/utils/generalFunctions';
+import getTokenApproval from "../../utils/contract-methods/getTokenApproval";
+import { addLiquidityV3 } from '@/utils/contract-methods/addLiquidity';
+import addresses from "../../utils/address.json";
+import { FeeAmount } from '@uniswap/v3-sdk';
 
 interface AddLiquidityModalProps {
     isOpen: boolean;
+    setOpenAddLiquidity: React.Dispatch<React.SetStateAction<boolean>>;
     handleCloseAddLiquidity: () => void;
     theme: 'light' | 'dark';
     amountInDesired: string;
@@ -20,11 +26,31 @@ interface AddLiquidityModalProps {
     priceLowerEntered: string;
     priceUpperEntered: string;
     priceCurrent: string;
+    slippageTolerance: number | null;
+    setAddLiquidityRunning: React.Dispatch<React.SetStateAction<boolean>>;
+    approvalAmount0: string;
+    approvalAmount1: string;
+    deadline: string;
+    fee: FeeAmount | null;
+    amount0Desired: string;
+    amount1Desired: string;
+    amount0Min: string;
+    amount1Min: string;
+    tickLower: string;
+    tickUpper: string;
+    sqrtPriceX96: string;
+    isFullRange: boolean;
+    reset: () => void;
+
 }
 
-const AddLiquidityModal: React.FC<AddLiquidityModalProps> = ({ isOpen, handleCloseAddLiquidity, theme, amountInDesired, amountOutDesired, token0, token1, tradingFee, priceLowerEntered, priceUpperEntered, priceCurrent }) => {
+const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
+    { isOpen, handleCloseAddLiquidity, theme, amountInDesired, amountOutDesired, token0, token1, tradingFee,
+        priceLowerEntered, priceUpperEntered, priceCurrent, slippageTolerance, setAddLiquidityRunning, approvalAmount0, approvalAmount1,
+        deadline, fee, tickLower, tickUpper, amount0Desired, amount1Desired, amount0Min, amount1Min, sqrtPriceX96, isFullRange, reset, setOpenAddLiquidity }) => {
 
-  
+    const NFPMAddress = addresses.PancakePositionManagerAddress;
+
     const style = {
         position: 'absolute' as 'absolute',
         top: '50%',
@@ -32,6 +58,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = ({ isOpen, handleClo
         fontSize: '14px',
         fontWeight: '500',
         transform: 'translate(-50%, -50%)',
+        maxWidth: "fitContent",
         width: 400,
         height: "45rem",
         bgcolor: theme === 'light' ? 'var(--white)' : 'var(--primary)',
@@ -49,7 +76,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = ({ isOpen, handleClo
 
     useEffect(() => {
         try {
-            if (priceCurrent >= priceLowerEntered && priceCurrent <= priceUpperEntered) {
+            if (Number(priceCurrent) >= Number(priceLowerEntered) && Number(priceCurrent) <= Number(priceUpperEntered)) {
                 setRange("Active");
             } else {
                 setRange("Inactive");
@@ -57,7 +84,67 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = ({ isOpen, handleClo
         } catch (error) {
             console.error("🚀 ~ Error calculating range ~", error);
         }
-    }, [priceCurrent, priceLowerEntered, priceUpperEntered]); 
+    }, [priceCurrent, priceLowerEntered, priceUpperEntered]);
+
+    const handleAddLiquidity = async () => {
+        if (!token0 || !token1 || !slippageTolerance) return;
+        setIsLiquidityAdded(true);
+        setAddLiquidityRunning(true);
+        try {
+
+            const addressToApprove = NFPMAddress;
+
+            if (!isNative(token0)) {
+                await getTokenApproval(token0, addressToApprove, approvalAmount0);
+            }
+            if (!isNative(token1)) {
+                await getTokenApproval(token1, addressToApprove, approvalAmount1);
+            }
+
+            alert("Tokens Approved!");
+        }
+        catch (error) {
+            setAddLiquidityRunning(false);
+            alert("Error approving tokens");
+            console.log(error)
+            return;
+        }
+
+        const unixDeadline = (Math.floor((Date.now() + Number(deadline) * 60 * 1000) / 1000)).toString();
+        try {
+            if (fee && token0 && token1) {
+                const addLiquidityTxHash = await addLiquidityV3(
+                    NFPMAddress,
+                    token0,
+                    token1,
+                    tickLower,
+                    tickUpper,
+                    amount0Desired,
+                    amount1Desired,
+                    amount0Min,
+                    amount1Min,
+                    unixDeadline,
+                    sqrtPriceX96,
+                    fee,
+                    isFullRange
+                )
+
+                alert(`Liquidity added. tx hash : ${addLiquidityTxHash} `)
+                setIsLiquidityAdded(false)
+                setOpenAddLiquidity(false)
+                reset();
+            }
+        }
+        catch (error) {
+            //console.log("Error adding liquidity", error);
+            setAddLiquidityRunning(false);
+            alert(`Error adding liquidity`);
+        }
+        setAddLiquidityRunning(false);
+        setIsLiquidityAdded(false)
+        setOpenAddLiquidity(false)
+
+    }
 
 
     return (
@@ -229,17 +316,17 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = ({ isOpen, handleClo
                         <Box sx={{
                             display: "flex", flexDirection: "column", textAlign: "center"
                         }}>
-                            <Box sx={{ display: "flex", width: "full" }}>
+                            <Box sx={{ display: "flex" }}>
                                 <Box sx={{
                                     display: "flex",
                                     flexDirection: "column",
                                     backgroundColor: theme === 'light' ? 'transparent' : 'gray',
                                     borderRadius: "0.75rem",
-                                    width: "20rem",
-                                    padding: "15px 30px",
+                                    width: "9rem",
+                                    padding: "15px",
                                     margin: "15px",
                                     border: `1px solid ${theme === 'light' ? 'rgb(115 115 115)' : '#666'}`,
-                                    justifyContent: "center"
+                                    alignContent: "center"
                                 }}>
                                     <Typography
                                         sx={{
@@ -264,7 +351,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = ({ isOpen, handleClo
                                             mb: 2,
                                         }}
                                     >
-                                        {priceLowerEntered}
+                                        {Number(priceLowerEntered).toFixed(2)}
                                     </Typography>
                                     <Typography
                                         sx={{
@@ -285,11 +372,11 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = ({ isOpen, handleClo
                                     flexDirection: "column",
                                     backgroundColor: theme === 'light' ? 'transparent' : 'gray',
                                     borderRadius: "0.75rem",
-                                    width: "20rem",
-                                    padding: "15px 30px",
+                                    width: "9rem",
+                                    padding: "15px",
                                     margin: "15px",
                                     border: `1px solid ${theme === 'light' ? 'rgb(115 115 115)' : '#666'}`,
-                                    justifyContent: "center"
+                                    alignItems: 'center',
                                 }}>
                                     <Typography
                                         sx={{
@@ -314,7 +401,8 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = ({ isOpen, handleClo
                                             mb: 2,
                                         }}
                                     >
-                                        {priceUpperEntered}
+                                        {Number(priceUpperEntered).toFixed(2)}
+
                                     </Typography>
                                     <Typography
                                         sx={{
@@ -338,10 +426,10 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = ({ isOpen, handleClo
                                 backgroundColor: theme === 'light' ? 'transparent' : 'gray',
                                 borderRadius: "0.75rem",
                                 width: "90%",
-                                padding: "15px",
+                                paddingTop: "15px",
                                 margin: "15px",
                                 border: `1px solid ${theme === 'light' ? 'rgb(115 115 115)' : '#666'}`,
-                                justifyContent: "center",
+                                alignItems: 'center',
                             }}>
                                 <Typography
                                     sx={{
@@ -366,7 +454,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = ({ isOpen, handleClo
                                         mb: 2,
                                     }}
                                 >
-                                    {priceCurrent}
+                                    {Number(priceCurrent).toFixed(2)}
                                 </Typography>
                                 <Typography
                                     sx={{
@@ -397,18 +485,15 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = ({ isOpen, handleClo
                                     sx={{ width: '100%' }}
                                     variant="contained"
                                     color="secondary"
+                                    onClick={handleAddLiquidity}
                                 >
                                     Add
                                 </Button>)
                             }
-
                         </Box>
-
                     </Box>
                 </Box>
-
             </Modal>
-
         </>
     );
 };
