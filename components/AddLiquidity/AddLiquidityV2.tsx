@@ -307,7 +307,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
     }
 
     getUserBalances();
-  }, [amount0Desired, amount1Desired]);
+  }, [amount0Desired, amount1Desired, token0, token1]);
 
   const copyToClipboard = (text: string | undefined) => {
     console.log("🚀 ~ copyToClipboard ~ text:", text)

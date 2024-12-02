@@ -712,7 +712,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     }
 
     getUserBalances();
-  }, [amount0Desired, amount1Desired]);
+  }, [amount0Desired, amount1Desired, token0, token1]);
 
   const handleButton = (buttonValue: boolean, fullRangeValue: boolean) => {
 

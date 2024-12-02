@@ -106,7 +106,7 @@ const SwapWidget = () => {
 
         runGetUserBalance();
 
-    }, [amountIn, isConnected]);
+    }, [amountIn, isConnected, token0]);
 
     // Load token data from local storage and set it to state
     useEffect(() => {
@@ -451,12 +451,12 @@ const SwapWidget = () => {
 
                         if (isAmountIn) {
                             const token1Price = await handlePriceForToken1(value);
-                            setToken1Price(token1Price);
-                            setAmountOut(value?.toString() || "");
+                                setToken1Price(token1Price);
+                                setAmountOut(value?.toString() || "");
                         } else {
                             const token0Price = await handlePriceForToken0(value);
-                            setToken0Price(token0Price);
-                            setAmountIn(value?.toString() || "");
+                                setToken0Price(token0Price);
+                                setAmountIn(value?.toString() || "");
                         }
                     } else {
                         console.error("Token path not found in response.");
@@ -742,16 +742,15 @@ const SwapWidget = () => {
                             color="secondary"
                             onClick={isActive && userBalance && Number(userBalance) >= Number(amountIn) ? handleCloseSwap : handleClick}
                             disabled={
-                                (isActive && (amountInLoading || amountOutLoading || !userBalance || Number(userBalance) < Number(amountIn) || !amountIn || !amountOut))
+                                (isActive && (amountInLoading || amountOutLoading || userBalance===null || Number(userBalance) < Number(amountIn) || !amountIn || !amountOut))
                             }
                         >
                             {!isActive ? (
                                 "Connect Wallet"
-                            ) : userBalance && Number(userBalance) >= Number(amountIn) && amountIn && amountOut ? (
-                                "Swap"
-                            ) : (
+                            ) : !userBalance || Number(userBalance) < Number(amountIn) ? (
                                 "Insufficient Balance"
-                            )}
+                            ) : "Swap"
+                            }
                         </Button>
                     </Box>
                     <Box className="slippageSec msls" sx={{ display: "none" }}>
