@@ -41,7 +41,6 @@ interface AddLiquidityModalProps {
     sqrtPriceX96: string;
     isFullRange: boolean;
     reset: () => void;
-
 }
 
 const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
@@ -61,7 +60,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
         maxWidth: "fitContent",
         width: 400,
         height: "45rem",
-        bgcolor: theme === 'light' ? 'var(--white)' : 'var(--primary)',
+        bgcolor: theme === 'light' ? "rgb(241 245 249)" : "#173D3D",
         boxShadow: 'rgba(0, 0, 0, 0.24) -40px 40px 80px -8px',
         borderRadius: '14px',
         color: theme === 'light' ? 'var(--primary)' : 'var(--white)',
@@ -73,6 +72,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
     const [range, setRange] = useState<string | null>("")
     const [isLiquidityAdded, setIsLiquidityAdded] = useState<boolean>(false);
 
+    console.log("🚀 ~ theme === light:", theme === "light")
 
     useEffect(() => {
         try {
@@ -169,7 +169,10 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                             }}
                         />
                     </Box>
-                    <Box className="modal_body">
+                    <Box className="modal_body" sx={{
+                        backgroundColor: theme === "light" ? "rgb(241 245 249)" : "#173D3D"
+                    }}
+                    >
                         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                             <Typography
                                 sx={{
@@ -200,7 +203,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                         <Box sx={{
                             display: "flex",
                             flexDirection: "column",
-                            backgroundColor: theme === 'light' ? 'transparent' : 'gray',
+                            backgroundColor: theme === 'light' ? 'rgb(203 213 225)' : 'rgb(71 85 105)',
                             borderRadius: "0.75rem",
                             width: "20rem",
                             padding: "10px",
@@ -320,7 +323,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                                 <Box sx={{
                                     display: "flex",
                                     flexDirection: "column",
-                                    backgroundColor: theme === 'light' ? 'transparent' : 'gray',
+                                    backgroundColor: theme === 'light' ? 'rgb(203 213 225)' : 'rgb(71 85 105)',
                                     borderRadius: "0.75rem",
                                     width: "9rem",
                                     padding: "15px",
@@ -370,7 +373,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                                 <Box sx={{
                                     display: "flex",
                                     flexDirection: "column",
-                                    backgroundColor: theme === 'light' ? 'transparent' : 'gray',
+                                    backgroundColor: theme === 'light' ? 'rgb(203 213 225)' : 'rgb(71 85 105)',
                                     borderRadius: "0.75rem",
                                     width: "9rem",
                                     padding: "15px",
@@ -423,7 +426,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                             <Box sx={{
                                 display: "flex",
                                 flexDirection: "column",
-                                backgroundColor: theme === 'light' ? 'transparent' : 'gray',
+                                backgroundColor: theme === 'light' ? 'rgb(203 213 225)' : 'rgb(71 85 105)',
                                 borderRadius: "0.75rem",
                                 width: "90%",
                                 paddingTop: "15px",

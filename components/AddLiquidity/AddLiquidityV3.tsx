@@ -65,7 +65,9 @@ enum PriceRangeError {
 }
 
 const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol: activeProtocol }) => {
+  console.log("🚀 ~AddLiquidityV3 theme:", theme)
   const { palette } = useTheme();
+  console.log("🚀 ~ palette:", palette)
   const [isActive, setIsActive] = useState(true);
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [pickData, setPickData] = useState<string>('Not created');
@@ -1384,7 +1386,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
           isOpen={openAddLiquidity}
           setOpenAddLiquidity={setOpenAddLiquidity}
           handleCloseAddLiquidity={handleCloseAddLiquidity}
-          theme={theme}
+          theme={palette.mode}
           amountInDesired={amount0Desired}
           amountOutDesired={amount1Desired}
           token0={token0}
