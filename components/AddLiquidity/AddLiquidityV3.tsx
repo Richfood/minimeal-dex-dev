@@ -325,6 +325,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
     }
 
     reset();
+    handleGettingPoolData();
   };
 
   // const handleTokenToggle = () => {

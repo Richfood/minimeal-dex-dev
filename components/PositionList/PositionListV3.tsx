@@ -89,9 +89,9 @@ export const PositionListV3: React.FC<PositionList> = ({ theme, data }) => {
                     },
                 }}
             >
-                <Typography sx={{ color: theme === 'light' ? 'var(--cream)' : 'var(--white)' }}>Min: <Typography  component="span">{parseFloat(tickToPrice(lowerTick, decimalDifference).toFixed(3))} {data.token1.symbol} per {data.token0.symbol}</Typography></Typography>
+                <Typography sx={{ color: theme === 'light' ? 'var(--cream)' : 'var(--white)' }}>Min: <Typography  component="span">{parseFloat((1/tickToPrice(lowerTick, decimalDifference)).toFixed(3))} {data.token0.symbol} per {data.token1.symbol}</Typography></Typography>
                 <Typography><VscArrowBoth /></Typography>
-                <Typography sx={{ color: theme === 'light' ? 'var(--cream)' : 'var(--white)' }}>Max: <Typography  component="span">{parseFloat(tickToPrice(upperTick, decimalDifference).toFixed(3))} {data.token1.symbol} per {data.token0.symbol}</Typography></Typography>
+                <Typography sx={{ color: theme === 'light' ? 'var(--cream)' : 'var(--white)' }}>Max: <Typography  component="span">{parseFloat((1/tickToPrice(upperTick, decimalDifference)).toFixed(3))} {data.token0.symbol} per {data.token1.symbol}</Typography></Typography>
             </Box>
         </Box>
     )
