@@ -1,4 +1,5 @@
 import { TokenDetails, TokenInfoFromAPI } from "@/interfaces";
+import addresses from "./address.json"
 
 export const DEFAULT_LOGO_URL = "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png";
 export const CONSTANT_IMPORT_STRING = "Imported Token : ";
@@ -57,5 +58,5 @@ export function expandIfNeeded(numStr : string) {
 }
 
 export function isNative(token: TokenDetails): boolean{
-  return token.symbol === "PLS";
+  return token.symbol === "PLS" && token.address.contract_address.toLowerCase() === addresses.WPLS_ADDRESS.toLowerCase();
 }

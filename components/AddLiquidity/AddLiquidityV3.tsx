@@ -43,7 +43,6 @@ import {getUserBalance, getUserNativeBalance} from '@/utils/api/getUserBalance';
 import AddLiquidityModal from '../AddLIquidityModal/AddLIquidityModal';
 
 interface AddLiquidityProps {
-  theme: 'light' | 'dark';
   defaultActiveProtocol: Protocol;
 }
 
@@ -64,8 +63,8 @@ enum PriceRangeError {
   ABOVE_RANGE
 }
 
-const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProtocol: activeProtocol }) => {
-  console.log("🚀 ~AddLiquidityV3 theme:", theme)
+const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ defaultActiveProtocol: activeProtocol }) => {
+  // console.log("🚀 ~AddLiquidityV3 theme:", theme)
   const { palette } = useTheme();
   console.log("🚀 ~ palette:", palette)
   const [isActive, setIsActive] = useState(true);
@@ -1375,7 +1374,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
         <SettingsModal
           isOpen={open}
           handleClose={handleClose}
-          theme={theme}
+          theme={palette.mode}
           slippageTolerance={slippageTolerance}
           setSlippageTolerance={setSlippageTolerance}
           deadline={deadline}
@@ -1401,8 +1400,8 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ theme, defaultActiveProto
           approvalAmount1={approvalAmount1}
           deadline={deadline}
           fee={fee}
-          amount0Desired={amount0Desired}
-          amount1Desired={amount1Desired}
+          amount0Desired={isSorted ? amount0Desired : amount1Desired}
+          amount1Desired={isSorted ? amount1Desired : amount0Desired}
           amount0Min={amount0Min}
           amount1Min={amount1Min}
           tickLower={tickLower}

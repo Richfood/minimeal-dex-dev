@@ -239,7 +239,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                                         whiteSpace: 'nowrap' // Prevent text wrapping
                                     }}
                                 >
-                                    {amountInDesired}
+                                    {amount0Desired}
                                 </Typography>
                             </Box>
 
@@ -272,7 +272,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                                         whiteSpace: 'nowrap' // Prevent text wrapping
                                     }}
                                 >
-                                    {amountOutDesired}
+                                    {amount1Desired}
                                 </Typography>
                             </Box>
 

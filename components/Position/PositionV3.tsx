@@ -309,19 +309,13 @@ const PositionV3 = ({ tokenId }: PositionProps) => {
                                         '&:hover': {
                                             backgroundColor: theme === 'light' ? `var(--primary)` : `var(--secondary)`,
                                         },
+                                        '&.Mui-disabled': {
+                                            cursor: 'not-allowed',
+                                        },
                                     }}
-                                    // sx={{
-                                    //     backgroundColor: theme === 'light' ? `var(--primary)` : `var(--cream)`,
-                                    //     color: theme === 'light' ? `white` : `black`,
-                                    //     borderRadius: '8px',
-                                    //     textTransform: 'none',
-                                    //     fontWeight: '600',
-                                    //     '&:hover': {
-                                    //         backgroundColor: theme === 'light' ? `var(--primary)` : `var(--secondary)`,
-                                    //     },
-                                    // }}
-                                    onClick={handleCollectFees}
+                                    onClick={!(Number(feesEarned0) === 0 && Number(feesEarned1) === 0) ? handleCollectFees : ()=>{}}
                                 >
+
                                     {runningCollectFees ? <CircularProgress size={20}/> : "Collect Fees"}
                                 </Button>
                             </Box>
