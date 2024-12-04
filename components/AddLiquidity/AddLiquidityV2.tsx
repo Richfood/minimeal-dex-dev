@@ -29,6 +29,7 @@ import { hooks } from '../ConnectWallet/connector';
 import { debounce } from '@syncfusion/ej2-base';
 import { flushSync } from 'react-dom';
 import {getUserBalance, getUserNativeBalance} from '@/utils/api/getUserBalance';
+import AddLiquidityModalV2 from '../AddLIquidityModal/AddLIquidityModalV2';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -77,6 +78,8 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   const [tokenBalance0, setTokenBalance0] = useState<string>("");
   const [tokenBalance1, setTokenBalance1] = useState<string>("");
 
+  const [openAddLiquidity, setOpenAddLiquidity] = useState(false);
+
   console.log("🚀 ~ slippageTolerance:", slippageTolerance)
   console.log("🚀 ~ deadline:", deadline)
 
@@ -100,6 +103,13 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   const toggleV2Class = () => {
     setIsActive(!isActive);
     router.replace(`/add/V3/${token0?.address.contract_address || "token"}/${token1?.address.contract_address || "token"}`);
+  }
+
+  const handleCloseAddLiquidity = () => {
+    setOpenAddLiquidity(prev => {
+      console.log("🚀 ~ prev:", prev)
+      return !prev
+    })
   }
 
   const handleOpenToken = useCallback((tokenNumber: number) => {
@@ -201,6 +211,12 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
 
   const handleGettingPoolData = async () => {
     await getPoolRatio();
+  }
+
+  const reset = () => {
+    setDeadline("10");
+    setAmount0Desired("");
+    setAmount1Desired("");
   }
 
   const calculate = useCallback(
@@ -505,7 +521,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
 
                 <Box sx={{ width: '100%' }}>
                   <Button
-                    onClick={handleAddLiquidity}
+                    onClick={handleCloseAddLiquidity}
                     variant="contained"
                     color="secondary"
                     sx={{ width: '100%' }}
@@ -552,6 +568,22 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
           setSlippageTolerance={setSlippageTolerance}
           deadline={deadline}
           setDeadline={setDeadline}
+        />
+
+        <AddLiquidityModalV2
+          isOpen={openAddLiquidity}
+          setOpenAddLiquidity={setOpenAddLiquidity}
+          handleCloseAddLiquidity={handleCloseAddLiquidity}
+          theme={palette.mode}
+          token0={token0}
+          token1={token1}
+          slippageTolerance={slippageTolerance}
+          setAddLiquidityRunning={setAddLiquidityRunning}
+          deadline={deadline}
+          amount0Desired={isSorted ? amount0Desired : amount1Desired}
+          amount1Desired={isSorted ? amount1Desired : amount0Desired}   
+          currentPrice={reserves ? reserves?.reserve0 / reserves?.reserve1 : 0} 
+          reset={reset}        
         />
         <style jsx>{`
         .greyed-out {

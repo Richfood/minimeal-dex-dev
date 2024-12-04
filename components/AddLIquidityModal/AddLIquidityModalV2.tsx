@@ -9,7 +9,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { tickToPrice } from '@/utils/utils';
 import { isNative } from '@/utils/generalFunctions';
 import getTokenApproval from "../../utils/contract-methods/getTokenApproval";
-import { addLiquidityV3 } from '@/utils/contract-methods/addLiquidity';
+import { addLiquidityETH, addLiquidityV2, addLiquidityV3 } from '@/utils/contract-methods/addLiquidity';
 import addresses from "../../utils/address.json";
 import { FeeAmount } from '@uniswap/v3-sdk';
 
@@ -18,37 +18,23 @@ interface AddLiquidityModalProps {
     setOpenAddLiquidity: React.Dispatch<React.SetStateAction<boolean>>;
     handleCloseAddLiquidity: () => void;
     theme: 'light' | 'dark';
-    amountInDesired: string;
-    amountOutDesired: string;
     token0: TokenDetails | null;
     token1: TokenDetails | null;
-    tradingFee: string;
-    priceLowerEntered: string;
-    priceUpperEntered: string;
-    priceCurrent: string;
     slippageTolerance: number | null;
     setAddLiquidityRunning: React.Dispatch<React.SetStateAction<boolean>>;
-    approvalAmount0: string;
-    approvalAmount1: string;
     deadline: string;
-    fee: FeeAmount | null;
     amount0Desired: string;
     amount1Desired: string;
-    amount0Min: string;
-    amount1Min: string;
-    tickLower: string;
-    tickUpper: string;
-    sqrtPriceX96: string;
-    isFullRange: boolean;
+    currentPrice : number;
     reset: () => void;
 }
 
-const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
-    { isOpen, handleCloseAddLiquidity, theme, amountInDesired, amountOutDesired, token0, token1, tradingFee,
-        priceLowerEntered, priceUpperEntered, priceCurrent, slippageTolerance, setAddLiquidityRunning, approvalAmount0, approvalAmount1,
-        deadline, fee, tickLower, tickUpper, amount0Desired, amount1Desired, amount0Min, amount1Min, sqrtPriceX96, isFullRange, reset, setOpenAddLiquidity }) => {
+const AddLiquidityModalV2: React.FC<AddLiquidityModalProps> = (
+    { isOpen, handleCloseAddLiquidity, theme, token0, token1,
+        slippageTolerance, setAddLiquidityRunning,
+        deadline, amount0Desired, amount1Desired, reset, setOpenAddLiquidity, currentPrice }) => {
 
-    const NFPMAddress = addresses.PancakePositionManagerAddress;
+    const v2RouterAddress = addresses.PancakeV2RouterAddress;
 
     const style = {
         position: 'absolute' as 'absolute',
@@ -74,78 +60,89 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
 
     console.log("🚀 ~ theme === light:", theme === "light")
 
-    useEffect(() => {
-        try {
-            if (Number(priceCurrent) >= Number(priceLowerEntered) && Number(priceCurrent) <= Number(priceUpperEntered)) {
-                setRange("Active");
-            } else {
-                setRange("Inactive");
-            }
-        } catch (error) {
-            console.error("🚀 ~ Error calculating range ~", error);
-        }
-    }, [priceCurrent, priceLowerEntered, priceUpperEntered]);
-
     const handleAddLiquidity = async () => {
         if (!token0 || !token1 || !slippageTolerance) return;
-        setIsLiquidityAdded(true);
+    
         setAddLiquidityRunning(true);
         try {
-
-            const addressToApprove = NFPMAddress;
-
-            if (!isNative(token0)) {
-                await getTokenApproval(token0, addressToApprove, approvalAmount0);
-            }
-            if (!isNative(token1)) {
-                await getTokenApproval(token1, addressToApprove, approvalAmount1);
-            }
-
-            alert("Tokens Approved!");
+    
+          const addressToApprove = v2RouterAddress;
+    
+          if (!isNative(token0)) {
+            await getTokenApproval(token0, addressToApprove, amount0Desired);
+          }
+          if (!isNative(token1)) {
+            await getTokenApproval(token1, addressToApprove, amount1Desired);
+          }
+    
+          alert("Tokens Approved!");
         }
         catch (error) {
-            setAddLiquidityRunning(false);
-            alert("Error approving tokens");
-            console.log(error)
-            return;
+          setAddLiquidityRunning(false);
+          alert("Error approving tokens");
+          console.log(error)
+          return;
         }
-
+    
         const unixDeadline = (Math.floor((Date.now() + Number(deadline) * 60 * 1000) / 1000)).toString();
         try {
-            if (fee && token0 && token1) {
-                const addLiquidityTxHash = await addLiquidityV3(
-                    NFPMAddress,
-                    token0,
-                    token1,
-                    tickLower,
-                    tickUpper,
-                    amount0Desired,
-                    amount1Desired,
-                    amount0Min,
-                    amount1Min,
-                    unixDeadline,
-                    sqrtPriceX96,
-                    fee,
-                    isFullRange
-                )
-
-                alert(`Liquidity added. tx hash : ${addLiquidityTxHash} `)
-                setIsLiquidityAdded(false)
-                setOpenAddLiquidity(false)
-                reset();
+          if (token0 && token1 && amount0Desired && amount1Desired) {
+            console.log("🚀 ~ handleAddLiquidity ~ amount1Desired:", amount1Desired)
+            console.log("🚀 ~ handleAddLiquidity ~ amount0Desired:", amount0Desired)
+            console.log("🚀 ~ handleAddLiquidity ~ token1:", token1)
+            console.log("🚀 ~ handleAddLiquidity ~ token0:", token0)
+    
+            let addLiquidityTxHash: any;
+    
+            if (token0.symbol === "PLS" || token1.symbol === "PLS") {
+              let amountTokenDesired: string;
+              let amountETHDesired: string;
+              let PLS: TokenDetails;
+              let Token: TokenDetails;
+    
+              if (token0.symbol === "PLS") {
+                PLS = token0;
+                Token = token1;
+                amountETHDesired = amount0Desired;
+                amountTokenDesired = amount1Desired;
+              }
+              else {
+                PLS = token1;
+                Token = token0;
+                amountETHDesired = amount1Desired;
+                amountTokenDesired = amount0Desired;
+              }
+    
+              addLiquidityTxHash = await addLiquidityETH(
+                Token,
+                amountETHDesired,
+                amountTokenDesired,
+                unixDeadline,
+                slippageTolerance
+              )
             }
+            else {
+              addLiquidityTxHash = await addLiquidityV2(
+                token0,
+                token1,
+                amount0Desired,
+                amount1Desired,
+                unixDeadline,
+                slippageTolerance
+              )
+            }
+    
+            alert(`Liquidity added. tx hash : ${addLiquidityTxHash}`);
+          }
         }
         catch (error) {
-            //console.log("Error adding liquidity", error);
-            setAddLiquidityRunning(false);
-            alert(`Error adding liquidity`);
+          console.log("Error adding V2 liquidity", error);
+          setAddLiquidityRunning(false);
+          alert(`Error adding liquidity`);
         }
         setAddLiquidityRunning(false);
-        setIsLiquidityAdded(false)
-        setOpenAddLiquidity(false)
-
-    }
-
+        reset();
+      }
 
     return (
         <>
@@ -310,7 +307,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                                         whiteSpace: 'nowrap' // Prevent text wrapping
                                     }}
                                 >
-                                    {tradingFee}
+                                    0.25%
                                 </Typography>
                             </Box>
 
@@ -341,7 +338,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                                             mb: 2,
                                         }}
                                     >
-                                        MIN PRICE
+                                        Price {token0?.symbol} / {token1?.symbol}
                                     </Typography>
 
                                     <Typography
@@ -354,7 +351,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                                             mb: 2,
                                         }}
                                     >
-                                        {Number(priceLowerEntered).toFixed(2)}
+                                        {currentPrice.toFixed(2)}
                                     </Typography>
                                     <Typography
                                         sx={{
@@ -391,7 +388,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                                             mb: 2,
                                         }}
                                     >
-                                        MAX PRICE
+                                        Price {token1?.symbol} / {token0?.symbol}
                                     </Typography>
 
                                     <Typography
@@ -404,7 +401,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                                             mb: 2,
                                         }}
                                     >
-                                        {Number(priceUpperEntered).toFixed(2)}
+                                        {currentPrice.toFixed(2)}
 
                                     </Typography>
                                     <Typography
@@ -423,7 +420,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
 
                             </Box>
 
-                            <Box sx={{
+                            {/* <Box sx={{
                                 display: "flex",
                                 flexDirection: "column",
                                 backgroundColor: theme === 'light' ? 'rgb(203 213 225)' : 'rgb(71 85 105)',
@@ -457,7 +454,7 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                                         mb: 2,
                                     }}
                                 >
-                                    {Number(priceCurrent).toFixed(2)}
+                                    {currentPrice.toFixed(2)}
                                 </Typography>
                                 <Typography
                                     sx={{
@@ -471,9 +468,10 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
                                 >
                                     {`${token1?.symbol}/${token0?.symbol}`}
                                 </Typography>
-                            </Box>
+                            </Box> */}
 
                         </Box>
+
                         <Box className="slippageSec dsls" sx={{ width: '90%', marginLeft: "15px" }}>
                             {isLiquidityAdded ? (
                                 <Button
@@ -501,4 +499,4 @@ const AddLiquidityModal: React.FC<AddLiquidityModalProps> = (
     );
 };
 
-export default AddLiquidityModal;
+export default AddLiquidityModalV2;
