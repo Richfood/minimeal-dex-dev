@@ -10,6 +10,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { metaMask, hooks } from '../ConnectWallet/connector';
 import NetworkMenu from './account';
+import { ethers } from 'ethers';
 const { useChainId, useAccounts, useIsActive } = hooks;
 
 const Header = () => {
@@ -42,21 +43,33 @@ const Header = () => {
 
   useEffect(() => {
     const updateButtonText = async () => {
-      if (typeof window === 'undefined') return;
+      try{
+        if(!window.ethereum) return;
 
-      // const domain = window.location.hostname;
+        const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+        const accounts = await newProvider.listAccounts();
 
-      // if (domain === 'dex.sunrewards.io') {
-        // setIsMainnet(true);
-        // if (isActive && chainId !== 369) {
-        //   await metaMask.activate(369);
+        if(accounts.length > 0) metaMask.activate();
+        // console.log(newProvider);
+        // if (window.ethereum) metaMask.activate();
+        // const domain = window.location.hostname;
+
+        // if (domain === 'dex.sunrewards.io') {
+          // setIsMainnet(true);
+          // if (isActive && chainId !== 369) {
+          //   await metaMask.activate(369);
+          // }
         // }
-      // }
+      }
+      catch(error){
+        console.log(error);
+      }
 
       if (accounts && accounts.length > 0 && isConnected) {
         const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
         setButtonText(shortenedAddress);
       } else {
+        // const provider = ethers.providers.JsonRpcProvider(process.env.)
         setButtonText('Connect Wallet');
       }
     };
