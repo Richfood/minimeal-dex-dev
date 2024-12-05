@@ -45,7 +45,7 @@ const AddLiquidityModalV2: React.FC<AddLiquidityModalProps> = (
         transform: 'translate(-50%, -50%)',
         maxWidth: "fitContent",
         width: 400,
-        height: "45rem",
+        height: "35rem",
         bgcolor: theme === 'light' ? "rgb(241 245 249)" : "#173D3D",
         boxShadow: 'rgba(0, 0, 0, 0.24) -40px 40px 80px -8px',
         borderRadius: '14px',
