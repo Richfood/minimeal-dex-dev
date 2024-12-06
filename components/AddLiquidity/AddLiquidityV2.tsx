@@ -24,7 +24,7 @@ import SettingsModal from '../SettingModal/SettingModal-addLiquidity';
 import { calculateV2Amounts } from '@/utils/calculateV2TokenAmounts';
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import famousToken from "../../utils/famousToken.json";
-const { useChainId } = hooks;
+const { useChainId, useIsActive } = hooks;
 import { hooks } from '../ConnectWallet/connector';
 import { debounce } from '@syncfusion/ej2-base';
 import { flushSync } from 'react-dom';
@@ -79,6 +79,8 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   const [tokenBalance1, setTokenBalance1] = useState<string>("");
 
   const [openAddLiquidity, setOpenAddLiquidity] = useState(false);
+
+  const isMetamaskActive = useIsActive();
 
   console.log("🚀 ~ slippageTolerance:", slippageTolerance)
   console.log("🚀 ~ deadline:", deadline)
@@ -529,13 +531,15 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
                   >
                     {addLiquidityRunning ? (
                       <CircularProgress size={25} />
-                    ) : (
+                    ) : isMetamaskActive ?
                       Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired) ? (
                         <>Insufficient Balance</>
                       ) : (
                         <>Create Liquidity</>
+                      ) : (
+                        <>Connect Wallet</>
                       )
-                    )}
+                    }
                   </Button>
                 </Box>
 

@@ -24,7 +24,7 @@ import SettingsModal from '../SettingModal/SettingModal-addLiquidity';
 import { calculateV2Amounts } from '@/utils/calculateV2TokenAmounts';
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import famousToken from "../../utils/famousToken.json";
-const { useChainId } = hooks;
+const { useChainId, useIsActive } = hooks;
 import { hooks } from '../ConnectWallet/connector';
 import { debounce } from '@syncfusion/ej2-base';
 import { flushSync } from 'react-dom';
@@ -68,7 +68,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, pairAddress }) => 
   // const [currentV2PoolRatio, setCurrentV2PoolRatio] = useState<number | null>(null);
   const [reserves, setReserves] = useState<{ reserve0: number; reserve1: number } | null>(null);
   const [isSorted, setIsSorted] = useState<boolean>(true);
-  const [addLiquidityRunning, setAddLiquidityRunning] = useState(false);
+  const [increaseLiquidityRunning, setincreaseLiquidityRunning] = useState(false);
   const [slippageTolerance, setSlippageTolerance] = useState<number | null>(1);
   const [deadline, setDeadline] = useState("10");
   const chainId = useChainId();
@@ -80,6 +80,8 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, pairAddress }) => 
   const [tokenBalance1, setTokenBalance1] = useState<string>("");
 
   const [userAddress, setUserAddress] = useState("");
+
+  const isMetamaskActive = useIsActive()
 
   console.log("🚀 ~ slippageTolerance:", slippageTolerance)
   console.log("🚀 ~ deadline:", deadline)
@@ -123,7 +125,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, pairAddress }) => 
   const handleAddLiquidity = async () => {
     if (!token0 || !token1 || !slippageTolerance) return;
 
-    setAddLiquidityRunning(true);
+    setincreaseLiquidityRunning(true);
     try {
 
       const addressToApprove = v2RouterAddress;
@@ -138,7 +140,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, pairAddress }) => 
       alert("Tokens Approved!");
     }
     catch (error) {
-      setAddLiquidityRunning(false);
+      setincreaseLiquidityRunning(false);
       alert("Error approving tokens");
       console.log(error)
       return;
@@ -197,10 +199,10 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, pairAddress }) => 
     }
     catch (error) {
       console.log("Error adding V2 liquidity", error);
-      setAddLiquidityRunning(false);
+      setincreaseLiquidityRunning(false);
       alert(`Error adding liquidity`);
     }
-    setAddLiquidityRunning(false);
+    setincreaseLiquidityRunning(false);
   }
 
   const handleGettingPoolData = async () => {
@@ -574,17 +576,19 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, pairAddress }) => 
                     variant="contained"
                     color="secondary"
                     sx={{ width: '100%' }}
-                    disabled={!amount0Desired || !amount1Desired || !token0 || !token1 || addLiquidityRunning || Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired)}
+                    disabled={!amount0Desired || !amount1Desired || !token0 || !token1 || increaseLiquidityRunning || Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired)}
                   >
-                    {addLiquidityRunning ? (
+                      {increaseLiquidityRunning ? (
                       <CircularProgress size={25} />
-                    ) : (
+                    ) : isMetamaskActive ?
                       Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired) ? (
                         <>Insufficient Balance</>
                       ) : (
-                        <>Increase Liquidity</>
+                        <>Create Liquidity</>
+                      ) : (
+                        <>Connect Wallet</>
                       )
-                    )}
+                    }
                   </Button>
                 </Box>
 

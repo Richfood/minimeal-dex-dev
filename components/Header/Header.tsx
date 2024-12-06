@@ -9,9 +9,9 @@ import AppSettingsModal from '../AppSettingsModal/AppSettingsModal';
 import Link from 'next/link';
 import Image from 'next/image';
 import { metaMask, hooks } from '../ConnectWallet/connector';
+const { useChainId, useAccounts, useIsActive } = hooks;
 import NetworkMenu from './account';
 import { ethers } from 'ethers';
-const { useChainId, useAccounts, useIsActive } = hooks;
 
 const Header = () => {
   const [openSettingsModal, setOpenSettingsModal] = useState(false);
@@ -25,6 +25,7 @@ const Header = () => {
   const isActive = useIsActive();
   const [buttonText, setButtonText] = useState('Connect Wallet');
   // const [isMainnet, setIsMainnet] = useState<boolean | null>(true);
+  const [disconnect, setDisconnect] = useState(false);
 
   const handleOpenSettings = () => setOpenSettingsModal(true);
   const handleCloseSettings = () => setOpenSettingsModal(false);
@@ -47,9 +48,9 @@ const Header = () => {
         if(!window.ethereum) return;
 
         const newProvider = new ethers.providers.Web3Provider(window.ethereum);
-        const accounts = await newProvider.listAccounts();
+        const providerAccounts = await newProvider.listAccounts();
 
-        if(accounts.length > 0) metaMask.activate();
+        if(providerAccounts.length > 0 && !disconnect) metaMask.activate();
         // console.log(newProvider);
         // if (window.ethereum) metaMask.activate();
         // const domain = window.location.hostname;
@@ -77,14 +78,16 @@ const Header = () => {
     updateButtonText();
   }, [accounts, isConnected, chainId, isActive]);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (isConnected) {
+      setDisconnect(true);
       if (metaMask.deactivate) {
         metaMask.deactivate?.();
       } else {
         metaMask.resetState();
       }
     } else {
+      setDisconnect(false);
       metaMask.activate();
     }
   };

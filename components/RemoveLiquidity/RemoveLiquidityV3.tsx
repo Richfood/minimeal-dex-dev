@@ -21,6 +21,7 @@ import { debounce } from '@syncfusion/ej2-base';
 import { ethers } from 'ethers';
 import { getUserNativeBalance } from '@/utils/api/getUserBalance';
 
+
 interface RemoveLiquidityProps {
     tokenId: string;
 }
@@ -457,7 +458,11 @@ const RemoveLiquidityV3 = ({ tokenId }: RemoveLiquidityProps) => {
 
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', my: '15px' }}>
                                     <Button variant="contained" color="secondary" sx={{ width: '100%' }} onClick={handleRemoveLiquidity} disabled={removeLiquidityRunning}>
-                                        {removeLiquidityRunning ? <CircularProgress size={20} /> : "Remove"}
+                                        {removeLiquidityRunning ? 
+                                            <CircularProgress size={20} /> 
+                                            : 
+                                            "Remove"
+                                        }
                                     </Button>
                                 </Box>
 

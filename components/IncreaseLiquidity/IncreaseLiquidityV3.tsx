@@ -38,8 +38,8 @@ import { useCall } from 'wagmi';
 import { getAllPoolsForTokens } from '@/utils/api/getAllPoolsForTokens';
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import famousToken from "../../utils/famousToken.json";
-const { useChainId } = hooks;
 import { hooks } from '../ConnectWallet/connector';
+const { useChainId, useIsActive } = hooks;
 import {getUserBalance, getUserNativeBalance} from '@/utils/api/getUserBalance';
 import { increaseLiquidityV3 } from '@/utils/contract-methods/increaseLiquidity';
 import { getPositionByTokenId } from '@/utils/api/getPositionByTokenId';
@@ -126,6 +126,8 @@ const IncreaseLiquidityV3: React.FC<IncreaseLiquidityProps> = ({
 
   const [increaseLiquidityRunning, setIncreaseLiquidityRunning] = useState(false);
   const [userAddress, setUserAddress] = useState("");
+
+  const isMetamaskActive = useIsActive()
 
   const toggleClass = () => {
     setIsActive(!isActive);
@@ -749,16 +751,17 @@ const IncreaseLiquidityV3: React.FC<IncreaseLiquidityProps> = ({
 
                     <Box>
                       <Button onClick={handleIncreaseLiquidity} variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || increaseLiquidityRunning || Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired)}>
-                        {increaseLiquidityRunning ? (
-                          <CircularProgress size={25} />
-                        ) : (
-                          Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired) ? (
-                            <>Insufficient Balance</>
-                          ) : (
-                            <>Increase Liquidity</>
-                          )
-                        )}
-
+                      {increaseLiquidityRunning ? (
+                      <CircularProgress size={25} />
+                    ) : isMetamaskActive ?
+                      Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired) ? (
+                        <>Insufficient Balance</>
+                      ) : (
+                        <>Create Liquidity</>
+                      ) : (
+                        <>Connect Wallet</>
+                      )
+                    }
                       </Button>
                     </Box>
                   </Box>

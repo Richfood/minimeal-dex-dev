@@ -37,8 +37,8 @@ import { useCall } from 'wagmi';
 import { getAllPoolsForTokens } from '@/utils/api/getAllPoolsForTokens';
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import famousToken from "../../utils/famousToken.json";
-const { useChainId } = hooks;
 import { hooks } from '../ConnectWallet/connector';
+const { useChainId, useIsActive } = hooks;
 import {getUserBalance, getUserNativeBalance} from '@/utils/api/getUserBalance';
 import AddLiquidityModal from '../AddLIquidityModal/AddLIquidityModal';
 
@@ -131,6 +131,7 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ defaultActiveProtocol: ac
   const [tokenBalance0, setTokenBalance0] = useState<string>("");
   const [tokenBalance1, setTokenBalance1] = useState<string>("");
   const [deadline, setDeadline] = useState("10");
+  const isMetamaskActive = useIsActive();
 
   useEffect(() => {
     // const isTestnet = chainId === 943;
@@ -1339,17 +1340,18 @@ const AddLiquidityV3: React.FC<AddLiquidityProps> = ({ defaultActiveProtocol: ac
 
                 <Box>
                   <Button onClick={handleCloseAddLiquidity}
-                    variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning || Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired)}>
+                    variant="contained" color="secondary" sx={{ width: '100%' }} disabled={!amount0Desired && !amount1Desired || !token0 || !token1 || addLiquidityRunning || Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired) || !isMetamaskActive}>
                     {addLiquidityRunning ? (
                       <CircularProgress size={25} />
-                    ) : (
+                    ) : isMetamaskActive ?
                       Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired) ? (
                         <>Insufficient Balance</>
                       ) : (
                         <>Create Liquidity</>
+                      ) : (
+                        <>Connect Wallet</>
                       )
-                    )}
-
+                    }
                   </Button>
                 </Box>
               </Box>
