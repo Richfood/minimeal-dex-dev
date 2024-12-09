@@ -108,6 +108,7 @@ run `npm install`
 
 ### Make Build for v3-sdk, v2-sdk, sdk-core and move to to node_modules of smart-order-router and router-api
 ## Smart-Order-Router
+    IMPORTANT : For smart order router to work, there must be atleast WPLS/USDC pool for each V3 and V2.
     Copy testnet/mainnet addresses in src/contractAddresses.json
     Change subgraph address in src/providers/v3/subgraph-provider
     Change src/util/chains.ts
