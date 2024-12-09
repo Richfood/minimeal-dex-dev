@@ -81,11 +81,17 @@ run `yarn-install`
             - address
             - startBlock
         - Constants.ts (addresses in lower case)
+        - utils/tick.ts
+            - in the feeTierToTickSpacing function, add if condition for 20,000 fee with tick spacing as 4000
     - Deploy on graph-node -  
         - yarn codegen
         - yarn build
         - yarn create-local
         - yarn deploy-local
+    - To add additional stable tokens and WPLS-stable pool addresses
+        - Add Stable Token addresses and WPLS-{stable token} addresses in Constants.ts
+        - Add the tokens from the Constants.ts to the WHITELIST_TOKENS array
+        - Add the stable token addresses to the STABLE_COINS array
 
 ## sdk-core
     - Copy testnet/mainnet addresses in src/contractAddresses.ts

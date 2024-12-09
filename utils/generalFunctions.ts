@@ -1,4 +1,9 @@
-import { TokenDetails } from "@/interfaces";
+import { TokenDetails, TokenInfoFromAPI } from "@/interfaces";
+import addresses from "./address.json"
+
+export const DEFAULT_LOGO_URL = "https://raw.githubusercontent.com/piteasio/app-tokens/main/token-logo/0xA1077a294dDE1B09bB078844df40758a5D0f9a27.png";
+export const CONSTANT_IMPORT_STRING = "Imported Token : ";
+
 
 export const truncateAddress = (address: any): string => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -17,6 +22,21 @@ export function adjustForSlippage(amount: string, slippageTolerance: number): nu
 
 export function decimalRound(value : string, decimal: number){
     return (parseFloat(Number(value).toFixed(decimal))).toString()
+}
+
+export function makeTokenFromInfo(tokenInfo : TokenInfoFromAPI){
+    const token : TokenDetails = {
+      name : tokenInfo.name,
+      symbol : tokenInfo.symbol,
+      address : {
+        contract_address : tokenInfo.address,
+        decimals : Number(tokenInfo.decimals)
+      },
+      logoURI : tokenInfo.icon_url ||  DEFAULT_LOGO_URL,
+      chainId : Number(process.env.NEXT_APP_CHAIN_ID)
+    }
+
+    return token;
 }
 
 export function expandIfNeeded(numStr : string) {
@@ -38,5 +58,5 @@ export function expandIfNeeded(numStr : string) {
 }
 
 export function isNative(token: TokenDetails): boolean{
-  return token.symbol === "PLS";
+  return token.symbol === "PLS" && token.address.contract_address.toLowerCase() === addresses.WPLS_ADDRESS.toLowerCase();
 }

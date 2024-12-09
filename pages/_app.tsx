@@ -13,7 +13,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <QueryClientProvider client={queryClient}> 
             <ThemeProvider>
                 <CssBaseline />
-                    <Component {...pageProps} />
+                        <Component {...pageProps} />
             </ThemeProvider>
         </QueryClientProvider>
     );

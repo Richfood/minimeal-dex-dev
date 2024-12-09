@@ -14,12 +14,13 @@ import { calculatePositionData } from '@/utils/calculatePositionData';
 import { V3PositionData, TokenDetails, V2PositionsData } from '@/interfaces';
 import Link from 'next/link';
 
-import tokenList from "@/utils/tokenList.json";
+import tokenList from "@/utils/famousToken.json";
 import { getV2Positions } from '@/utils/api/getV2Positions';
 import postionDataV2 from "@/utils/positionsDataV2.json";
 // import postionDataV3 from "@/utils/positionsDataV3.json";
 import { PositionListV3 } from '../PositionList/PositionListV3';
 import { PositionListV2 } from '../PositionList/PositionListV2';
+import { ethers } from 'ethers';
 
 
 interface LiquidityProps {
@@ -36,6 +37,8 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
   const [v3Positions, setV3Positions] = useState<V3PositionData[]>([]);
   const [v2Positions, setV2Positions] = useState<V2PositionsData[]>([]);
 
+  const [userAddress, setUserAddress] = useState("");
+
   const [isLoadingPosition, setIsLoadingPosition] = useState(false);
 
   const handleOpen = useCallback(() => setIsOpen(true), []);
@@ -47,46 +50,118 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
   const handleOpenRecent = useCallback(() => setIsOpenRecent(true), []);
   const handleCloseRecent = () => setIsOpenRecent(false);
 
-  const [startToken0, setStartToken0] = useState<TokenDetails>(tokenList.TokenB);
-  const [startToken1, setStartToken1] = useState<TokenDetails>(tokenList.TokenA);
+  const [startToken0, setStartToken0] = useState<TokenDetails>(tokenList.filter((token)=>token.symbol === "SOIL")[0]);
+  const [startToken1, setStartToken1] = useState<TokenDetails>(tokenList.filter((token)=>token.symbol === "STBL")[0]);
+
+  const [prevUserAddress, setPrevUserAddress] = useState("");
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
 
+  const handlePositionClick = (protocol : string, id: string)=>{
+    if(protocol === "V3"){
+      router.push(`/positionV3/${id}`)
+    }
+    else{
+      router.push(`/positionV2/${id}`)
+    }
+  }
+
+  useEffect(() => {
+    const getUserAddress = async () => {
+        try {
+            const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+            const newSigner = newProvider.getSigner();
+            const userAddressToSet = await newSigner.getAddress();
+            setUserAddress(userAddressToSet);
+        } catch (error) {
+            console.error("Error fetching user address:", error);
+            setUserAddress("");
+        }
+    };
+
+    if (window.ethereum) {
+        getUserAddress();
+
+        // Listen for account changes
+        const handleAccountsChanged = (accounts : any[]) => {
+            if (accounts.length > 0) {
+                setUserAddress(accounts[0]);
+            } else {
+                setUserAddress(""); // User disconnected wallet
+            }
+        };
+
+        // Add event listener
+        window.ethereum.on("accountsChanged", handleAccountsChanged);
+
+        // Cleanup the event listener on unmount
+        return () => {
+            window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+        };
+    } else {
+        setUserAddress("");
+    }
+}, []); // Dependency array empty so it runs once on mount
+
   useEffect(() => {
     const runGetPositionsData = async () => {
       setIsLoadingPosition(true);
 
-      if(value === "0" && (v2Positions.length === 0 || v3Positions.length === 0)){
-        let newV3Positions: V3PositionData[] = await getV3PositionsData();
-        setV3Positions(newV3Positions);
-
-        let newV2Positions: V2PositionsData[] = await getV2Positions();
-        setV2Positions(newV2Positions)
-      }
-      else if (value === "2" && v2Positions.length === 0) {
-        let newPositions: V2PositionsData[] = await getV2Positions();
-        setV2Positions(newPositions)
-      }
-      else if(value === "1" && v3Positions.length === 0){
-        let newPositions: V3PositionData[] = await getV3PositionsData();
-        setV3Positions(newPositions);
-      }
+      try {
+        if (value === "0" && (v2Positions.length === 0 || v3Positions.length === 0 || userAddress !== prevUserAddress)) {
+          try {
+            let newV3Positions: V3PositionData[] = await getV3PositionsData();
+            setV3Positions(newV3Positions);
+          } catch (error) {
+            console.error("Error fetching V3 positions:", error);
+          }
+      
+          try {
+            let newV2Positions: V2PositionsData[] = await getV2Positions();
+            setV2Positions(newV2Positions);
+          } catch (error) {
+            console.error("Error fetching V2 positions:", error);
+          }
+      
+          setPrevUserAddress(userAddress);
+        } else if (value === "2" && v2Positions.length === 0 || userAddress !== prevUserAddress) {
+          try {
+            let newPositions: V2PositionsData[] = await getV2Positions();
+            setV2Positions(newPositions);
+            setPrevUserAddress(userAddress);
+          } catch (error) {
+            console.error("Error fetching V2 positions:", error);
+          }
+        } else if (value === "1" && v3Positions.length === 0 || userAddress !== prevUserAddress) {
+          try {
+            let newPositions: V3PositionData[] = await getV3PositionsData();
+            setV3Positions(newPositions);
+            setPrevUserAddress(userAddress);
+          } catch (error) {
+            console.error("Error fetching V3 positions:", error);
+          }
+        }
+      } catch (error) {
+        console.error("Unexpected error:", error);
+      }      
 
       setIsLoadingPosition(false);
     }
     runGetPositionsData();
-  }, [value])
+  }, [value, userAddress])
 
   const color = theme === 'light' ? 'var(--primary)' : 'var(--cream)';
 
+
+  console.log(value !== '2' && PositionListV3.length>3)
   return (
     <>
       <Box className="white_box">
         <Box className="Liq_top">
           <Box>
-            <Typography variant="h4" className='sec_title' sx={{ mb: '10px' }}>Your Liquidity</Typography>
+            <Typography variant="h4" className='sec_title' sx={{ mb: '10px' }}>Your Positions</Typography>
             <Typography sx={{ color: 'var(--cream)', fontSize: '14px', fontWeight: '500' }}>List of your liquidity positions</Typography>
           </Box>
           <Box>
@@ -106,37 +181,49 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
         </Box>
 
         <Box className="Liq_mid">
-          {/* <Box>
-            <FormGroup>
-              <FormControlLabel
-                sx={{ m: '0' }}
-                control={<Customcheckbox />}
-                label={
-                  <Typography sx={{ ml: '5px', fontSize: '12px', mt: '3px', fontWeight: '400', color: 'var(--cream)' }}>
-                    Hide closed positions
-                  </Typography>
-                }
-              />
-            </FormGroup>
-          </Box> */}
-          <Box>
-            <TabContext value={value}>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                variant="scrollable"
-                scrollButtons="auto"
-                aria-label="connect-wallet-tabs"
-                sx={{ border: 'unset', minHeight: 'unset' }}
-                className="tabsOuter"
-              >
-                <Tab label="All" value="0" />
-                <Tab label="V3" value="1" />
-                <Tab label="V2" value="2" />
-              </Tabs>
-            </TabContext>
-          </Box>
-        </Box>
+  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <TabContext value={value}>
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        variant="scrollable"
+        scrollButtons="auto"
+        aria-label="connect-wallet-tabs"
+        sx={{ border: 'unset', minHeight: 'unset' }}
+        className="tabsOuter"
+      >
+        <Tab label="All" value="0" />
+        <Tab label="V3" value="1" />
+        <Tab label="V2" value="2" />
+      </Tabs>
+    </TabContext>
+  </Box>
+    {(value === '2' && v2Positions.length>3) || (value !== '2' && v3Positions.length>3) ? (
+      <Box>
+        <Button
+          onClick={() => {
+            const pathVal = value === '2' ? "V2" : "V3";
+            const path = `/add/${pathVal}/${startToken0.address.contract_address}/${startToken1.address.contract_address}`;
+            router.push(path);
+          }}
+          variant="contained"
+          color="secondary"
+          sx={{           
+            padding: '12px 12px',
+            fontSize: '12px',
+            gap: '5px',
+            minWidth: 'auto',
+            display: 'flex',
+            alignItems: 'center'
+          }}
+        >
+          Add Liquidity
+        </Button>
+    </Box>
+    ) : null}
+</Box>
+
+
 
         <Box className="tabsContent">
           {isLoadingPosition ? 
@@ -150,7 +237,9 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
                   {v3Positions.length ? (
                     <List sx={{ width: '100%', maxWidth: 'screen' }}>
                       {v3Positions.map((elem) => (
-                        <PositionListV3 theme={theme} data={elem}/>
+                        <Box onClick={()=>handlePositionClick("V3", elem.id)} sx={{cursor:"pointer"}}>
+                          <PositionListV3 theme={theme} data={elem}/>
+                        </Box>
                       ))}
                     </List>
                   ) : (
@@ -161,12 +250,12 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
               {value === '2' && (
                 <Box sx={{ py: '15px', textAlign: 'center' }}>
                   {v2Positions.length ? (
-                    <List sx={{ width: '100%', maxWidth: 'screen' }}> {/* Set a max width for uniformity */}
-                      {v2Positions.map((elem) => {
-                        return (
+                    <List sx={{ width: '100%', maxWidth: 'screen' }}> 
+                      {v2Positions.map((elem) => (
+                        <Box onClick={()=>handlePositionClick("V2", elem.pair.id)} sx={{cursor:"pointer"}}>
                           <PositionListV2 theme={theme} data={elem}/>
-                        );
-                      })}
+                        </Box>
+                      ))}
                     </List>
                   ) : (
                     <Typography sx={{ fontSize: '12px', color: 'var(--cream)' }}>No liquidity found</Typography>
@@ -175,13 +264,17 @@ const Liquidity: React.FC<LiquidityProps> = ({ theme, onToggle }) => {
               )}
               {value === '0' && (
                 <Box sx={{ py: '15px', display: 'flex', justifyContent: 'center' }}>
-                  {v3Positions.length && v2Positions.length ? (
+                  {v3Positions.length || v2Positions.length ? (
                       <List sx={{ width: '100%', maxWidth: 'screen' }}>
                         {v3Positions.map((elem) => (
-                          <PositionListV3 theme={theme} data={elem}/>
+                          <Box onClick={()=>handlePositionClick("V3", elem.id)} sx={{cursor:"pointer"}}>
+                            <PositionListV3 theme={theme} data={elem}/>
+                          </Box>
                         ))}
                         {v2Positions.map((elem)=>
-                          <PositionListV2 theme={theme} data={elem}/>
+                          <Box onClick={()=>handlePositionClick("V2", elem.pair.id)} sx={{cursor:"pointer"}}>
+                            <PositionListV2 theme={theme} data={elem}/>
+                          </Box>
                         )
                       }
                       </List>

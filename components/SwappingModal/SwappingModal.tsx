@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -7,11 +7,10 @@ import { FaArrowRight } from 'react-icons/fa';
 import { TokenDetails } from '@/interfaces';
 import { Button } from '@mui/material';
 import getTokenApproval from '@/utils/contract-methods/getTokenApproval';
-import { swapExactTokensForTokens } from '@/utils/swapV2exacttokensfortokens';
-import { swapV3 } from '@/utils/contract-methods/swapTokens';
-
+import { swapV3, swapExactTokensForTokens } from '@/utils/contract-methods/swapTokens';
+import CircularProgress from '@mui/material/CircularProgress';
 import addresses from "@/utils/address.json";
-import { expandIfNeeded } from '@/utils/generalFunctions';
+import { tickToPrice } from '@/utils/utils';
 
 interface SwappingModalProps {
     openSwap: boolean;
@@ -26,27 +25,54 @@ interface SwappingModalProps {
     setAmountOut: React.Dispatch<React.SetStateAction<string>>;
     dataForSwap: any;
     setOpenSwap: React.Dispatch<React.SetStateAction<boolean>>;
+    tickPrice: string | null;
+    decimalDiff: number;
+    isPoolV3: boolean;
+    tradingFee: number;
 
 }
 
-const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap, theme, amountIn, amountOut, token0, token1, slippageTolerance, setOpenSwap, setAmountIn, setAmountOut, dataForSwap }) => {
+const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap, theme, amountIn, amountOut, token0, token1, slippageTolerance, setOpenSwap, setAmountIn, setAmountOut, dataForSwap, tickPrice, decimalDiff, isPoolV3, tradingFee }) => {
 
     const style = {
         position: 'absolute' as 'absolute',
-        top: '30%',
+        top: '50%',
         left: '50%',
         fontSize: '14px',
         fontWeight: '500',
         transform: 'translate(-50%, -50%)',
         width: 400,
-        height: "30rem",
+        height: "32rem",
         bgcolor: theme === 'light' ? 'var(--white)' : 'var(--primary)',
         boxShadow: 'rgba(0, 0, 0, 0.24) -40px 40px 80px -8px',
         borderRadius: '14px',
         color: theme === 'light' ? 'var(--primary)' : 'var(--white)',
         maxHeight: '80vh',
         overflowY: 'auto',
+        overflowX: 'hidden',
     };
+
+    const [price, setPrice] = useState<number | null>(0)
+    const [isSwapping, setIsSwapping] = useState<boolean>(false);
+
+
+    useEffect(() => {
+        if (tickPrice && typeof decimalDiff === 'number') {
+            try {
+                if (isPoolV3 === true) {
+                    const tick = tickToPrice(Number(tickPrice), decimalDiff);
+                    console.log("🚀 ~ calculateTick ~ tick:", tick);
+                    setPrice(tick);
+
+                }
+                else {
+                    setPrice(Number(tickPrice))
+                }
+            } catch (error) {
+                console.log("🚀 ~ Error calculating tick ~ error:", error)
+            }
+        }
+    }, [tickPrice, decimalDiff]);
 
     const smartRouterAddress = addresses.PancakeRouterAddress;
 
@@ -56,6 +82,7 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
             console.log("🚀 ~ handleSwap ~ Missing tokens:", token0, token1);
             return; // Exit early if tokens are missing
         }
+        setIsSwapping(true)
 
         try {
             // Approve token for the swap
@@ -64,7 +91,7 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
 
             // Execute the swap after approval
             // await swapExactTokensForTokens(token0, token1, amountIn, slippageTolerance, amountOut, routePath)
-            
+
             let txHash: string;
             if (dataForSwap.protocol === "V3")
                 txHash = await swapV3(token0, token1, dataForSwap, amountIn, amountOut, slippageTolerance);
@@ -78,6 +105,7 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
             setAmountIn("");
             setAmountOut("");
             setOpenSwap(false);
+            setIsSwapping(false)
 
         } catch (error) {
             console.error("Error during swap process:", error);
@@ -86,6 +114,7 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
             setAmountIn("");
             setAmountOut("");
             setOpenSwap(false);
+            setIsSwapping(false)
 
         }
     };
@@ -96,7 +125,6 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
             <Modal
                 open={openSwap}
                 onClose={handleCloseSwap}
-
                 aria-labelledby="settings-modal-title"
                 aria-describedby="settings-modal-description"
             >
@@ -109,6 +137,9 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
                             size={24}
                             style={{ position: 'absolute', right: '10px', top: '5px', cursor: 'pointer' }}
                             aria-label="Close settings modal"
+                            onClick={() => {
+                                handleCloseSwap()
+                            }}
                         />
                     </Box>
                     <Box className="modal_body">
@@ -137,9 +168,21 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
                             </Typography>
 
                         </Box>
-                        <Box className="swapData" sx={{ display: 'flex', alignItems: 'flex-start', margin: '0 auto', backgroundColor: "none" }}>
+                        <Box
+                            className="swapData"
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                margin: '0 auto',
+                                marginBottom: "20px",
+                                marginTop: "-10px",
+
+                                backgroundColor: 'transparent'
+                            }}
+                        >
                             <FaArrowRight />
                         </Box>
+
                         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                             <Typography
                                 sx={{
@@ -188,7 +231,7 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
                                     mb: 2,
                                 }}
                             >
-                                {slippageTolerance}%
+                                {slippageTolerance} %
 
                             </Typography>
 
@@ -235,8 +278,7 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
                                     mb: 2,
                                 }}
                             >
-                                1%
-
+                                {`${price} ${token1?.symbol}/${token0?.symbol}`}
                             </Typography>
 
                         </Box>
@@ -263,21 +305,59 @@ const SwappingModal: React.FC<SwappingModalProps> = ({ openSwap, handleCloseSwap
                                     mb: 2,
                                 }}
                             >
-                                {(Number(amountOut) - Number((Number(amountOut) * slippageTolerance / 100).toFixed(2))).toFixed(2)}
+                                {`${(Number(amountOut) - Number((Number(amountOut) * slippageTolerance / 100).toFixed(2))).toFixed(2)} ${token1?.symbol}`}
+
+                            </Typography>
+
+                        </Box>
+
+                        <Box sx={{ display: "flex", justifyContent: "space-between", paddingLeft: "24px", paddingRight: "24px" }}>
+                            <Typography
+                                sx={{
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    display: 'flex',
+                                    gap: '5px',
+                                    alignItems: 'center',
+                                    mb: 2,
+                                }}
+                            >
+                                Trading Fee
+                            </Typography>
+                            <Typography
+                                sx={{
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    display: 'flex',
+                                    gap: '5px',
+                                    alignItems: 'center',
+                                    mb: 2,
+                                }}
+                            >
+                                {`${tradingFee} ${token0?.symbol}`}
 
                             </Typography>
 
                         </Box>
                         <Box className="slippageSec dsls" sx={{ width: '90%', marginLeft: "15px" }}>
-
-                            <Button
-                                sx={{ width: '100%' }}
-                                variant="contained"
-                                color="secondary"
-                                onClick={handleSwap}
-                            >
-                                Confirm Swap
-                            </Button>
+                            {isSwapping ? (
+                                <Button
+                                    sx={{ width: '100%' }}
+                                    variant="contained"
+                                    color="secondary"
+                                >
+                                    <CircularProgress size={24} sx={{ color: "inherit" }} />
+                                </Button>
+                            ) :
+                                (<Button
+                                    sx={{ width: '100%' }}
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={handleSwap}
+                                >
+                                    Confirm Swap
+                                </Button>)
+                            }
 
                         </Box>
                     </Box>

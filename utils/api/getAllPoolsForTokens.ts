@@ -7,7 +7,7 @@ export async function getAllPoolsForTokens(token0 : TokenDetails, token1 : Token
 
     if(!token0 || !token1) return;
 
-    if(token0.address.contract_address > token1.address.contract_address){
+    if(token0.address.contract_address.toLowerCase() > token1.address.contract_address.toLowerCase()){
       const tempToken = token0;
       token0 = token1;
       token1 = tempToken;

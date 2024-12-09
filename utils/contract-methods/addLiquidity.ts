@@ -125,7 +125,7 @@ export async function addLiquidityV3(
         amount1Min = "0";
     }
 
-    if(token0.address.contract_address > token1.address.contract_address){
+    if(token0.address.contract_address.toLowerCase() > token1.address.contract_address.toLowerCase()){
         const temp = token0;
         token0 = token1;
         token1 = temp;

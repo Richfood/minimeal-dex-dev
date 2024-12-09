@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { TokenDetails } from "@/interfaces";
-import { adjustForSlippage, expandIfNeeded, isNative } from "../generalFunctions";
+import { adjustForSlippage, decimalRound, expandIfNeeded, isNative } from "../generalFunctions";
 import addresses from "../address.json";
 import nfpmArtifact from "../../abis/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
 import v2RouterArtifact from "../../abis/PancakeV2Router.sol/PancakeRouter.json"
@@ -27,17 +27,19 @@ export async function removeLiquidityV3(
     deadline : string,
     liquidity : string
 ) {
+    console.log("🚀 ~ liquidity:", liquidity)
+    console.log("🚀 ~ deadline:", deadline)
+    console.log("🚀 ~ amount1Min:", amount1Min)
+    console.log("🚀 ~ amount0Min:", amount0Min)
+    console.log("🚀 ~ tokenId:", tokenId)
+    console.log("🚀 ~ token1:", token1)
+    console.log("🚀 ~ token0:", token0)
+    console.log("🚀 ~ contractAddress:", contractAddress)
     if(!window.ethereum) return;
 
     const newProvider = new ethers.providers.Web3Provider(window.ethereum);
     const newSigner = newProvider.getSigner();
     const nfpmContract = new ethers.Contract(contractAddress, nfpmAbi, newSigner);
-
-    if(token0.address.contract_address > token1.address.contract_address){
-        const temp = token0;
-        token0 = token1;
-        token1 = temp;
-    }
 
     const is0Native = isNative(token0);
     const is1Native = isNative(token1);
@@ -51,16 +53,17 @@ export async function removeLiquidityV3(
         amount1Min,
         deadline
     }
+    console.log("🚀 ~ decreaseLiquidityData.tokenId:", decreaseLiquidityData.tokenId)
+    console.log("🚀 ~ decreaseLiquidityData.liquidity:", decreaseLiquidityData.liquidity)
+    console.log("🚀 ~ decreaseLiquidityData.amount0Min:", decreaseLiquidityData.amount0Min)
+    console.log("🚀 ~ decreaseLiquidityData.amount1Min:", decreaseLiquidityData.amount1Min)
+    console.log("🚀 ~ decreaseLiquidityData.deadline:", decreaseLiquidityData.deadline)
 
-    const finalValueToPass = ethers.utils.parseEther("1");
-
-    console.log("Running increase liquidty");
-    const tx = await nfpmContract.decreaseLiquidity(decreaseLiquidityData, {
-        value: finalValueToPass,
-    });
-    console.log("IncreaseLiquidity TX = ", tx);
+    console.log("Running decrease liquidty");
+    const tx = await nfpmContract.decreaseLiquidity(decreaseLiquidityData);
+    console.log("DecreaseLiquidity TX = ", tx);
     await tx.wait();
-    console.log("Liquidity increased. Transaction hash:", tx.hash);
+    console.log("Liquidity decreaseed. Transaction hash:", tx.hash);
 
     return tx.hash;
 }
@@ -86,10 +89,14 @@ export async function removeLiquidityV2(
     amount1Min : string,
     deadline : string
 ){
+    console.log("🚀 ~ liquidity:", liquidity)
+    console.log("🚀 ~ amount0Min:", amount0Min)
+    console.log("🚀 ~ amount1Min:", amount1Min)
     if(!window.ethereum) return;
 
     const newProvider = new ethers.providers.Web3Provider(window.ethereum);
     const newSigner = newProvider.getSigner();
+    const userAddress = await newSigner.getAddress();
     const v2RouterContract = new ethers.Contract(v2RouterContractAddress, v2RouterAbi, newSigner);
 
     const removeLiquidityTx = await v2RouterContract.removeLiquidity(
@@ -98,13 +105,14 @@ export async function removeLiquidityV2(
         liquidity,
         amount0Min,
         amount1Min,
+        userAddress,
         deadline
     )
     console.log("🚀 ~ removeLiquidityTx:", removeLiquidityTx)
-    const txHash = removeLiquidityTx.wait();
-    console.log("🚀 ~ txHash:", txHash)
+    await removeLiquidityTx.wait()
+    
 
-    return txHash;
+    return removeLiquidityTx.hash;
 }
 
 /*
@@ -142,5 +150,5 @@ export async function removeLiquidityETHV2(
     const txHash = await removeLiquidityETHTx.wait();
     console.log("🚀 ~ txHash:", txHash)
 
-    return txHash;
+    return txHash.hash;
 }

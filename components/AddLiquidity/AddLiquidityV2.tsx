@@ -24,11 +24,12 @@ import SettingsModal from '../SettingModal/SettingModal-addLiquidity';
 import { calculateV2Amounts } from '@/utils/calculateV2TokenAmounts';
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 import famousToken from "../../utils/famousToken.json";
-const { useChainId } = hooks;
+const { useChainId, useIsActive } = hooks;
 import { hooks } from '../ConnectWallet/connector';
 import { debounce } from '@syncfusion/ej2-base';
 import { flushSync } from 'react-dom';
-import getUserBalance from '@/utils/api/getUserBalance';
+import {getUserBalance, getUserNativeBalance} from '@/utils/api/getUserBalance';
+import AddLiquidityModalV2 from '../AddLIquidityModal/AddLIquidityModalV2';
 
 interface AddLiquidityProps {
   theme: 'light' | 'dark';
@@ -77,6 +78,10 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   const [tokenBalance0, setTokenBalance0] = useState<string>("");
   const [tokenBalance1, setTokenBalance1] = useState<string>("");
 
+  const [openAddLiquidity, setOpenAddLiquidity] = useState(false);
+
+  const isMetamaskActive = useIsActive();
+
   console.log("🚀 ~ slippageTolerance:", slippageTolerance)
   console.log("🚀 ~ deadline:", deadline)
 
@@ -100,6 +105,13 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   const toggleV2Class = () => {
     setIsActive(!isActive);
     router.replace(`/add/V3/${token0?.address.contract_address || "token"}/${token1?.address.contract_address || "token"}`);
+  }
+
+  const handleCloseAddLiquidity = () => {
+    setOpenAddLiquidity(prev => {
+      console.log("🚀 ~ prev:", prev)
+      return !prev
+    })
   }
 
   const handleOpenToken = useCallback((tokenNumber: number) => {
@@ -203,6 +215,12 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
     await getPoolRatio();
   }
 
+  const reset = () => {
+    setDeadline("10");
+    setAmount0Desired("");
+    setAmount1Desired("");
+  }
+
   const calculate = useCallback(
     debounce(async (value: string, inputBox: number) => {
       console.log("calculate run V2");
@@ -282,13 +300,13 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   useEffect(() => {
     if (token0 && token1) {
       getPoolRatio();
-      setIsSorted(token0.address.contract_address < token1.address.contract_address);
+      setIsSorted(token0.address.contract_address.toLowerCase() < token1.address.contract_address.toLowerCase());
     }
   }, [])
 
   useEffect(() => {
     if (token0 && token1) {
-      setIsSorted(token0.address.contract_address < token1.address.contract_address);
+      setIsSorted(token0.address.contract_address.toLowerCase() < token1.address.contract_address.toLowerCase());
     }
     setAmount0Desired("");
     setAmount1Desired("")
@@ -298,8 +316,8 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
   useEffect(() => {
     const getUserBalances = async () => {
       if (token0 && token1) {
-        const token0Balance = await getUserBalance(token0);
-        const token1Balance = await getUserBalance(token1);
+        const token0Balance = isNative(token0) ? await getUserNativeBalance() : await getUserBalance(token0);
+        const token1Balance = isNative(token1) ? await getUserNativeBalance() : await getUserBalance(token1);
 
         setTokenBalance0(token0Balance);
         setTokenBalance1(token1Balance);
@@ -307,7 +325,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
     }
 
     getUserBalances();
-  }, [amount0Desired, amount1Desired]);
+  }, [amount0Desired, amount1Desired, token0, token1]);
 
   const copyToClipboard = (text: string | undefined) => {
     console.log("🚀 ~ copyToClipboard ~ text:", text)
@@ -447,7 +465,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
                 </Box>
                 <Box className="ftcardBoxOuter" sx={{ display: isActive ? "block" : "none" }}>
                   <Box className="fiFooter" sx={{ display: 'block', mt: '30px' }}>
-                    <Link onClick={toggleV2Class} sx={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer', p: "8px 16px", borderRadius: "30px", background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', textDecoration: 'none' }}>Add V3 Liquidity</Link>
+                    <Link onClick={toggleV2Class} sx={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer', p: "8px 16px", borderRadius: "30px", background: 'transparent', border: palette.mode === 'light' ? '1px solid var(--primary)' : '1px solid var(--cream)', color: palette.mode === 'light' ? 'var(--primary)' : 'var(--cream)', textDecoration: 'none' }}>Add V3 Liquidity</Link>
                   </Box>
                 </Box>
               </Box>
@@ -505,7 +523,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
 
                 <Box sx={{ width: '100%' }}>
                   <Button
-                    onClick={handleAddLiquidity}
+                    onClick={handleCloseAddLiquidity}
                     variant="contained"
                     color="secondary"
                     sx={{ width: '100%' }}
@@ -513,13 +531,15 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
                   >
                     {addLiquidityRunning ? (
                       <CircularProgress size={25} />
-                    ) : (
+                    ) : isMetamaskActive ?
                       Number(tokenBalance0) < Number(amount0Desired) || Number(tokenBalance1) < Number(amount1Desired) ? (
                         <>Insufficient Balance</>
                       ) : (
                         <>Create Liquidity</>
+                      ) : (
+                        <>Connect Wallet</>
                       )
-                    )}
+                    }
                   </Button>
                 </Box>
 
@@ -533,7 +553,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
         <SelectedToken
           openToken={openToken}
           handleCloseToken={handleCloseToken}
-          mode={theme}
+          mode={palette.mode}
           setToken0={setToken0}
           setToken1={setToken1}
           tokenNumber={tokenBeingChosen}
@@ -552,6 +572,22 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme }) => {
           setSlippageTolerance={setSlippageTolerance}
           deadline={deadline}
           setDeadline={setDeadline}
+        />
+
+        <AddLiquidityModalV2
+          isOpen={openAddLiquidity}
+          setOpenAddLiquidity={setOpenAddLiquidity}
+          handleCloseAddLiquidity={handleCloseAddLiquidity}
+          theme={palette.mode}
+          token0={token0}
+          token1={token1}
+          slippageTolerance={slippageTolerance}
+          setAddLiquidityRunning={setAddLiquidityRunning}
+          deadline={deadline}
+          amount0Desired={isSorted ? amount0Desired : amount1Desired}
+          amount1Desired={isSorted ? amount1Desired : amount0Desired}   
+          currentPrice={reserves ? reserves?.reserve0 / reserves?.reserve1 : 0} 
+          reset={reset}        
         />
         <style jsx>{`
         .greyed-out {

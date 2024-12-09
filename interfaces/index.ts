@@ -7,6 +7,14 @@ export interface AddLiquidityPoolData {
     price0: String,
     price1: String
   },
+  token0: {
+    decimals: number,
+    name: string
+  },
+  token1: {
+    decimals: number,
+    name: string
+  },
   token0Price: String,
   token1Price: String
 }
@@ -31,6 +39,7 @@ export interface V3PositionData {
   depositedToken1: string;
   withdrawnToken0: string;
   withdrawnToken1: string;
+  owner: string;
   pool: {
     feeTier: string
     tick: string
@@ -84,6 +93,33 @@ export interface V2PositionsData {
   timestamp: string
 }
 
+export interface V2PairData {
+  token0Price : string
+  token1Price : string
+  token0: {
+      id: string
+      name: string
+      symbol: string;
+      decimals: string;
+  }
+  token1: {
+      id: string
+      name: string
+      symbol: string
+      decimals: string
+  }
+  totalSupply: string
+  id: string
+}
+
+export interface TokenRpcData {
+  address: string
+  decimals: string
+  icon_url: string | null
+  name: string
+  symbol: string
+  type: string
+}
 
 export interface TokenDetails {
   name: string;
@@ -102,6 +138,15 @@ export interface PoolDetails {
   liquidity: BigNumber | string;
   tick: number;
   fee: number;
+}
+
+export interface TokenInfoFromAPI {
+  name : string;
+  symbol : string;
+  address : string;
+  decimals : string;
+  icon_url? : string;
+  type?: string;
 }
 
 export enum Protocol {

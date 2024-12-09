@@ -16,6 +16,7 @@ const { useChainId, useAccounts } = hooks;
 import famousTokenTestnet from "../../utils/famousTokenTestnet.json";
 
 import { TokenDetails } from '@/interfaces';
+import { CONSTANT_IMPORT_STRING } from '@/utils/generalFunctions';
 
 interface SelectedTokenProps {
     openToken: boolean;
@@ -97,6 +98,7 @@ const fetchStablecoins = async (): Promise<any> => {
 const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseToken, mode, setToken0, setToken1, tokenNumber, token0, token1, setTokensSelected
 
 }) => {
+    console.log("🚀 ~ mode:", mode)
     console.log("🚀 ~SelectedToken token1:", token1)
     console.log("🚀 ~SelectedToken token0:", token0)
     const [openManage, setOpenManage] = useState(false);
@@ -107,37 +109,27 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
     console.log("🚀 ~ tokens:", tokens)
     const isConnected = useAccounts();
     const chainId = useChainId();
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [filteredResults, setFilteredResults] = useState<any>([]);
+    const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+    const [existingImportedTokens, setExistingImportedTokens] = useState<TokenDetails[]>([]);
 
     const handleOpenManage = () => setOpenManage(true);
     const handleCloseManage = () => setOpenManage(false);
-    const [searchTerm, setSearchTerm] = useState<string>("");
-    console.log("🚀 ~ searchTerm:", typeof searchTerm)
-    const [filteredResults, setFilteredResults] = useState<any>([]);
-    console.log("🚀 ~ filteredResults:", filteredResults)
-    const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        // const initializeData = async () => {
-        // const tokenData = isTestnet ? famousTokenTestnet : famousToken;
-        // const data = await fetchStablecoins();
-
-        // const usableCoinData = await fetchCoinStablecoins();
-        // setCoinData(usableCoinData);
-
-
-        setTokens(famousTokenTestnet);
-        // const tokenOfLiquidityData = isTestnet && tokenList ? Object.entries(tokenList).map(([key, value]) => value) : [];
-        // setTokensOfLiquidity(tokenOfLiquidityData);
-        // };
-
-        // initializeData();
-    }, []); // Add dependencies
-
+        if (true || tokens.length === famousTokenTestnet.length) { // Ensure only setting when the value changes
+            console.log("🚀 ~ useEffect ~ famousTokenTestnet:", tokens)
+            setTokens(famousTokenTestnet);
+        }
+    }, [famousTokenTestnet]);
 
     const handleSelectToken = (token: TokenDetails) => {
+        console.log("🚀 ~ handleSelectToken ~ token:", token)
 
         if (tokenNumber === 0) {
             if (token.address === token1?.address) {
+                console.log("🚀 ~ handleSelectToken0 ~ token:", token)
                 setToken0(token);
                 setToken1(token0);
             } else {
@@ -145,13 +137,17 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
             }
         } else {
             if (token.address === token0?.address) {
+                console.log("🚀 ~ handleSelectToken1 ~ token:", token)
                 setToken1(token);
                 setToken0(token1);
             } else {
+                console.log("🚀 ~ handleSelectToken2 ~ token:", token)
+
                 setToken1(token);
             }
         }
 
+        setSearchTerm("");
         handleCloseToken();
         setTokensSelected(true);
     };
@@ -168,9 +164,10 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
         bgcolor: mode === 'light' ? 'var(--white)' : 'var(--primary)',
         boxShadow: 'rgba(0, 0, 0, 0.24) -40px 40px 80px -8px',
         borderRadius: '16px',
-        color: mode === 'light' ? 'var(--primary)' : 'var(--white)',
-        maxHeight: '90vh',
-        overflow: 'hidden'
+        color: mode === 'light' ? 'var(--primary)' : 'white',
+        maxHeight: '100vh',
+        overflowY: 'auto',
+        overflowX: 'hidden',
     };
 
     const Search = styled('div')(({ theme }) => ({
@@ -211,8 +208,15 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                 return nameMatch || symbolMatch || addressMatch; // Return true if any match is found
             });
 
+            const filteredImported = existingImportedTokens.filter((item) => {
+                const nameMatch = item.name && item.name.toLowerCase().includes(value.toLowerCase()); // Match name
+                const symbolMatch = item.symbol && item.symbol.toLowerCase().includes(value.toLowerCase()); // Match symbol
+                const addressMatch = item.address && item.address.contract_address && item.address.contract_address.toLowerCase().includes(value.toLowerCase()); // Match address        
+                return nameMatch || symbolMatch || addressMatch; // Return true if any match is found
+            });
+
             console.log("🚀  performSearch  filtered tokens:", filtered);
-            setFilteredResults(filtered); // Update filtered results
+            setFilteredResults(filtered.concat(filteredImported)); // Update filtered results
         } else {
             setFilteredResults([]); // Clear results if input is empty
         }
@@ -240,19 +244,46 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
         setDebounceTimer(timer);
     };
 
+    const updateImportedTokens = () => {
+        let importedTokens: TokenDetails[] = [];
+        console.log("🚀 ~ updateExistingTokens0 ~ importedTokens:", importedTokens)
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+
+            if (key && key.includes(CONSTANT_IMPORT_STRING)) {
+                const item = localStorage.getItem(key);
+                if (item)
+                    importedTokens.push(JSON.parse(item));
+            }
+        }
+
+        setExistingImportedTokens(importedTokens);
+    }
+
+    useEffect(() => {
+        updateImportedTokens();
+    }, [])
+
 
     return (
         <>
             <Modal
                 open={openToken}
-                onClose={handleCloseToken}
+                onClose={() => {
+                    setSearchTerm("");
+                    handleCloseToken()
+                }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
                     <Box className="modal_head" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="h6">Select a Token</Typography>
-                        <IoCloseOutline onClick={handleCloseToken} size={24} style={{ cursor: 'pointer' }} />
+                        <IoCloseOutline onClick={() => {
+                            setSearchTerm("");
+                            handleCloseToken();
+                        }} size={24} style={{ cursor: 'pointer' }} />
                     </Box>
                     <Box className="modal_body">
                         <Box className="search_box" sx={{ marginBottom: 2 }}>
@@ -281,41 +312,7 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                             />
                         </Box>
                         <Box className="common_token" sx={{ pt: '20px' }}>
-                            <Typography sx={{ fontWeight: '500', fontSize: '14px' }}>Common tokens</Typography>
-                            <Box className="token_Outer" sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-
-                                <Box className="token_Outer" sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                    {tokens?.map((token, index) => {
-                                        const selectedToken = tokenNumber === 0 ? token0 : token1;
-
-
-                                        // Check if the token should be disabled
-                                        const isTokenDisabled = token.address === selectedToken?.address;
-
-
-                                        return (
-                                            <Box
-                                                key={index}
-                                                className="token_box"
-                                                sx={{
-                                                    cursor: isTokenDisabled ? "default" : "pointer",
-                                                    opacity: isTokenDisabled ? 0.4 : 1,
-                                                }}
-                                                onClick={!isTokenDisabled ? () => handleSelectToken(token) : undefined} // Allow click only if token is not disabled
-                                            >
-                                                <img
-                                                    src={token.logoURI}
-                                                    alt={`${token.symbol} logo`}
-                                                    style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
-                                                />
-                                                <Typography>{token.symbol.toUpperCase()}</Typography>
-                                            </Box>
-                                        );
-                                    })}
-
-                                </Box>
-                            </Box>
-                            {searchTerm !== "" && filteredResults.length > 0 ?
+                            {searchTerm !== "" ?
                                 (<Box className="token_list">
                                     <List>
                                         {filteredResults?.map((token: TokenDetails) => {
@@ -369,57 +366,106 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                     </List>
                                 </Box>)
                                 :
-                                (<Box className="token_list">
-                                    <List>
-                                        {tokens?.map((token) => {
-                                            // Select the relevant token based on tokenNumber
-                                            const selectedToken = tokenNumber === 0 ? token0 : token1;
+                                (
+                                    <Box>
+                                        <Typography sx={{ fontWeight: '500', fontSize: '14px' }}>Common tokens</Typography>
+                                        <Box
+                                            className="token_Outer"
+                                            sx={{
+                                                display: 'flex',
+                                                flexWrap: 'wrap',
+                                                gap: '10px',
+                                                // backgroundColor: mode === 'light' ? '#fdf5e6' : "var(--cream)", // Light cream color
+                                                // padding: '10px', // Optional: Add some padding for spacing
+                                                // borderRadius: '8px', // Optional: Rounded corners for a smoother look
+                                                // boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', // Optional: Add a subtle shadow for depth
+                                            }}
+                                        >
+                                            {tokens?.map((token, index) => {
+                                                const selectedToken = tokenNumber === 0 ? token0 : token1;
 
+                                                // Check if the token should be disabled
+                                                const isTokenDisabled = token.address === selectedToken?.address;
 
-                                            // Check if the token should be disabled
-                                            const isTokenDisabled = token.address === selectedToken?.address;
-
-                                            return (
-                                                <ListItem
-                                                    key={token.symbol}
-                                                    sx={{
-                                                        display: "flex",
-                                                        flexDirection: "column",
-                                                        alignItems: "flex-start",
-                                                        transition: "background-color 0.3s",
-                                                        '&:hover': { backgroundColor: 'rgb(248 250 252)' },
-                                                        padding: 1,
-                                                    }}
-                                                    onClick={!isTokenDisabled ? () => handleSelectToken(token) : undefined} // Only enable click if not disabled
-                                                >
+                                                return (
                                                     <Box
+                                                        key={index}
                                                         className="token_box"
                                                         sx={{
                                                             cursor: isTokenDisabled ? "default" : "pointer",
                                                             opacity: isTokenDisabled ? 0.4 : 1,
-                                                            display: "flex",
-                                                            alignItems: "center",
+                                                            backgroundColor: isTokenDisabled ? '#f5f5f5' : mode === 'light' ? 'var(--white)' : '#fdf5e6', // Subtle background for tokens
+                                                            color:'var(--primary)',
+                                                            padding: '8px', // Optional: Add padding inside each token box
+                                                            borderRadius: '6px', // Optional: Rounded corners for individual tokens
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            boxShadow: isTokenDisabled ? 'none' : '0px 2px 4px rgba(0, 0, 0, 0.1)', // Subtle shadow for active tokens
                                                         }}
+                                                        onClick={!isTokenDisabled ? () => handleSelectToken(token) : undefined} // Allow click only if token is not disabled
                                                     >
                                                         <img
                                                             src={token.logoURI}
                                                             alt={`${token.symbol} logo`}
-                                                            style={{ width: 24, height: 24, marginRight: 8 }}
+                                                            style={{ width: 24, height: 24, marginRight: 8 }} // Adjust size and spacing as needed
                                                         />
-                                                        <Box sx={{ display: "flex", flexDirection: "column" }}>
-                                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                                {token.symbol.toUpperCase()}
-                                                            </Typography>
-                                                            <Typography color="text.secondary" variant="body2">
-                                                                {token.name}
-                                                            </Typography>
-                                                        </Box>
+                                                        <Typography>{token.symbol.toUpperCase()}</Typography>
                                                     </Box>
-                                                </ListItem>
-                                            );
-                                        })}
+                                                );
+                                            })}
+                                        </Box>
 
-                                        {/* {tokensOfLiquidity?.map((token: TokenDetails) => {
+                                        <Typography sx={{ fontWeight: '500', fontSize: '14px', marginTop: '20px' }}>All Tokens</Typography>
+                                        <Box className="token_list">
+                                            <List>
+                                                {tokens.concat(existingImportedTokens)?.map((token) => {
+                                                    // Select the relevant token based on tokenNumber
+                                                    const selectedToken = tokenNumber === 0 ? token0 : token1;
+
+                                                    // Check if the token should be disabled
+                                                    const isTokenDisabled = token.address === selectedToken?.address;
+
+                                                    return (
+                                                        <ListItem
+                                                            key={token.symbol}
+                                                            sx={{
+                                                                display: "flex",
+                                                                flexDirection: "column",
+                                                                alignItems: "flex-start",
+                                                                transition: "background-color 0.3s",
+                                                                '&:hover': { backgroundColor: mode==='light' ? 'rgb(248 250 252)' : 'grey' },
+                                                                padding: 1,
+                                                            }}
+                                                            onClick={!isTokenDisabled ? () => handleSelectToken(token) : undefined} // Only enable click if not disabled
+                                                        >
+                                                            <Box
+                                                                className="token_box"
+                                                                sx={{
+                                                                    cursor: isTokenDisabled ? "default" : "pointer",
+                                                                    opacity: isTokenDisabled ? 0.4 : 1,
+                                                                    display: "flex",
+                                                                    alignItems: "center",
+                                                                }}
+                                                            >
+                                                                <img
+                                                                    src={token.logoURI}
+                                                                    alt={`${token.symbol} logo`}
+                                                                    style={{ width: 24, height: 24, marginRight: 8 }}
+                                                                />
+                                                                <Box sx={{ display: "flex", flexDirection: "column" }}>
+                                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                                        {token.symbol.toUpperCase()}
+                                                                    </Typography>
+                                                                    <Typography color="text.secondary" variant="body2">
+                                                                        {token.name}
+                                                                    </Typography>
+                                                                </Box>
+                                                            </Box>
+                                                        </ListItem>
+                                                    );
+                                                })}
+
+                                                {/* {tokensOfLiquidity?.map((token: TokenDetails) => {
                                         // Select the relevant token based on tokenNumber
                                         const selectedToken = tokenNumber === 0 ? token0 : token1;
 
@@ -466,24 +512,27 @@ const SelectedToken: React.FC<SelectedTokenProps> = ({ openToken, handleCloseTok
                                             </ListItem>
                                         );
                                     })} */}
-                                    </List>
-                                </Box>)}
+                                            </List>
+                                        </Box>
+                                    </Box>
+                                )}
 
 
-                            <Box sx={{ textAlign: 'center', mt: '20px' }}>
-                                <Typography
-                                    variant="h6"
-                                    sx={{ color: 'var(--cream)', cursor: 'pointer' }}
-                                    onClick={handleOpenManage}
-                                >
-                                    Manage Tokens
-                                </Typography>
-                            </Box>
+
+                        </Box>
+                        <Box sx={{ textAlign: 'center', mt: '20px' }}>
+                            <Typography
+                                variant="h6"
+                                sx={{ color: 'var(--cream)', cursor: 'pointer', }}
+                                onClick={handleOpenManage}
+                            >
+                                Manage Tokens
+                            </Typography>
                         </Box>
                     </Box>
                 </Box>
             </Modal >
-            <ManageToken open={openManage} handleClose={handleCloseManage} mode={mode} />
+            <ManageToken open={openManage} handleClose={handleCloseManage} mode={mode} handleSelectTokens={handleSelectToken} existingImportedTokens={existingImportedTokens} updateImportedTokens={updateImportedTokens} />
         </>
     );
 };

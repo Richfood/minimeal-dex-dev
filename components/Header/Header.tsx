@@ -9,8 +9,9 @@ import AppSettingsModal from '../AppSettingsModal/AppSettingsModal';
 import Link from 'next/link';
 import Image from 'next/image';
 import { metaMask, hooks } from '../ConnectWallet/connector';
-import NetworkMenu from './account';
 const { useChainId, useAccounts, useIsActive } = hooks;
+import NetworkMenu from './account';
+import { ethers } from 'ethers';
 
 const Header = () => {
   const [openSettingsModal, setOpenSettingsModal] = useState(false);
@@ -24,6 +25,7 @@ const Header = () => {
   const isActive = useIsActive();
   const [buttonText, setButtonText] = useState('Connect Wallet');
   // const [isMainnet, setIsMainnet] = useState<boolean | null>(true);
+  const [disconnect, setDisconnect] = useState(false);
 
   const handleOpenSettings = () => setOpenSettingsModal(true);
   const handleCloseSettings = () => setOpenSettingsModal(false);
@@ -42,21 +44,33 @@ const Header = () => {
 
   useEffect(() => {
     const updateButtonText = async () => {
-      if (typeof window === 'undefined') return;
+      try{
+        if(!window.ethereum) return;
 
-      // const domain = window.location.hostname;
+        const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+        const providerAccounts = await newProvider.listAccounts();
 
-      // if (domain === 'dex.sunrewards.io') {
-        // setIsMainnet(true);
-        // if (isActive && chainId !== 369) {
-        //   await metaMask.activate(369);
+        if(providerAccounts.length > 0 && !disconnect) metaMask.activate();
+        // console.log(newProvider);
+        // if (window.ethereum) metaMask.activate();
+        // const domain = window.location.hostname;
+
+        // if (domain === 'dex.sunrewards.io') {
+          // setIsMainnet(true);
+          // if (isActive && chainId !== 369) {
+          //   await metaMask.activate(369);
+          // }
         // }
-      // }
+      }
+      catch(error){
+        console.log(error);
+      }
 
       if (accounts && accounts.length > 0 && isConnected) {
         const shortenedAddress = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
         setButtonText(shortenedAddress);
       } else {
+        // const provider = ethers.providers.JsonRpcProvider(process.env.)
         setButtonText('Connect Wallet');
       }
     };
@@ -64,14 +78,16 @@ const Header = () => {
     updateButtonText();
   }, [accounts, isConnected, chainId, isActive]);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (isConnected) {
+      setDisconnect(true);
       if (metaMask.deactivate) {
         metaMask.deactivate?.();
       } else {
         metaMask.resetState();
       }
     } else {
+      setDisconnect(false);
       metaMask.activate();
     }
   };

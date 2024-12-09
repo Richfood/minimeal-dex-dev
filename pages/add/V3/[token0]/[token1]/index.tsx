@@ -13,7 +13,7 @@ const index = () => {
       <Header />
       <Container>
         <Box className="AddLiquidity" sx={{ minHeight: 'calc(100vh - 149px)', py: '50px' }}>
-          <AddLiquidityV3  theme={'light'} defaultActiveProtocol={Protocol.V3}/>
+          <AddLiquidityV3 defaultActiveProtocol={Protocol.V3}/>
         </Box>
       </Container>
       <Footer />

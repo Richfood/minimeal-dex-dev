@@ -6,7 +6,7 @@ export async function getPoolData(token0 : TokenDetails, token1 : TokenDetails, 
 
     if(!token0 || !token1) return;
 
-    if(token0.address.contract_address > token1.address.contract_address){
+    if(token0.address.contract_address.toLowerCase() > token1.address.contract_address.toLowerCase()){
       const tempToken = token0;
       token0 = token1;
       token1 = tempToken;
@@ -28,9 +28,17 @@ export async function getPoolData(token0 : TokenDetails, token1 : TokenDetails, 
             token1Price
             liquidity
             feeTier
+            token0 {
+              name
+              decimals
+            }
+            token1 {
+              name
+              decimals
+            }
             ticks {
-            price0
-            price1
+              price0
+              price1
             }
         }
       }

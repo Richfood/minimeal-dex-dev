@@ -31,12 +31,6 @@ export async function increaseLiquidityV3(
     const newSigner = newProvider.getSigner();
     const nfpmContract = new ethers.Contract(contractAddress, nfpmAbi, newSigner);
 
-    if(token0.address.contract_address > token1.address.contract_address){
-        const temp = token0;
-        token0 = token1;
-        token1 = temp;
-    }
-
     const is0Native = isNative(token0);
     const is1Native = isNative(token1);
 
@@ -61,11 +55,11 @@ export async function increaseLiquidityV3(
     }
 
     const valueForNativeToken = is0Native ? amount0Desired : is1Native ? amount1Desired : 0;
-    const finalValueToPass = ethers.utils.parseEther("1").add(valueForNativeToken);
+    // const finalValueToPass = ethers.utils.parseEther("1").add(valueForNativeToken);
 
     console.log("Running increase liquidty");
     const tx = await nfpmContract.increaseLiquidity(increaseLiquidityData, {
-        value: finalValueToPass,
+        value: valueForNativeToken,
     });
     console.log("IncreaseLiquidity TX = ", tx);
     await tx.wait();
