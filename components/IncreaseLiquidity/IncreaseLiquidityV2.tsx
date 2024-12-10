@@ -118,7 +118,7 @@ const AddLiquidityV2: React.FC<AddLiquidityProps> = ({ theme, pairAddress }) => 
   const router = useRouter();
 
   const handleGoBack = () => {
-    router.replace("/liquidity");
+    router.replace(`/positionV2/${pairAddress}`);
     router.back();
   };
 
