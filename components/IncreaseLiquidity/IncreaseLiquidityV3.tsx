@@ -140,7 +140,7 @@ const IncreaseLiquidityV3: React.FC<IncreaseLiquidityProps> = ({
   const handleGoBack = () => {
     if (!tokenId) return;
 
-    router.replace(`/positionV3/${tokenId.toString()}`);
+    // router.replace(`/positionV3/${tokenId.toString()}`);
     router.back();
   };
 
